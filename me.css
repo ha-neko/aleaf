@@ -70,12 +70,11 @@ h1, p {
     background-size: 400% 400%;
     -webkit-background-clip: text;
     background-clip: text;
-    animation: gradientAnimation 4s ease infinite;
-    text-shadow: 0 0 8px rgba(107,195,153, 0.8);
+    animation: gradientGlow 4s ease infinite;
+    text-shadow: 0 0 15px rgba(107,195,153, 1), 0 0 20px rgba(137,216,155, 0.9), 0 0 30px rgba(107,195,153, 0.8);
 }
 
-/* Gradient animation */
-@keyframes gradientAnimation {
+@keyframes gradientGlow {
     0% {
         background-position: 0% 50%;
     }
