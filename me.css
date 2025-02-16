@@ -65,13 +65,12 @@ h1, p {
 
 /* Changing green to span color */
 .card-content p span {
-    color: transparent;
-    background: linear-gradient(270deg, rgb(107,195,153), rgb(137,216,155));
-    background-size: 400% 400%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    animation: gradientGlow 4s ease infinite;
-    text-shadow: 0 0 15px rgba(107,195,153, 1), 0 0 20px rgba(137,216,155, 0.9), 0 0 30px rgba(107,195,153, 0.8);
+    color: white;
+    text-shadow: 0 0 8px rgba(107,195,153, 1), 0 0 12px rgba(107,195,153, 0.9), 0 0 20px rgba(107,195,153, 0.8);
+    border: 2px solid rgb(107,195,153);
+    padding: 2px 4px;
+    display: inline-block;
+    background: none;
 }
 
 @keyframes gradientGlow {
@@ -85,6 +84,7 @@ h1, p {
         background-position: 0% 50%;
     }
 }
+
 
 /* Falling Leaves Canvas */
 #heartCanvas {
