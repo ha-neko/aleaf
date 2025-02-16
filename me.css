@@ -63,14 +63,14 @@ h1, p {
     line-height: 1.5;
 }
 
-/* Changing green to span color */
+.card-content p {
+    font-size: clamp(12px, 2vw, 14px);
+    line-height: 1.5;
+}
+
 .card-content p span {
-    color: white;
+    color: rgb(107,195,153);
     text-shadow: 0 0 8px rgba(107,195,153, 1), 0 0 12px rgba(107,195,153, 0.9), 0 0 20px rgba(107,195,153, 0.8);
-    border: 2px solid rgb(107,195,153);
-    padding: 2px 4px;
-    display: inline-block;
-    background: none;
 }
 
 @keyframes gradientGlow {
@@ -84,7 +84,6 @@ h1, p {
         background-position: 0% 50%;
     }
 }
-
 /* Falling Leaves Canvas */
 #heartCanvas {
     position: absolute;
