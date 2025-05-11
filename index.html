@@ -6,6 +6,18 @@
     <title>get to know me</title>
     <link rel="icon" type="image/png" href="https://opengameart.org/sites/default/files/styles/medium/public/heart%20pixel%20art%2032x32.png">
     <link rel="stylesheet" href="me.css">
+    <svg width="0" height="0">
+        <defs>
+          <linearGradient id="sharedGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#6bc399">
+              <animate attributeName="stop-color" values="#6bc399;#89d89b;#e3be66;#6bc399" dur="5s" repeatCount="indefinite"/>
+            </stop>
+            <stop offset="100%" stop-color="#e3be66">
+              <animate attributeName="stop-color" values="#e3be66;#b68933;#6bc399;#e3be66" dur="5s" repeatCount="indefinite"/>
+            </stop>
+          </linearGradient>
+        </defs>
+      </svg>   
 </head>
 <body>
 
@@ -13,13 +25,12 @@
     <source src="https://a.top4top.io/m_3174xf7ls1.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
 </audio>
-<canvas id="heartCanvas"></canvas>
-<!-- Container holding both cards -->
+<canvas id="leafCanvas"></canvas>
+
 <div class="cards-container">
-    <!-- Left Card (Image on the right) -->
-    <div class="card left-card">
-        <img src="https://i.pinimg.com/736x/44/97/0e/44970e3a19b84d8436461a308d69a876.jpg" alt="Profile Image">
-        <div class="card-content">
+  <div class="card">  
+    <div class="card-content">
+          <img src="https://i.pinimg.com/736x/44/97/0e/44970e3a19b84d8436461a308d69a876.jpg" alt="Profile Image">
             <h1>who am i?</h1>
             <p>
                 🍃 NAME: <span>a leaf or kuro neko</span><br>
@@ -33,9 +44,39 @@
                 🍃 INTERESTS: <span>anime, language, programming, IT fields, gaming, and tanks (military vehicles)</span><br>
                 🍃 HOBBIES: <span>Gaming, reading manga, playing chess</span><br>
                 🍃 EXTRA: <span>tank brrrr</span>
-            </p>
-        </div>
-    </div>
+            </p>   
+            <div class="social-links">
+                    <a href="https://github.com/comrade-catlin" target="_blank" aria-label="GitHub">
+                        <svg class="glow-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                          <path fill="url(#sharedGradient)" d="M10,0 C15.523,0 20,4.59 20,10.253 C20,14.782 17.138,18.624 13.167,19.981 C12.66,20.082 12.48,19.762 12.48,19.489 C12.48,19.151 12.492,18.047 12.492,16.675 C12.492,15.719 12.172,15.095 11.813,14.777 C14.04,14.523 16.38,13.656 16.38,9.718 C16.38,8.598 15.992,7.684 15.35,6.966 C15.454,6.707 15.797,5.664 15.252,4.252 C15.252,4.252 14.414,3.977 12.505,5.303 C11.706,5.076 10.85,4.962 10,4.958 C9.15,4.962 8.295,5.076 7.497,5.303 C5.586,3.977 4.746,4.252 4.746,4.252 C4.203,5.664 4.546,6.707 4.649,6.966 C4.01,7.684 3.619,8.598 3.619,9.718 C3.619,13.646 5.954,14.526 8.175,14.785 C7.889,15.041 7.63,15.493 7.54,16.156 C6.97,16.418 5.522,16.871 4.63,15.304 C4.63,15.304 4.101,14.319 3.097,14.247 C3.097,14.247 2.122,14.234 3.029,14.87 C3.029,14.87 3.684,15.185 4.139,16.37 C4.139,16.37 4.726,18.2 7.508,17.58 C7.513,18.437 7.522,19.245 7.522,19.489 C7.522,19.76 7.338,20.077 6.839,19.982 C2.865,18.627 0,14.783 0,10.253 C0,4.59 4.478,0 10,0 Z" />
+                        </svg>
+                      </a>                      
+                      <a href="https://instagram.com/96_._neko" target="_blank" aria-label="Instagram">
+                        <svg class="glow-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path fill="url(#sharedGradient)" d="M12 18C15.3137 18 18 15.3137 18 12C18 8.68629 15.3137 6 12 6C8.68629 6 6 8.68629 6 12C6 15.3137 8.68629 18 12 18ZM12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z"/>
+                          <path fill="url(#sharedGradient)" d="M18 5C17.4477 5 17 5.44772 17 6C17 6.55228 17.4477 7 18 7C18.5523 7 19 6.55228 19 6C19 5.44772 18.5523 5 18 5Z"/>
+                          <path fill="url(#sharedGradient)" fill-rule="evenodd" clip-rule="evenodd" d="M1.65396 4.27606C1 5.55953 1 7.23969 1 10.6V13.4C1 16.7603 1 18.4405 1.65396 19.7239C2.2292 20.8529 3.14708 21.7708 4.27606 22.346C5.55953 23 7.23969 23 10.6 23H13.4C16.7603 23 18.4405 23 19.7239 22.346C20.8529 21.7708 21.7708 20.8529 22.346 19.7239C23 18.4405 23 16.7603 23 13.4V10.6C23 7.23969 23 5.55953 22.346 4.27606C21.7708 3.14708 20.8529 2.2292 19.7239 1.65396C18.4405 1 16.7603 1 13.4 1H10.6C7.23969 1 5.55953 1 4.27606 1.65396C3.14708 2.2292 2.2292 3.14708 1.65396 4.27606ZM13.4 3H10.6C8.88684 3 7.72225 3.00156 6.82208 3.0751C5.94524 3.14674 5.49684 3.27659 5.18404 3.43597C4.43139 3.81947 3.81947 4.43139 3.43597 5.18404C3.27659 5.49684 3.14674 5.94524 3.0751 6.82208C3.00156 7.72225 3 8.88684 3 10.6V13.4C3 15.1132 3.00156 16.2777 3.0751 17.1779C3.14674 18.0548 3.27659 18.5032 3.43597 18.816C3.81947 19.5686 4.43139 20.1805 5.18404 20.564C5.49684 20.7234 5.94524 20.8533 6.82208 20.9249C7.72225 20.9984 8.88684 21 10.6 21H13.4C15.1132 21 16.2777 20.9984 17.1779 20.9249C18.0548 20.8533 18.5032 20.7234 18.816 20.564C19.5686 20.1805 20.1805 19.5686 20.564 18.816C20.7234 18.5032 20.8533 18.0548 20.9249 17.1779C20.9984 16.2777 21 15.1132 21 13.4V10.6C21 8.88684 20.9984 7.72225 20.9249 6.82208C20.8533 5.94524 20.7234 5.49684 20.564 5.18404C20.1805 4.43139 19.5686 3.81947 18.816 3.43597C18.5032 3.27659 18.0548 3.14674 17.1779 3.0751C16.2777 3.00156 15.1132 3 13.4 3Z"/>
+                        </svg>
+                      </a>                      
+                      <a href="https://steamcommunity.com/id/aleafeon" target="_blank" aria-label="Steam">
+                        <svg class="glow-icon" viewBox="-3.2 -3.2 38.4 38.4" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M18.102 12.129c0-0 0-0 0-0.001 0-1.564 1.268-2.831 2.831-2.831s2.831 1.268 2.831 2.831c0 1.564-1.267 2.831-2.831 2.831-0 0-0 0-0.001 0h0c-0 0-0 0-0.001 0-1.563 0-2.83-1.267-2.83-2.83 0-0 0-0 0-0.001v0zM24.691 12.135c0-2.081-1.687-3.768-3.768-3.768s-3.768 1.687-3.768 3.768c0 2.081 1.687 3.768 3.768 3.768v0c2.080-0.003 3.765-1.688 3.768-3.767v-0zM10.427 23.76l-1.841-0.762c0.524 1.078 1.611 1.808 2.868 1.808 1.317 0 2.448-0.801 2.93-1.943l0.008-0.021c0.155-0.362 0.246-0.784 0.246-1.226 0-1.757-1.424-3.181-3.181-3.181-0.405 0-0.792 0.076-1.148 0.213l0.022-0.007 1.903 0.787c0.852 0.364 1.439 1.196 1.439 2.164 0 1.296-1.051 2.347-2.347 2.347-0.324 0-0.632-0.066-0.913-0.184l0.015 0.006zM15.974 1.004c-7.857 0.001-14.301 6.046-14.938 13.738l-0.004 0.054 8.038 3.322c0.668-0.462 1.495-0.737 2.387-0.737 0.001 0 0.002 0 0.002 0h-0c0.079 0 0.156 0.005 0.235 0.008l3.575-5.176v-0.074c0.003-3.12 2.533-5.648 5.653-5.648 3.122 0 5.653 2.531 5.653 5.653s-2.531 5.653-5.653 5.653h-0.131l-5.094 3.638c0 0.065 0.005 0.131 0.005 0.199 0 0.001 0 0.002 0 0.003 0 2.342-1.899 4.241-4.241 4.241-2.047 0-3.756-1.451-4.153-3.38l-0.005-0.027-5.755-2.383c1.841 6.345 7.601 10.905 14.425 10.905 8.281 0 14.994-6.713 14.994-14.994s-6.713-14.994-14.994-14.994c-0 0-0.001 0-0.001 0h0z" fill="url(#sharedGradient)"/>
+                        </svg>
+                      </a>                      
+                    </div>  
+                  </div>
+                     <div class="gameFavorites">
+                      <h2>🎮 <span> Favorite Games </span></h2>
+                      <div class="game-images">
+                      <img src="nso.jpg" alt="Needy Streamer Overload">
+                      <img src="ddlc.jpg" alt="Doki Doki Literature Club">
+                      <img src="md.jpg" alt="Muse dash">
+                      <img src="tnoyam.jpg" alt="The No-Existence of Me and You">
+                    </div>
+                  </div>
+                  </div>
+                </div>
+              </div>
 
 <script src="me.js"></script>
 </body>
