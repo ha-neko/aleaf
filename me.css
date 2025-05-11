@@ -8,6 +8,7 @@ body {
     background: linear-gradient(135deg, rgb(242,231,166), rgb(182,137,51));
     font-family: 'Poppins', sans-serif;
     color: rgb(182,137,51);
+    overflow-x: hidden;
 }
 
 h1, p {
@@ -16,27 +17,45 @@ h1, p {
 
 .cards-container {
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap;
     justify-content: center;
-    align-items: center;
-    gap: 20px;
-    width: clamp(300px, 90%, 850px);
+    gap: 27px;
+    width: clamp(300px, 90%, 1000px);
     margin: auto;
+    padding: 20px;
+    z-index: 1;
+}
+.gameFavorites {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 35%;
+}
+.game-images {
+    gap: 10px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Create two equal-width columns */
+    grid-template-rows: repeat(2, 1fr);    /* Create two equal-height rows */
 }
 
 .card {
     position: relative;
-    width: 48%;
+    width: 85%;
     padding: clamp(15px, 2vw, 20px);
     background: rgba(227,190,102, 0.2);
     border-radius: 20px;
     backdrop-filter: blur(10px);
     box-shadow: 0 4px 30px rgba(182,137,51, 0.3);
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
     color: rgb(182,137,51);
     z-index: 1;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+   align-items: center;
+}  
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 40px rgba(182,137,51, 0.4);
 }
 
 .card img {
@@ -44,12 +63,15 @@ h1, p {
     height: clamp(100px, 15vw, 150px);
     border-radius: 50%;
     object-fit: cover;
-    margin-bottom: 15px;
     border: 3px solid rgb(182,137,51);
+    flex-direction: column;
 }
 
 .card-content {
     text-align: left;
+    flex: 2;
+    display: flex;
+    flex-direction: column;
 }
 
 .card-content h1 {
@@ -63,29 +85,46 @@ h1, p {
     line-height: 1.5;
 }
 
-.card-content p {
-    font-size: clamp(12px, 2vw, 14px);
-    line-height: 1.5;
-}
-
-.card-content p span {
-    color: rgb(107,195,153);
-    text-shadow: 0 0 8px rgba(107,195,153, 1), 0 0 12px rgba(107,195,153, 0.9), 0 0 20px rgba(107,195,153, 0.8);
-}
-
-@keyframes gradientGlow {
+/* Animated Text Highlight */
+@keyframes gradientAnimation {
     0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
+        background-position: -200% 0;
     }
     100% {
-        background-position: 0% 50%;
+        background-position: 200% 0;
     }
 }
+
+span {
+    font-weight: bold;
+    background: linear-gradient(
+        90deg,
+        #e3be66,
+        #b68933,
+        #6bc399,
+        #89d89b,
+        #f2e7a6,
+        #e3be66
+    );
+    background-size: 400% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation: gradientAnimation 10s linear infinite;
+}
+
+/* Section Title Glow */
+.section-title {
+    text-align: center;
+    font-size: clamp(22px, 5vw, 32px);
+    margin: 40px 0 20px;
+    color: rgb(182,137,51);
+    text-shadow: 0 0 10px rgba(227,190,102, 0.7), 0 0 20px rgba(182,137,51, 0.4);
+}
+
 /* Falling Leaves Canvas */
-#heartCanvas {
+#leafCanvas {
     position: absolute;
     top: 0;
     left: 0;
@@ -95,16 +134,58 @@ h1, p {
     pointer-events: none;
 }
 
+/* Social Icons */
+.social-links {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.glow-icon {
+    width: 36px;
+    height: 36px;
+    fill: url(#sharedGradient);
+    transition: transform 0.3s ease, filter 0.3s ease;
+    filter: drop-shadow(0 0 6px rgba(137, 216, 155, 0.8));
+}
+
+.glow-icon:hover {
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 12px rgba(227, 190, 102, 1));
+}
+
 /* Mobile styles */
 @media only screen and (max-width: 768px) {
     .cards-container {
-        flex-direction: row;
-        gap: 10px;
-        width: 100%;
+        flex-direction: column;
         padding: 10px;
     }
 
     .card {
-        width: 48%;
+        width: 90%;
     }
 }
+
+.gameFavorites {
+    flex: 1;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 1rem;
+    backdrop-filter: blur(6px);
+    color: #fff;
+  }
+  
+  .gameFavorites h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+  }
+  
+  .gameFavorites img {
+    width: 100%;
+    flex-direction: grid;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 0 8px  #89d89b;
+  }
+  

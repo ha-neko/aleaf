@@ -1,4 +1,4 @@
-const canvas = document.getElementById('heartCanvas');
+const canvas = document.getElementById('leafCanvas');
 const ctx = canvas.getContext('2d');
 
 canvas.width = window.innerWidth;
@@ -78,6 +78,16 @@ function animateLeaves() {
 
 generateLeaves();
 animateLeaves();
+
+if (this.y > canvas.height) {
+    Object.assign(this, new Leaf());
+}
+
+window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+
 
 // Set the date of birth
 const birthDate = new Date("2008-12-06"); // Birthdate: 6 December 2008
