@@ -79,14 +79,6 @@ function animateLeaves() {
 generateLeaves();
 animateLeaves();
 
-if (this.y > canvas.height) {
-    Object.assign(this, new Leaf());
-}
-
-window.addEventListener("resize", () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-});
 
 
 // Set the date of birth
@@ -106,3 +98,34 @@ if (currentDate < nextBirthday) {
 
 // Dynamically fill the age span
 document.getElementById("age").textContent = age;
+
+window.addEventListener("resize", () => {
+    // Check if the canvas dimensions have actually changed
+    if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
+        // Update the canvas size
+        const oldWidth = canvas.width;
+        const oldHeight = canvas.height;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Adjust the positions of the leaves proportionally
+        leaves.forEach(leaf => {
+            leaf.x = (leaf.x / oldWidth) * canvas.width;
+            leaf.y = (leaf.y / oldHeight) * canvas.height;
+        });
+    }
+});
+function resizeCanvasToPage() {
+    // Set canvas width to the viewport width
+    canvas.width = window.innerWidth;
+
+    // Set canvas height to the full scrollable height of the document
+    canvas.height = Math.max(
+        document.documentElement.scrollHeight,
+        document.body.scrollHeight
+    );
+}
+
+// Call the function initially and on window resize
+resizeCanvasToPage();
+window.addEventListener("resize", resizeCanvasToPage);
