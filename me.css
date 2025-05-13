@@ -24,11 +24,16 @@ h1, p {
     margin: auto;
     padding: 20px;
     z-index: 1;
+    display: flex; /* Use Flexbox for layout */
+    align-items: flex-start; /* Align items at the top */
+    gap: 20px; /* Add spacing between the profile and game favorites */
 }
 .gameFavorites {
     display: flex;
+    flex: 1; /* Allow the game favorites section to take up equal space */
+    display: flex;
     flex-direction: column;
-    flex: 1 1 35%;
+    justify-content: flex-start; /* Align content at the top */
 }
 .game-images {
     gap: 10px;
@@ -64,6 +69,7 @@ h1, p {
     z-index: 1;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
    align-items: center;
+   flex: 1; /* Allow the profile card to take up available space */
 }  
 
 .card:hover {
