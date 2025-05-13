@@ -32,9 +32,22 @@ h1, p {
 }
 .game-images {
     gap: 10px;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Create two equal-width columns */
-    grid-template-rows: repeat(2, 1fr);    /* Create two equal-height rows */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Enables vertical scrolling */
+    max-height: 300px; /* Set a maximum height for the scrollable area */
+    padding-right: 10px; /* Add padding to prevent content from being cut off */
+    box-sizing: content-box; /* Ensure padding doesn't affect the width */
+}
+
+/* Hide scrollbar for WebKit-based browsers */
+.game-images::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for other browsers (Firefox) */
+.game-images {
+    scrollbar-width: none; /* Firefox-specific property */
 }
 
 .card {
