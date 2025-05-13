@@ -28,18 +28,30 @@ class Leaf {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
         this.size = Math.random() * 15 + 10;
-        this.speedY = Math.random() * 1 + 0.5;
+        this.speedY = (Math.random() * 1 + 0.5) * (window.innerWidth < 768 ? 2 : 1); // Faster on mobile
         this.speedX = Math.random() * 0.6 - 0.3; // Sideways drift
         this.angle = Math.random() * Math.PI * 2;
         this.angleSpeed = Math.random() * 0.02 - 0.01;
+
+        // Assign a random color from the colors array
         this.color = colors[Math.floor(Math.random() * colors.length)];
-        this.opacity = Math.random() * 0.5 + 0.5;
+    }
+
+    update() {
+        this.y += this.speedY;
+        this.x += this.speedX;
+        this.angle += this.angleSpeed;
+
+        // Reset leaf position when it falls off the screen
+        if (this.y > canvas.height) {
+            this.y = -this.size;
+            this.x = Math.random() * canvas.width;
+        }
     }
 
     draw() {
         ctx.save();
-        ctx.globalAlpha = this.opacity;
-        ctx.fillStyle = this.color;
+        ctx.fillStyle = this.color; // Use the assigned random color
         ctx.translate(this.x, this.y);
         ctx.rotate(this.angle);
         ctx.beginPath();
@@ -50,18 +62,6 @@ class Leaf {
         ctx.fill();
         ctx.restore();
     }
-
-    update() {
-        this.y += this.speedY;
-        this.x += this.speedX;
-        this.angle += this.angleSpeed;
-
-        if (this.y > canvas.height) {
-            this.y = 0 - this.size;
-            this.x = Math.random() * canvas.width;
-        }
-        this.draw();
-    }
 }
 
 function generateLeaves() {
@@ -71,11 +71,13 @@ function generateLeaves() {
 }
 
 function animateLeaves() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    leaves.forEach(leaf => leaf.update());
-    requestAnimationFrame(animateLeaves);
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    leaves.forEach(leaf => {
+        leaf.update(); // Update the leaf's position
+        leaf.draw();   // Draw the leaf on the canvas
+    });
+    requestAnimationFrame(animateLeaves); // Continue the animation
 }
-
 generateLeaves();
 animateLeaves();
 
@@ -99,33 +101,17 @@ if (currentDate < nextBirthday) {
 // Dynamically fill the age span
 document.getElementById("age").textContent = age;
 
-window.addEventListener("resize", () => {
-    // Check if the canvas dimensions have actually changed
-    if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
-        // Update the canvas size
-        const oldWidth = canvas.width;
-        const oldHeight = canvas.height;
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
 
-        // Adjust the positions of the leaves proportionally
-        leaves.forEach(leaf => {
-            leaf.x = (leaf.x / oldWidth) * canvas.width;
-            leaf.y = (leaf.y / oldHeight) * canvas.height;
-        });
-    }
-});
-function resizeCanvasToPage() {
-    // Set canvas width to the viewport width
+// Function to set the canvas size
+function setCanvasSize() {
     canvas.width = window.innerWidth;
-
-    // Set canvas height to the full scrollable height of the document
-    canvas.height = Math.max(
-        document.documentElement.scrollHeight,
-        document.body.scrollHeight
-    );
+    canvas.height = document.documentElement.scrollHeight; // Set height to the full scrollable height
 }
 
-// Call the function initially and on window resize
-resizeCanvasToPage();
-window.addEventListener("resize", resizeCanvasToPage);
+// Call the function once to set the initial size
+setCanvasSize();
+
+// Prevent resizing the canvas on scroll
+window.addEventListener("resize", () => {
+    setCanvasSize(); // Resize only when the window size changes
+});
