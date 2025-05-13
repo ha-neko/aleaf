@@ -47,6 +47,7 @@ h1, p {
     max-height: 300px; /* Set a maximum height for the scrollable area */
     padding-right: 10px; /* Add padding to prevent content from being cut off */
     box-sizing: content-box; /* Ensure padding doesn't affect the width */
+   overflow-x: hidden;
 }
 
 /* Hide scrollbar for WebKit-based browsers */
@@ -226,3 +227,9 @@ span {
     box-shadow: 0 0 8px  #89d89b;
   }
   
+/* Disable scrolling on desktop */
+@media only screen and (min-width: 769px) {
+    body {
+        overflow: hidden; /* Disable scrolling */
+    }
+}
