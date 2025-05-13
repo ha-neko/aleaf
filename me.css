@@ -16,25 +16,29 @@ h1, p {
 }
 
 .cards-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 27px;
     width: clamp(300px, 90%, 1000px);
     margin: auto;
     padding: 20px;
     z-index: 1;
     display: flex; /* Use Flexbox for layout */
-    align-items: flex-start; /* Align items at the top */
+    flex-wrap: nowrap; /* Prevent wrapping to a new line */
+    align-items: stretch; /* Stretch items to the same height */
+    justify-content: space-between; /* Distribute space between items */
     gap: 20px; /* Add spacing between the profile and game favorites */
 }
+
 .gameFavorites {
-    display: flex;
     flex: 1; /* Allow the game favorites section to take up equal space */
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* Align content at the top */
+    flex-direction: column; /* Ensure content inside the game favorites stacks vertically */
+    justify-content: space-between; /* Align content evenly within the section */
+    min-width: 300px; /* Ensure a minimum width for the section */
+    background: rgba(255, 255, 255, 0.05); /* Keep the glass-like effect */
+    border-radius: 1rem;
+    backdrop-filter: blur(6px);
+    padding: 1rem;
 }
+
 .game-images {
     gap: 10px;
     display: flex;
@@ -68,8 +72,11 @@ h1, p {
     color: rgb(182,137,51);
     z-index: 1;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-   align-items: center;
-   flex: 1; /* Allow the profile card to take up available space */
+    align-items: center;
+    flex: 1; /* Allow the profile card to take up available space */
+    min-width: 300px; /* Ensure a minimum width for the card */
+    display: flex; /* Ensure the card content is laid out in a row */
+    flex-direction: row; /* Keep the content inside the card in a row */
 }  
 
 .card:hover {
@@ -173,18 +180,31 @@ span {
 }
 
 /* Mobile styles */
-/* Remove or adjust the mobile-specific styles */
+/* Mobile-specific styles */
 @media only screen and (max-width: 768px) {
     .cards-container {
-        flex-direction: row; /* Change to row to match desktop layout */
-        padding: 20px; /* Match desktop padding */
+        flex-direction: column; /* Stack items vertically on smaller screens */
+        align-items: center; /* Center-align items */
+        gap: 30px; /* Increase spacing between sections */
     }
 
     .card {
-        width: 85%; /* Match desktop width */
+        flex-direction: column; /* Stack the profile image and content vertically */
+        align-items: center; /* Center-align items */
+        text-align: center; /* Center-align text */
+    }
+
+    .card img {
+        margin-right: 0; /* Remove margin on mobile */
+        margin-bottom: 20px; /* Add spacing below the image */
+    }
+
+    .gameFavorites {
+        width: 100%; /* Make the game favorites section take up full width */
+        max-width: 500px; /* Limit the width for better readability */
+        align-items: center; /* Center-align the game favorites section */
     }
 }
-
 .gameFavorites {
     flex: 1;
     padding: 1rem;
