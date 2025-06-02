@@ -33,7 +33,6 @@ h1, p {
     flex-direction: column; /* Ensure content inside the game favorites stacks vertically */
     justify-content: space-between; /* Align content evenly within the section */
     min-width: 300px; /* Ensure a minimum width for the section */
-    background: rgba(255, 255, 255, 0.05); /* Keep the glass-like effect */
     border-radius: 1rem;
     backdrop-filter: blur(6px);
     padding: 1rem;
@@ -209,7 +208,6 @@ span {
 .gameFavorites {
     flex: 1;
     padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
     border-radius: 1rem;
     backdrop-filter: blur(6px);
     color: #fff;
@@ -227,6 +225,10 @@ span {
     box-shadow: 0 0 8px  #89d89b;
   }
   
+* {
+  cursor: url('cursor-leaf.png') 7 7, auto;
+}
+
 /* Disable scrolling on desktop */
 @media only screen and (min-width: 769px) {
     body {
