@@ -16,7 +16,7 @@ h1, p {
 }
 
 .cards-container {
-    width: clamp(300px, 90%, 1000px);
+    width: 90%;
     margin: auto;
     padding: 20px;
     z-index: 1;
@@ -62,7 +62,7 @@ h1, p {
 .card {
     position: relative;
     width: 85%;
-    padding: clamp(15px, 2vw, 20px);
+    padding: 2vw;
     background: rgba(227,190,102, 0.2);
     border-radius: 20px;
     backdrop-filter: blur(10px);
@@ -185,13 +185,19 @@ span {
     .cards-container {
         flex-direction: column; /* Stack items vertically on smaller screens */
         align-items: center; /* Center-align items */
-        gap: 30px; /* Increase spacing between sections */
+        gap: 8px; /* Increase spacing between sections */  
     }
 
     .card {
+        max-height: 70%;
         flex-direction: column; /* Stack the profile image and content vertically */
         align-items: center; /* Center-align items */
         text-align: center; /* Center-align text */
+    }
+
+    .card-content {
+        margin-bottom: 5px;
+        max-height: 360px;
     }
 
     .card img {
@@ -200,9 +206,11 @@ span {
     }
 
     .gameFavorites {
+        max-height: 230px;
         width: 100%; /* Make the game favorites section take up full width */
         max-width: 500px; /* Limit the width for better readability */
         align-items: center; /* Center-align the game favorites section */
+
     }
 }
 .gameFavorites {
