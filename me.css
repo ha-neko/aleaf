@@ -34,7 +34,6 @@ h1, p {
     justify-content: space-between; /* Align content evenly within the section */
     min-width: 300px; /* Ensure a minimum width for the section */
     border-radius: 1rem;
-    backdrop-filter: blur(6px);
     padding: 1rem;
 }
 
@@ -209,7 +208,6 @@ span {
     flex: 1;
     padding: 1rem;
     border-radius: 1rem;
-    backdrop-filter: blur(6px);
     color: #fff;
   }
   
