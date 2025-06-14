@@ -20,17 +20,12 @@
       </svg>   
 </head>
 <body>
-
-<audio autoplay loop style="display: none;">
-    <source src="https://a.top4top.io/m_3174xf7ls1.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
-</audio>
 <canvas id="leafCanvas"></canvas>
 
 <div class="cards-container">
   <div class="card">  
     <div class="card-content">
-          <img src="https://i.pinimg.com/736x/44/97/0e/44970e3a19b84d8436461a308d69a876.jpg" alt="Profile Image">
+          <img src="https://i.pinimg.com/736x/44/97/0e/44970e3a19b84d8436461a308d69a876.jpg" alt="Profile Image" id="pfp">
             <h1>who am i?</h1>
             <p>
                 🍃 NAME: <span>a leaf or kuro neko</span><br>
@@ -59,8 +54,50 @@
                       <img src="hoif.jpg" alt="hero of ice fairy">
                       <img src="co9.jpg" alt="class of 9">
                     </div>
-                    <div class="social-links">
-                    <a href="https://github.com/comrade-catlin" target="_blank" aria-label="GitHub">
+                  </div>
+<div class="title">
+  <h2 id="ideology-test">📚 <span>ideology test </span></h2>
+    <div class="test-card">
+    <div class="home">
+        <P>pick one of the following subject to test your each of ideology type</P>
+        <button class="politics">Political ideology</button>
+        <button class="psychology">Philosophical Ideologies</button>
+    </div>
+    <div class="test">
+        <P class="questions"></P>
+        <div class="options">
+            <button class="option1"></button>
+            <button class="option2"></button>
+            <button class="option3"></button>
+            <button class="option4"></button>
+    </div>
+</div>
+<div class="loading">
+        <img src="loading.gif" alt="loading" id="loading">
+        <p class="loading-text">Loading...</p>
+        <div class="loading-bar"></div>
+</div>
+    <div class="result">
+        <h2 class="result-title"></h2>
+        <p class="result-description"></p>
+        <button class="restart">Restart</button>
+    </div>
+</div>
+
+ <div class="control">
+    <button class="next">Next</button>
+    <button class="previous">Previous</button>
+    <button class="submit">Submit</button> <!-- This button will be hidden until the last question -->
+</div>   
+<div class="progress">
+        <p class="progress-text">Question <span class="current-question">1</span> of <span class="total-questions"></span></p>
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+</div>
+
+ <div class="social-links">
+                    <a href="https://github.com/ha-neko" target="_blank" aria-label="GitHub">
                         <svg class="glow-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                           <path fill="url(#sharedGradient)" d="M10,0 C15.523,0 20,4.59 20,10.253 C20,14.782 17.138,18.624 13.167,19.981 C12.66,20.082 12.48,19.762 12.48,19.489 C12.48,19.151 12.492,18.047 12.492,16.675 C12.492,15.719 12.172,15.095 11.813,14.777 C14.04,14.523 16.38,13.656 16.38,9.718 C16.38,8.598 15.992,7.684 15.35,6.966 C15.454,6.707 15.797,5.664 15.252,4.252 C15.252,4.252 14.414,3.977 12.505,5.303 C11.706,5.076 10.85,4.962 10,4.958 C9.15,4.962 8.295,5.076 7.497,5.303 C5.586,3.977 4.746,4.252 4.746,4.252 C4.203,5.664 4.546,6.707 4.649,6.966 C4.01,7.684 3.619,8.598 3.619,9.718 C3.619,13.646 5.954,14.526 8.175,14.785 C7.889,15.041 7.63,15.493 7.54,16.156 C6.97,16.418 5.522,16.871 4.63,15.304 C4.63,15.304 4.101,14.319 3.097,14.247 C3.097,14.247 2.122,14.234 3.029,14.87 C3.029,14.87 3.684,15.185 4.139,16.37 C4.139,16.37 4.726,18.2 7.508,17.58 C7.513,18.437 7.522,19.245 7.522,19.489 C7.522,19.76 7.338,20.077 6.839,19.982 C2.865,18.627 0,14.783 0,10.253 C0,4.59 4.478,0 10,0 Z" />
                         </svg>
@@ -87,10 +124,10 @@
                             <path d="M20,2H4C2.9,2,2,2.9,2,4v16c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V4C22,2.9,21.1,2,20,2z M17.6,8.8c0,0.1,0,0.2,0,0.4 c0,3.8-2.9,8.2-8.2,8.2c-1.6,0-3.1-0.5-4.4-1.3c0.2,0,0.5,0,0.7,0c1.3,0,2.6-0.5,3.6-1.2c-1.3,0-2.3-0.9-2.7-2C6.8,12.9,7,13,7.1,13 c0.3,0,0.5,0,0.8-0.1c-1.3-0.3-2.3-1.4-2.3-2.8l0,0c0.4,0.2,0.8,0.3,1.3,0.4C6.1,9.8,5.6,9,5.6,8c0-0.5,0.1-1,0.4-1.4 c1.4,1.7,3.5,2.9,5.9,3c0-0.2-0.1-0.4-0.1-0.7c0-1.6,1.3-2.9,2.9-2.9c0.8,0,1.6,0.3,2.1,0.9c0.7-0.1,1.3-0.4,1.8-0.7 c-0.2,0.7-0.7,1.2-1.3,1.6c0.6-0.1,1.1-0.2,1.7-0.5C18.6,7.9,18.1,8.4,17.6,8.8z"></path>
                         </svg>
                     </a>    
-                    </div>  
-                  </div>
+                    </div> 
+                    </div> 
   </div>
-
+<script src="test.js"></script>
 <script src="me.js"></script>
 </body>
 </html>
