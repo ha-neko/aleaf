@@ -28,15 +28,24 @@ h1, p {
 }
 
 
-.gameFavorites {
+.gameFavorites{
     flex: 1; /* Allow the game favorites section to take up equal space */
     display: flex;
     flex-direction: column; /* Ensure content inside the game favorites stacks vertically */
     min-width: 300px; /* Ensure a minimum width for the section */
     border-radius: 1rem;
     padding: 1rem;
-    height: 500px;
+    max-height: 500px;
 }
+
+ .gameFavorites img {
+    height: clamp(100px, 15vw, 150px);
+    border: 3px solid rgb(182,137,51);
+    width: 100%;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 0 8px  #89d89b;
+  }
 
 .game-images {
     gap: 10px;
@@ -47,14 +56,6 @@ h1, p {
     padding-right: 10px; /* Add padding to prevent content from being cut off */
    overflow-x: hidden;
 }
-  .gameFavorites img {
-    height: clamp(150px, 15vw, 150px);
-    border: 3px solid rgb(182,137,51);
-    width: 100%;
-    border-radius: 0.5rem;
-    margin-bottom: 0.5rem;
-    box-shadow: 0 0 8px  #89d89b;
-  }
 
 /* Hide scrollbar for WebKit-based browsers */
 .game-images::-webkit-scrollbar {
@@ -211,6 +212,11 @@ span {
   max-height: 500px;
 }
 
+.test-container {
+  display: flex;
+  flex-direction: column;
+}
+
 .test-card {
     width: 90%;
     max-width: 250px;
@@ -234,7 +240,7 @@ span {
 }
 
 .title h2 {
-    font-size: 1.4rem;
+  font-size: 1.4rem;
     margin-bottom: 1rem;
 }
 
@@ -297,7 +303,7 @@ span {
 }
 
 .options button {
-    background: rgba(107, 195, 153, 0.1);
+    background: #f8f9fa;
     border: 2px solid #e9ecef;
     padding: 10px 15px; /* Reduced padding */
     border-radius: 12px;
@@ -397,8 +403,6 @@ span {
 
 /* Loading Section */
 .loading {
-    flex: 0 0 auto; /* Prevent from expanding */
-    height: auto;   /* Let it fit content only */
     display: none;
     text-align: center;
     animation: fadeIn 0.5s ease-in;
@@ -413,8 +417,8 @@ span {
 }
 
 .loading img {
-    width: 100px; /* Smaller size */
-    height: 100px;
+    width: 80px; /* Smaller size */
+    height: 80px;
     margin-bottom: 15px; /* Reduced margin */
 }
 
@@ -454,7 +458,7 @@ span {
     display: none;
     text-align: center;
     animation: fadeIn 0.6s ease-in;
-    height: 100%;
+    height: 300px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -528,47 +532,6 @@ span {
     }
 }
 
-/* Responsive Design */
-@media only screen and (max-width: 768px) {
-
-    .test-card {
-        display: flex;
-        flex-direction: column;
-        min-height: 250px;
-        max-height: 500px;
-        height: fit-content;
-        overflow: hidden; /* only if you want to cut off excess */
-    }
-
-    .home p {
-        font-size: 1rem; /* Smaller font on mobile */
-    }
-    
-    .home button {
-        min-width: 160px; /* Smaller buttons on mobile */
-        margin: 8px;
-        padding: 12px 25px;
-        font-size: 1rem;
-    }
-    
-    .questions {
-        font-size: 1rem;
-    }
-    
-    .options button {
-        padding: 8px 12px;
-        font-size: 1rem;
-    }
-    
-    .control button {
-        padding: 8px 15px;
-        margin: 0 3px;
-        font-size: 1rem;
-    }
-}
-
-
-/* Mobile styles */
 /* Mobile-specific styles */
 @media only screen and (max-width: 768px) {
     .cards-container {
@@ -581,6 +544,8 @@ span {
         flex-direction: column; /* Stack the profile image and content vertically */
         align-items: center; /* Center-align items */
         text-align: center; /* Center-align text */
+        width: 95%; /* Take up more screen width */
+        max-width: 400px; /* Set a reasonable max width */
     }
 
     .card img {
@@ -588,32 +553,102 @@ span {
         margin-bottom: 20px; /* Add spacing below the image */
     }
 
-   .gameFavorites {
-    flex: 1;
-    padding: 1rem;
-    border-radius: 1rem;
-    color: #fff;
-    max-width: 500px; /* Limit the width for better readability */
-  }
+    .gameFavorites {
+        width: 95%; /* Make the game favorites section take up most width */
+        max-width: 400px; /* Match the card width */
+        height: 300px; /* Fixed height as requested */
+        max-height: 300px; /* Ensure it doesn't exceed 300px */
+        align-items: center; /* Center-align the game favorites section */
+    }
 
-  .game-images {
-    display: flex;
-    flex-direction: column; /* Stack images vertically */
-    gap: 10px; /* Add spacing between images */
-    overflow-y: auto; /* Enable vertical scrolling */
-    max-height: 300px; /* Limit height for better readability */
-  }
-  
-  .gameFavorites h2 {
-    font-size: 1.4rem;
-    margin-bottom: 1rem;
-  }
+    .game-images {
+        max-height: 300px; /* Leave space for padding and title */
+        flex-grow: 1; /* Take available space */
+    }
+
+    .gameFavorites img {
+        margin-bottom: 5px; /* Reduced margin */
+    }
+
+    /* Test card mobile improvements */
+  .test-card {
+        height: 400px; /* Fixed height for better mobile experience */
+        max-height: 400px;
+        max-width: 350px; /* Increased width for mobile */
+        width: 95%; /* Take up more screen width */
+        min-height: 400px; /* Ensure minimum height */
+    }
+    
+    .home {
+        height: 100%; /* Ensure it fills the card height */
+        justify-content: center; /* Center content vertically */
+        padding: 20px 0; /* Add more vertical padding */
+    }
+
+    .home p {
+        font-size: 1.1rem; /* Larger font on mobile */
+        margin-bottom: 30px; /* More margin */
+        flex-grow: 1; /* Take available space */
+        display: flex;
+        align-items: center; /* Center the text vertically */
+        text-align: center;
+    }
+    
+    .home button {
+        min-width: 180px; /* Larger buttons on mobile */
+        margin: 10px;
+        padding: 15px 30px; /* More padding */
+        font-size: 1.1rem; /* Larger font */
+        flex-shrink: 0; /* Prevent shrinking */
+    }
+    
+    .questions {
+        font-size: 0.95rem; /* Slightly smaller for mobile */
+        margin-bottom: 10px;
+    }
+    
+    .options {
+        gap: 8px; /* Slightly smaller gap on mobile */
+        margin-bottom: 10px;
+    }
+    
+    .options button {
+        padding: 12px 15px; /* More padding for better touch targets */
+        font-size: 0.9rem;
+    }
+    
+    .control button {
+        padding: 10px 15px;
+        margin: 0 3px;
+        font-size: 0.9rem;
+        min-width: 80px; /* Ensure buttons are large enough */
+    }
+
+    .result {
+        height: 320px; /* Slightly taller on mobile */
+        max-height: 320px;
+    }
+
+    .loading {
+        height: 100%; /* Fill the card height */
+        justify-content: center; /* Center content */
+        align-items: center; /* Center content horizontally */
+        padding: 30px 0; /* More vertical padding */
+    }
+
+    .loading img {
+        width: 100px; /* Larger size for mobile */
+        height: 100px;
+        margin-bottom: 20px; /* More margin */
+        flex-shrink: 0; /* Prevent shrinking */
+    }
+
+    .loading-text {
+        font-size: 1.1rem; /* Larger font for mobile */
+        margin-bottom: 25px; /* More margin */
+    }
 }
 
-  
-* {
-  cursor: url('cursor-leaf.png') 7 7, auto;
-}
 
 /* Disable scrolling on desktop */
 @media only screen and (min-width: 769px) {
@@ -622,8 +657,11 @@ span {
     }
 }
 
+* {
+  cursor: url('cursor-leaf.png') 7 7, auto;
+}
+
 .loading { display: none; }
 .test { display: none; }
 .result { display: none; }
 .control { display: none; }
-.progress { display: none; }
