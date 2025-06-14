@@ -27,14 +27,15 @@ h1, p {
     gap: 20px; /* Add spacing between the profile and game favorites */
 }
 
+
 .gameFavorites {
     flex: 1; /* Allow the game favorites section to take up equal space */
     display: flex;
     flex-direction: column; /* Ensure content inside the game favorites stacks vertically */
-    justify-content: space-between; /* Align content evenly within the section */
     min-width: 300px; /* Ensure a minimum width for the section */
     border-radius: 1rem;
     padding: 1rem;
+    height: 500px;
 }
 
 .game-images {
@@ -42,11 +43,18 @@ h1, p {
     display: flex;
     flex-direction: column;
     overflow-y: auto; /* Enables vertical scrolling */
-    max-height: 300px; /* Set a maximum height for the scrollable area */
+    max-height: auto; /* Set a maximum height for the scrollable area */
     padding-right: 10px; /* Add padding to prevent content from being cut off */
-    box-sizing: content-box; /* Ensure padding doesn't affect the width */
    overflow-x: hidden;
 }
+  .gameFavorites img {
+    height: clamp(150px, 15vw, 150px);
+    border: 3px solid rgb(182,137,51);
+    width: 100%;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 0 8px  #89d89b;
+  }
 
 /* Hide scrollbar for WebKit-based browsers */
 .game-images::-webkit-scrollbar {
@@ -58,6 +66,16 @@ h1, p {
     scrollbar-width: none; /* Firefox-specific property */
 }
 
+/* Hide scrollbar for WebKit-based browsers */
+.result::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for other browsers (Firefox) */
+.result {
+    scrollbar-gutter: none; /* Firefox-specific property */
+}
+
 .card {
     position: relative;
     width: 85%;
@@ -66,8 +84,6 @@ h1, p {
     border-radius: 20px;
     backdrop-filter: blur(10px);
     box-shadow: 0 4px 30px rgba(182,137,51, 0.3);
-    display: flex;
-    flex-direction: row;
     color: rgb(182,137,51);
     z-index: 1;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -83,7 +99,7 @@ h1, p {
     box-shadow: 0 6px 40px rgba(182,137,51, 0.4);
 }
 
-.card img {
+#pfp {
     width: clamp(100px, 15vw, 150px);
     height: clamp(100px, 15vw, 150px);
     border-radius: 50%;
@@ -178,6 +194,380 @@ span {
     filter: drop-shadow(0 0 12px rgba(227, 190, 102, 1));
 }
 
+/* Mobile social icons adjustments */
+@media (max-width: 768px) {
+    .social-links {
+        margin-top: 15px;
+        gap: 15px;
+    }
+    
+    .glow-icon {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+.title {
+  max-height: 500px;
+}
+
+.test-card {
+    width: 90%;
+    max-width: 250px;
+    max-height: 500px;
+    padding: 1rem;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box; /* Include padding in the total dimensions */
+}
+
+/* Home Section */
+.home {
+    text-align: center;
+    animation: fadeIn 0.6s ease-in;
+    height: 100%; /* Take full height of the card */
+    display: flex;
+    flex-direction: column;
+}
+
+.title h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+}
+
+.home p {
+    color: #333;
+    font-size: 1.2rem;
+    margin-bottom: 40px;
+    line-height: 1.6;
+}
+
+.home button {
+    background: linear-gradient(135deg, #6bc399, #89d89b);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    margin: 10px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(107, 195, 153, 0.3);
+    min-width: 200px;
+}
+
+.home button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(107, 195, 153, 0.4);
+    background: linear-gradient(135deg, #89d89b, #6bc399);
+}
+
+.home button:active {
+    transform: translateY(-1px);
+}
+
+/* Test Section */
+.test {
+    display: none;
+    animation: slideIn 0.5s ease-out;
+}
+
+.test.active {
+    display: flex; /* Override the display: none when active */
+}
+
+.questions {
+    color: #333;
+    font-size: 1rem; /* Slightly smaller to fit better */
+    font-weight: 300;
+    margin-bottom: 8px; /* Reduced margin */
+    line-height: 1; /* Reduced line height */
+    text-align: center;
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+.options {
+    display: grid;
+    gap: 10px; /* Reduced gap */
+    margin-bottom: 5px; /* Reduced margin */
+    flex-grow: 1; /* Take available space */
+}
+
+.options button {
+    background: rgba(107, 195, 153, 0.1);
+    border: 2px solid #e9ecef;
+    padding: 10px 15px; /* Reduced padding */
+    border-radius: 12px;
+    font-size: 0.9rem; /* Slightly smaller font */
+    transition: all 0.3s ease;
+    text-align: left;
+    color: #333;
+    line-height: 1.3; /* Reduced line height */
+}
+
+.options button:hover {
+    border-color: #6bc399;
+    background: rgba(107, 195, 153, 0.1);
+    transform: translateX(5px);
+}
+
+.options button.selected {
+    background: linear-gradient(135deg, #6bc399, #89d89b);
+    color: white;
+    border-color: #6bc399;
+    box-shadow: 0 5px 15px rgba(107, 195, 153, 0.3);
+}
+
+/* Control Section */
+.control {
+    display: none;
+    text-align: center;
+    margin-top: 10px; /* Reduced margin */
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+.control.active {
+  display: flex;
+  flex-direction: row;       /* Arrange in horizontal line */
+  justify-content: center;   /* Center them horizontally (optional) */
+  gap: 10px;                 /* Add spacing between buttons */
+  flex-wrap: wrap;   
+}
+
+.control button {
+    flex-direction: row;
+    background: linear-gradient(135deg, #e3be66, #b68933);
+    color: white;
+    border: none;
+    padding: 10px 10px; /* Reduced padding */
+    margin: 0 5px; /* Reduced margin */
+    border-radius: 25px;
+    font-size: 0.9rem; /* Slightly smaller font */
+    font-weight: 300;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(182, 137, 51, 0.3);
+}
+
+.control button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(182, 137, 51, 0.4);
+}
+
+.control button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.submit {
+    background: linear-gradient(135deg, #b68933, #e3be66) !important;
+}
+
+/* Progress Section */
+.progress {
+    margin: 8px 0; /* Reduced margin */
+    text-align: center;
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+.progress-text {
+    color: #666;
+    font-size: 0.8rem; /* Smaller font */
+    margin-bottom: 8px; /* Reduced margin */
+}
+
+.progress-bar {
+    background: #e9ecef;
+    height: 6px; /* Slightly smaller */
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 8px 0; /* Reduced margin */
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, #6bc399, #89d89b);
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 3px;
+}
+
+/* Loading Section */
+.loading {
+    flex: 0 0 auto; /* Prevent from expanding */
+    height: auto;   /* Let it fit content only */
+    display: none;
+    text-align: center;
+    animation: fadeIn 0.5s ease-in;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.loading.active {
+    display: flex;
+}
+
+.loading img {
+    width: 100px; /* Smaller size */
+    height: 100px;
+    margin-bottom: 15px; /* Reduced margin */
+}
+
+.loading-text {
+    color: #666;
+    font-size: 1rem; /* Smaller font */
+    margin-bottom: 15px; /* Reduced margin */
+}
+
+.loading-bar {
+    width: 100%;
+    height: 4px;
+    background: #e9ecef;
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+
+.loading-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #6bc399, #89d89b, #e3be66);
+    animation: loading 2s infinite;
+}
+
+@keyframes loading {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Result Section */
+.result {
+    display: none;
+    text-align: center;
+    animation: fadeIn 0.6s ease-in;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow-y: auto;
+}
+
+.result.active {
+    display: flex;
+}
+
+.result-title {
+    color: #b68933;
+    font-size: 1.5rem; /* Smaller font */
+    font-weight: 700;
+    margin-bottom: 15px; /* Reduced margin */
+}
+
+.result-description {
+    color: #333;
+    font-size: 0.9rem; /* Smaller font */
+    line-height: 1.5; /* Reduced line height */
+    margin-bottom: 20px; /* Reduced margin */
+    text-align: left;
+    background: rgba(107, 195, 153, 0.1);
+    padding: 15px; /* Reduced padding */
+    border-radius: 12px;
+    border-left: 4px solid #6bc399;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.restart {
+    background: linear-gradient(135deg, #6bc399, #89d89b);
+    color: white;
+    border: none;
+    padding: 12px 25px; /* Reduced padding */
+    border-radius: 25px;
+    font-size: 1rem; /* Smaller font */
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(107, 195, 153, 0.3);
+    flex-shrink: 0;
+}
+
+.restart:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(107, 195, 153, 0.4);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Responsive Design */
+@media only screen and (max-width: 768px) {
+
+    .test-card {
+        display: flex;
+        flex-direction: column;
+        min-height: 250px;
+        max-height: 500px;
+        height: fit-content;
+        overflow: hidden; /* only if you want to cut off excess */
+    }
+
+    .home p {
+        font-size: 1rem; /* Smaller font on mobile */
+    }
+    
+    .home button {
+        min-width: 160px; /* Smaller buttons on mobile */
+        margin: 8px;
+        padding: 12px 25px;
+        font-size: 1rem;
+    }
+    
+    .questions {
+        font-size: 1rem;
+    }
+    
+    .options button {
+        padding: 8px 12px;
+        font-size: 1rem;
+    }
+    
+    .control button {
+        padding: 8px 15px;
+        margin: 0 3px;
+        font-size: 1rem;
+    }
+}
+
+
 /* Mobile styles */
 /* Mobile-specific styles */
 @media only screen and (max-width: 768px) {
@@ -198,30 +588,28 @@ span {
         margin-bottom: 20px; /* Add spacing below the image */
     }
 
-    .gameFavorites {
-        width: 100%; /* Make the game favorites section take up full width */
-        max-width: 500px; /* Limit the width for better readability */
-        align-items: center; /* Center-align the game favorites section */
-    }
-}
-.gameFavorites {
+   .gameFavorites {
     flex: 1;
     padding: 1rem;
     border-radius: 1rem;
     color: #fff;
+    max-width: 500px; /* Limit the width for better readability */
+  }
+
+  .game-images {
+    display: flex;
+    flex-direction: column; /* Stack images vertically */
+    gap: 10px; /* Add spacing between images */
+    overflow-y: auto; /* Enable vertical scrolling */
+    max-height: 300px; /* Limit height for better readability */
   }
   
   .gameFavorites h2 {
     font-size: 1.4rem;
     margin-bottom: 1rem;
   }
-  
-  .gameFavorites img {
-    width: 100%;
-    border-radius: 0.5rem;
-    margin-bottom: 0.5rem;
-    box-shadow: 0 0 8px  #89d89b;
-  }
+}
+
   
 * {
   cursor: url('cursor-leaf.png') 7 7, auto;
@@ -233,3 +621,9 @@ span {
         overflow: hidden; /* Disable scrolling */
     }
 }
+
+.loading { display: none; }
+.test { display: none; }
+.result { display: none; }
+.control { display: none; }
+.progress { display: none; }

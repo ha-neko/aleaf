@@ -115,3 +115,115 @@ setCanvasSize();
 window.addEventListener("resize", () => {
     setCanvasSize(); // Resize only when the window size changes
 });
+
+let wasMobile = window.innerWidth < 769;
+
+  window.addEventListener("resize", () => {
+    const isNowDesktop = window.innerWidth >= 769;
+
+    if (wasMobile && isNowDesktop) {
+      // If we resized from mobile to desktop, scroll to top
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    wasMobile = window.innerWidth < 769;
+  });
+
+  
+const audio = document.getElementById('audioPlayer');
+const playPauseBtn = document.getElementById('playPauseBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const volumeBtn = document.getElementById('volumeBtn');
+const seekBar = document.getElementById('seekBar');
+const timeTrack = document.getElementById('timetrack');
+const title = document.querySelector('.track-title');
+const playlistItems = document.querySelectorAll('.playlist li');
+const waves = document.querySelectorAll('.wave');
+
+let currentTrack = 0;
+let isMuted = false;
+let tracks = [];
+
+playlistItems.forEach((item, index) => {
+  tracks.push(item.dataset.src);
+  item.addEventListener('click', () => {
+    currentTrack = index;
+    loadTrack(currentTrack);
+    audio.play();
+    updatePlayPause();
+  });
+});
+
+function loadTrack(index) {
+  audio.src = tracks[index];
+  title.textContent = playlistItems[index].textContent;
+}
+
+function updatePlayPause() {
+  playPauseBtn.textContent = audio.paused ? '▶️' : '⏸️';
+}
+
+playPauseBtn.onclick = () => {
+  if (!audio.src) loadTrack(currentTrack);
+  if (audio.paused) audio.play();
+  else audio.pause();
+  updatePlayPause();
+};
+
+prevBtn.onclick = () => {
+  currentTrack = (currentTrack - 1 + tracks.length) % tracks.length;
+  loadTrack(currentTrack);
+  audio.play();
+  updatePlayPause();
+};
+
+nextBtn.onclick = () => {
+  currentTrack = (currentTrack + 1) % tracks.length;
+  loadTrack(currentTrack);
+  audio.play();
+  updatePlayPause();
+};
+
+volumeBtn.onclick = () => {
+  isMuted = !isMuted;
+  audio.muted = isMuted;
+  volumeBtn.textContent = isMuted ? '🔇' : '🔊';
+  volumeBtn.title = `Volume: ${isMuted ? '0%' : Math.round(audio.volume * 100) + '%'}`;
+};
+
+audio.ontimeupdate = () => {
+  seekBar.value = (audio.currentTime / audio.duration) * 100 || 0;
+  timeTrack.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+  updateWaves();
+};
+
+seekBar.oninput = () => {
+  audio.currentTime = (seekBar.value / 100) * audio.duration;
+};
+
+function updateWaves() {
+  const level = isMuted ? 0 : audio.volume;
+  const amp = Math.abs(Math.sin(audio.currentTime)) * level;
+  waves.forEach((wave, i) => {
+    wave.style.height = `${4 + amp * (10 + i * 5)}px`;
+  });
+}
+
+function formatTime(seconds) {
+  const min = Math.floor(seconds / 60);
+  const sec = Math.floor(seconds % 60);
+  return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+}
+
+loadTrack(currentTrack);
+updatePlayPause();
+
+function loadTrack(index) {
+  const item = playlistItems[index];
+  audio.src = item.dataset.src;
+  title.textContent = item.textContent;
+  
+  const cover = item.dataset.cover || 'cover.jpg';
+  document.querySelector('.music-cover img').src = cover;
+}
