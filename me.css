@@ -35,27 +35,66 @@ h1, p {
     min-width: 300px; /* Ensure a minimum width for the section */
     border-radius: 1rem;
     padding: 1rem;
-    max-height: 500px;
+    max-height: 520px;
 }
 
  .gameFavorites img {
+    margin-top: auto;
     height: clamp(100px, 15vw, 150px);
     border: 3px solid rgb(182,137,51);
-    width: 100%;
+    width: 90%;
     border-radius: 0.5rem;
     margin-bottom: 0.5rem;
     box-shadow: 0 0 8px  #89d89b;
+      /* Enable pointer events and cursor */
+    pointer-events: auto;
+    cursor: url('cursor-leaf.png') 7 7, pointer; /* Use pointer as fallback */
   }
 
+/* Add space to the first game image universally */
+.gameFavorites img:first-child {
+    margin-top: 15px;
+}
+
 .game-images {
+    height: 95%;
+    max-width: 500px;
     gap: 10px;
+    align-items: center;
     display: flex;
     flex-direction: column;
     overflow-y: auto; /* Enables vertical scrolling */
     max-height: auto; /* Set a maximum height for the scrollable area */
     padding-right: 10px; /* Add padding to prevent content from being cut off */
    overflow-x: hidden;
+     /* Enable pointer events and cursor */
+    pointer-events: auto;
+    cursor: url('cursor-leaf.png') 7 7, pointer; /* Use pointer as fallback */
 }
+
+  .game-images img::before {
+        content: '🔗';
+        top: 20px;
+        right: 10px;
+        background: rgba(182, 137, 51, 0.9);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        font-size: 12px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 1;
+          /* Enable pointer events and cursor */
+    pointer-events: auto;
+    cursor: url('cursor-leaf.png') 7 7, pointer; /* Use pointer as fallback */
+    }
+    
+    .game-images img:hover::before {
+          /* Enable pointer events and cursor */
+    pointer-events: auto;
+    cursor: url('cursor-leaf.png') 7 7, pointer; /* Use pointer as fallback */
+        opacity: 1;
+    }
 
 /* Hide scrollbar for WebKit-based browsers */
 .game-images::-webkit-scrollbar {
@@ -127,7 +166,8 @@ h1, p {
     line-height: 1.5;
 }
 
-/* Animated Text Highlight */
+/* Gradient Text */
+
 @keyframes gradientAnimation {
     0% {
         background-position: -200% 0;
@@ -138,23 +178,17 @@ h1, p {
 }
 
 span {
-    font-weight: bold;
-    background: linear-gradient(
-        90deg,
-        #e3be66,
-        #b68933,
-        #6bc399,
-        #89d89b,
-        #f2e7a6,
-        #e3be66
-    );
-    background-size: 400% 100%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    -webkit-text-fill-color: transparent;
-    animation: gradientAnimation 10s linear infinite;
-}
+            font-weight: bold;
+            /* Darker, more contrasting colors */ background: linear-gradient(90deg, #d4a850, #8b5a1a, #4a9b6b, #5fb876, #e8d478, #d4a850);
+            background-size: 400% 100%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: rgb(182,137,51); /* Fallback color */
+            -webkit-text-fill-color: transparent;
+            animation: gradientAnimation 5s linear infinite;
+            filter: drop-shadow(0 0 4px rgba(182,137,51,0.6));
+        }
+
 
 /* Section Title Glow */
 .section-title {
@@ -176,7 +210,7 @@ span {
 }
 /* Social Icons */
 .social-links {
-    margin-top: 20px;
+    margin-top: 10px;
     display: flex;
     justify-content: center;
     gap: 20px;
@@ -195,24 +229,8 @@ span {
     filter: drop-shadow(0 0 12px rgba(227, 190, 102, 1));
 }
 
-/* Mobile social icons adjustments */
-@media (max-width: 768px) {
-    .social-links {
-        margin-top: 15px;
-        gap: 15px;
-    }
-    
-    .glow-icon {
-        width: 32px;
-        height: 32px;
-    }
-}
-
-.title {
-  max-height: 500px;
-}
-
 .test-container {
+    max-height: 520px;
   display: flex;
   flex-direction: column;
 }
@@ -303,8 +321,8 @@ span {
 }
 
 .options button {
-    background: #f8f9fa;
-    border: 2px solid #e9ecef;
+    background: rgba(107, 195, 153, 0.1);
+    border: 2px solid rgba(0, 0, 0, 0.616);
     padding: 10px 15px; /* Reduced padding */
     border-radius: 12px;
     font-size: 0.9rem; /* Slightly smaller font */
@@ -534,6 +552,29 @@ span {
 
 /* Mobile-specific styles */
 @media only screen and (max-width: 768px) {
+
+    #pfp {
+        display: block;
+        margin: 0 auto;
+        max-width: 100%;
+        height: auto;
+    }
+
+    .social-links {
+        margin-top: 5px;
+        gap: 20px;
+        height: 60px; /* Increased height */
+    }
+    
+    .glow-icon {
+        width: 48px; /* Increased from 32px to 48px */
+        height: 48px; /* Increased from 32px to 48px */
+    }
+    .social-links svg { 
+        height: 100%;
+        width: 48px; /* Ensure consistent sizing */
+    }
+
     .cards-container {
         flex-direction: column; /* Stack items vertically on smaller screens */
         align-items: center; /* Center-align items */
@@ -556,18 +597,25 @@ span {
     .gameFavorites {
         width: 95%; /* Make the game favorites section take up most width */
         max-width: 400px; /* Match the card width */
-        height: 300px; /* Fixed height as requested */
-        max-height: 300px; /* Ensure it doesn't exceed 300px */
+        height: 320px; /* Fixed height as requested */
+        max-height: 320px; /* Ensure it doesn't exceed 320px */
         align-items: center; /* Center-align the game favorites section */
     }
 
     .game-images {
+        width: 70%; /* Make the game images section take full width */
+        max-width: 500px;
         max-height: 300px; /* Leave space for padding and title */
         flex-grow: 1; /* Take available space */
     }
 
     .gameFavorites img {
         margin-bottom: 5px; /* Reduced margin */
+    }
+
+    /* Ensure first game image still has top spacing on mobile */
+    .gameFavorites img:first-child {
+        margin-top: 15px; /* Slightly more spacing on mobile */
     }
 
     /* Test card mobile improvements */
