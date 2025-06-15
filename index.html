@@ -20,6 +20,9 @@
     </svg>   
 </head>
 <body>
+    <audio id="backgroundMusic" loop preload="auto">
+    <source src="First Date.mp3" type="audio/mpeg">
+</audio>
     <canvas id="leafCanvas"></canvas>
 
     <div class="cards-container">
@@ -48,7 +51,7 @@
                     <img src="nso.jpg" alt="Needy Streamer Overload">
                     <img src="ddlc.jpg" alt="Doki Doki Literature Club">
                     <img src="md.jpg" alt="Muse dash">
-                    <img src="tnoyam.jpg" alt="The No-Existence of Me and You">
+                    <img src="tnoyam.jpg" alt="The NoexistenceN of Me and You">
                     <img src="pu.jpg" alt="pokemon unite">
                     <img src="hc.jpg" alt="holocure">
                     <img src="is.jpg" alt="idol showdown">
@@ -77,8 +80,8 @@
                         
                         <div class="control">
                             <button class="next">Next</button>
-                            <button class="previous">Previous</button>
                             <button class="submit">Submit</button> <!-- This button will be hidden until the last question -->
+                            <button class="previous">Previous</button>
                         </div>   
                         
                         <div class="progress">
@@ -137,5 +140,6 @@
     
     <script src="test.js"></script>
     <script src="me.js"></script>
+    <script src="store.js"></script>
 </body>
 </html>
