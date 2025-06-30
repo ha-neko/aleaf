@@ -8,7 +8,9 @@ const gameStoreLinks = {
     'hc.jpg': 'https://store.steampowered.com/app/2420510/HoloCure__Save_the_Fans/',
     'is.jpg': 'https://store.steampowered.com/app/1742020/Idol_Showdown/',
     'hoif.jpg': 'https://store.steampowered.com/app/1705430/Touhou_Hero_of_Ice_Fairy/',
-    'co9.jpg': 'https://store.steampowered.com/app/1443200/Class_of_09/'
+    'co9.jpg': 'https://store.steampowered.com/app/1443200/Class_of_09/',
+    'smss.jpg': 'https://store.steampowered.com/app/1639610/Save_Me_Sakuyasan/',
+    'sg.jpg': 'https://store.steampowered.com/app/412830/STEINSGATE/'
 };
 
 // Game titles for better user experience
@@ -21,7 +23,9 @@ const gameTitles = {
     'hc.jpg': 'HoloCure - Save the Fans!',
     'is.jpg': 'Idol Showdown',
     'hoif.jpg': 'Hero of Ice Fairy',
-    'co9.jpg': 'Class of \'09'
+    'co9.jpg': 'Class of \'09',
+    'smss.jpg': 'Save Me, sakuya san',
+    'sg.jpg': 'STEINS;GATE'
 };
 
 // Initialize store functionality when DOM is loaded
