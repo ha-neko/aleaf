@@ -204,7 +204,116 @@ class IdeologyTest {
                         weights: { Nihilism: [4,1,1,2], Existentialism: [1,4,1,1], Hedonism: [1,2,4,1], Stoicism: [1,1,1,4], Utilitarianism: [0,2,3,2], Absurdism: [3,4,2,2], Humanism: [0,3,2,3], Determinism: [4,0,1,3], Relativism: [2,4,3,2], Pragmatism: [0,3,4,3] }
                     }
                 ]
-            }
+            },
+            eeveelution: {
+    name: "Eeveelution Type",
+    ideologies: [
+        'Eevee', 'Vaporeon', 'Jolteon', 'Flareon', 'Espeon', 
+        'Umbreon', 'Leafeon', 'Glaceon', 'Sylveon'
+    ],
+    questions: [
+        {
+            q: "What's your ideal environment?",
+            options: ["Cozy and adaptable", "Near water", "High energy places", "Warm and sunny"],
+            weights: { Eevee: [4,1,1,1], Vaporeon: [1,4,0,1], Jolteon: [1,0,4,1], Flareon: [1,0,1,4], Espeon: [2,1,2,3], Umbreon: [2,1,1,1], Leafeon: [2,2,1,2], Glaceon: [2,2,1,1], Sylveon: [3,2,1,2] }
+        },
+        {
+            q: "How do you handle conflict?",
+            options: ["Try to adapt and avoid", "Go with the flow", "Strike quickly", "Face it head-on"],
+            weights: { Eevee: [4,2,1,1], Vaporeon: [2,4,1,2], Jolteon: [1,1,4,2], Flareon: [1,1,2,4], Espeon: [2,2,2,3], Umbreon: [2,1,3,3], Leafeon: [3,3,1,2], Glaceon: [3,2,2,2], Sylveon: [4,3,1,1] }
+        },
+        {
+            q: "What's your social style?",
+            options: ["Friendly to everyone", "Calm and soothing", "Energetic and playful", "Passionate and intense"],
+            weights: { Eevee: [4,2,2,1], Vaporeon: [2,4,1,1], Jolteon: [2,1,4,2], Flareon: [1,1,2,4], Espeon: [3,3,2,2], Umbreon: [2,2,1,2], Leafeon: [3,3,3,1], Glaceon: [2,3,2,2], Sylveon: [4,3,3,1] }
+        },
+        {
+            q: "What motivates you most?",
+            options: ["Helping others grow", "Emotional connections", "Achieving goals", "Personal strength"],
+            weights: { Eevee: [4,3,2,2], Vaporeon: [2,4,1,2], Jolteon: [2,1,4,3], Flareon: [2,2,3,4], Espeon: [3,2,4,2], Umbreon: [2,1,2,4], Leafeon: [4,2,2,2], Glaceon: [3,2,3,3], Sylveon: [4,4,2,1] }
+        },
+        {
+            q: "How do you prefer to spend your free time?",
+            options: ["Learning new things", "Relaxing activities", "Active hobbies", "Creative pursuits"],
+            weights: { Eevee: [4,2,2,3], Vaporeon: [2,4,2,2], Jolteon: [3,1,4,2], Flareon: [2,2,3,4], Espeon: [4,2,2,3], Umbreon: [3,3,2,4], Leafeon: [3,4,3,2], Glaceon: [4,3,2,3], Sylveon: [2,2,2,4] }
+        },
+        {
+            q: "What's your approach to challenges?",
+            options: ["Versatile problem-solving", "Patient persistence", "Quick action", "Determined effort"],
+            weights: { Eevee: [4,2,2,2], Vaporeon: [2,4,1,2], Jolteon: [2,1,4,2], Flareon: [1,2,2,4], Espeon: [3,3,3,2], Umbreon: [2,3,2,4], Leafeon: [3,4,2,3], Glaceon: [3,4,2,3], Sylveon: [3,3,2,3] }
+        },
+        {
+            q: "What's most important to you in relationships?",
+            options: ["Loyalty and support", "Emotional depth", "Fun and excitement", "Mutual respect"],
+            weights: { Eevee: [4,3,2,3], Vaporeon: [3,4,2,3], Jolteon: [2,2,4,2], Flareon: [3,2,2,4], Espeon: [3,3,2,4], Umbreon: [4,4,1,3], Leafeon: [4,3,3,3], Glaceon: [3,3,2,4], Sylveon: [4,4,3,2] }
+        },
+        {
+            q: "How do you handle stress?",
+            options: ["Adapt and find solutions", "Find a calm space", "Channel into activity", "Push through with determination"],
+            weights: { Eevee: [4,2,2,2], Vaporeon: [2,4,1,2], Jolteon: [2,1,4,3], Flareon: [1,1,2,4], Espeon: [3,4,2,2], Umbreon: [2,4,1,3], Leafeon: [3,4,2,2], Glaceon: [3,4,1,2], Sylveon: [3,3,2,2] }
+        },
+        {
+            q: "What's your ideal way to help others?",
+            options: ["Being supportive and adaptable", "Providing comfort", "Energizing and motivating", "Being a strong protector"],
+            weights: { Eevee: [4,2,2,2], Vaporeon: [2,4,1,2], Jolteon: [1,1,4,2], Flareon: [2,2,2,4], Espeon: [3,2,3,3], Umbreon: [2,2,1,4], Leafeon: [3,3,2,3], Glaceon: [3,3,2,3], Sylveon: [4,4,2,2] }
+        },
+        {
+            q: "What describes your personality best?",
+            options: ["Adaptable and curious", "Calm and nurturing", "Energetic and quick", "Warm and passionate"],
+            weights: { Eevee: [4,1,2,1], Vaporeon: [1,4,0,2], Jolteon: [2,0,4,1], Flareon: [1,1,1,4], Espeon: [3,2,2,2], Umbreon: [2,2,1,2], Leafeon: [2,3,2,2], Glaceon: [2,3,1,2], Sylveon: [3,4,2,3] }
+        },
+        {
+            q: "What's your preferred time of day?",
+            options: ["Anytime - I'm flexible", "Evening by water", "High-energy morning", "Bright afternoon"],
+            weights: { Eevee: [4,1,2,2], Vaporeon: [1,4,1,2], Jolteon: [2,1,4,2], Flareon: [1,1,2,4], Espeon: [2,2,2,4], Umbreon: [2,4,1,1], Leafeon: [3,2,3,3], Glaceon: [3,2,2,2], Sylveon: [3,2,2,3] }
+        },
+        {
+            q: "How do you show affection?",
+            options: ["Thoughtful gestures", "Gentle care", "Playful energy", "Passionate devotion"],
+            weights: { Eevee: [4,3,2,2], Vaporeon: [3,4,2,2], Jolteon: [2,2,4,2], Flareon: [2,2,2,4], Espeon: [4,3,2,3], Umbreon: [3,3,1,4], Leafeon: [4,4,2,2], Glaceon: [4,3,2,3], Sylveon: [4,4,3,3] }
+        },
+        {
+            q: "What's your approach to learning?",
+            options: ["Try everything once", "Steady and patient", "Quick and active", "Intense focus"],
+            weights: { Eevee: [4,2,2,2], Vaporeon: [2,4,1,2], Jolteon: [2,1,4,2], Flareon: [1,2,2,4], Espeon: [3,2,2,4], Umbreon: [2,2,1,4], Leafeon: [3,4,2,2], Glaceon: [3,4,2,3], Sylveon: [3,3,2,3] }
+        },
+        {
+            q: "What's your ideal aesthetic?",
+            options: ["Simple and versatile", "Flowing and serene", "Bright and dynamic", "Warm and cozy"],
+            weights: { Eevee: [4,2,2,2], Vaporeon: [2,4,1,2], Jolteon: [1,1,4,2], Flareon: [1,2,2,4], Espeon: [3,2,3,3], Umbreon: [2,1,2,3], Leafeon: [3,3,2,2], Glaceon: [3,3,2,2], Sylveon: [3,3,3,4] }
+        },
+        {
+            q: "How do you handle change?",
+            options: ["Embrace it easily", "Flow with it naturally", "Adapt quickly", "Work through it steadily"],
+            weights: { Eevee: [4,2,3,2], Vaporeon: [2,4,2,2], Jolteon: [2,2,4,2], Flareon: [1,2,2,4], Espeon: [3,3,3,3], Umbreon: [2,2,2,4], Leafeon: [3,3,3,3], Glaceon: [2,3,2,4], Sylveon: [3,3,2,3] }
+        },
+        {
+    q: "Which weather do you enjoy most?",
+    options: ["Mild and changing", "Rainy", "Stormy", "Hot and sunny"],
+    weights: { Eevee: [4,2,2,2], Vaporeon: [1,4,1,2], Jolteon: [1,2,4,1], Flareon: [1,1,1,4], Espeon: [2,2,2,3], Umbreon: [2,2,2,2], Leafeon: [3,2,1,2], Glaceon: [2,2,2,3], Sylveon: [3,2,2,2] }
+},
+{
+    q: "How do you react to surprises?",
+    options: ["Adapt quickly", "Stay calm", "React instantly", "Embrace with warmth"],
+    weights: { Eevee: [4,2,2,2], Vaporeon: [2,4,1,2], Jolteon: [1,1,4,2], Flareon: [2,1,2,4], Espeon: [3,2,2,3], Umbreon: [2,2,3,2], Leafeon: [3,3,2,2], Glaceon: [2,3,2,3], Sylveon: [3,2,2,4] }
+},
+{
+    q: "What is your favorite color palette?",
+    options: ["Earth tones", "Blues", "Yellows", "Reds and oranges"],
+    weights: { Eevee: [4,2,2,2], Vaporeon: [1,4,1,2], Jolteon: [1,2,4,1], Flareon: [1,1,1,4], Espeon: [2,2,2,3], Umbreon: [2,2,2,2], Leafeon: [4,1,1,2], Glaceon: [2,4,1,1], Sylveon: [3,2,2,2] }
+},
+{
+    q: "How do you approach teamwork?",
+    options: ["Flexible role", "Supportive", "Take initiative", "Lead with passion"],
+    weights: { Eevee: [4,2,2,2], Vaporeon: [2,4,1,2], Jolteon: [1,1,4,2], Flareon: [2,1,2,4], Espeon: [3,2,2,3], Umbreon: [2,2,3,2], Leafeon: [3,3,2,2], Glaceon: [2,3,2,3], Sylveon: [3,2,2,4] }
+},
+{
+    q: "What do you value most in life?",
+    options: ["Growth", "Peace", "Excitement", "Love"],
+    weights: { Eevee: [4,2,2,2], Vaporeon: [2,4,1,2], Jolteon: [1,1,4,2], Flareon: [2,1,2,4], Espeon: [3,2,2,3], Umbreon: [2,2,3,2], Leafeon: [3,3,2,2], Glaceon: [2,3,2,3], Sylveon: [2,2,2,4] }
+},
+      ]   
+    }
         };
     }
     
@@ -212,7 +321,8 @@ class IdeologyTest {
         // Test selection buttons
         document.querySelector('.politics').addEventListener('click', () => this.startTest('political'));
         document.querySelector('.psychology').addEventListener('click', () => this.startTest('philosophical'));
-        
+        document.querySelector('.eeveelution').addEventListener('click', () => this.startTest('eeveelution'));
+
         // Navigation buttons
         this.elements.nextBtn.addEventListener('click', () => this.nextQuestion());
         this.elements.prevBtn.addEventListener('click', () => this.previousQuestion());
@@ -430,7 +540,18 @@ class IdeologyTest {
             'Humanism': 'A philosophical stance emphasizing the value and agency of human beings.',
             'Determinism': 'The doctrine that all events are the result of previously existing causes.',
             'Relativism': 'The idea that points of view have no absolute truth or validity within themselves.',
-            'Pragmatism': 'A philosophical tradition that considers practical consequences as the criteria of truth and meaning.'
+            'Pragmatism': 'A philosophical tradition that considers practical consequences as the criteria of truth and meaning.',
+            
+            // Eeveelution types
+            'Eevee': 'You are adaptable, curious, and full of potential. Like Eevee, you can thrive in many different environments and situations. You\'re friendly, loyal, and always ready to learn and grow.',
+            'Vaporeon': 'You are calm, nurturing, and emotionally intuitive. Like Vaporeon, you bring peace to those around you and can adapt to flow with life\'s changes. You value deep emotional connections.',
+            'Jolteon': 'You are energetic, quick-thinking, and dynamic. Like Jolteon, you approach life with enthusiasm and can quickly adapt to new situations. You enjoy being active and motivating others.',
+            'Flareon': 'You are passionate, warm-hearted, and determined. Like Flareon, you face challenges head-on with courage and bring warmth to those around you. You value strength and loyalty.',
+            'Espeon': 'You are wise, psychic, and graceful. Like Espeon, you have strong intuition and prefer to think things through. You\'re elegant and have a deep understanding of others.',
+            'Umbreon': 'You are mysterious, loyal, and protective. Like Umbreon, you may seem reserved but are deeply caring. You\'re strong-willed and fiercely protective of those you love.',
+            'Leafeon': 'You are nature-loving, patient, and nurturing. Like Leafeon, you have a strong connection to the natural world and prefer peaceful, harmonious environments. You help others grow.',
+            'Glaceon': 'You are cool, composed, and elegant. Like Glaceon, you maintain your composure under pressure and have a refined, graceful nature. You value precision and beauty.',
+            'Sylveon': 'You are affectionate, charming, and emotionally supportive. Like Sylveon, you love cute things and form strong emotional bonds. You bring joy and comfort to others through your caring nature.'        
         };
         
         return descriptions[ideology] || 'A unique ideological perspective.';
