@@ -1,0 +1,46 @@
+name: Update Age Badge
+
+on:
+  schedule:
+    # runs at 00:05 on Dec 6 every year (birthday!)
+    - cron: "5 0 6 12 *"
+  workflow_dispatch: # lets you trigger it manually too
+
+jobs:
+  update-age:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Calculate age and update README
+        run: |
+          BIRTH="2008-12-06"
+          TODAY=$(date +%Y-%m-%d)
+          BIRTH_Y=$(echo $BIRTH | cut -d- -f1)
+          BIRTH_M=$(echo $BIRTH | cut -d- -f2)
+          BIRTH_D=$(echo $BIRTH | cut -d- -f3)
+          TODAY_Y=$(date +%Y)
+          TODAY_M=$(date +%m)
+          TODAY_D=$(date +%d)
+
+          AGE=$((TODAY_Y - BIRTH_Y))
+          if [ "$TODAY_M" -lt "$BIRTH_M" ] || { [ "$TODAY_M" -eq "$BIRTH_M" ] && [ "$TODAY_D" -lt "$BIRTH_D" ]; }; then
+            AGE=$((AGE - 1))
+          fi
+
+          echo "Calculated age: $AGE"
+
+          # Update the badge in README.md
+          sed -i "s|age-[0-9]*-85b7eb|age-${AGE}-85b7eb|g" README.md
+
+          # Update the age in the about.js code block
+          sed -i "s|age        : [0-9]*,|age        : ${AGE},|g" README.md
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git diff --quiet && echo "No changes" && exit 0
+          git add README.md
+          git commit -m "🎂 happy birthday! age updated"
+          git push
