@@ -26,6 +26,7 @@ class IdeologyTest {
             currentQ: document.querySelector('.current-question'),
             totalQ: document.querySelector('.total-questions'),
             progressFill: document.querySelector('.progress-fill'),
+            progressBar: document.querySelector('.progress-bar'),
             resultTitle: document.querySelector('.result-title'),
             resultDesc: document.querySelector('.result-description')
         };
@@ -315,6 +316,25 @@ class IdeologyTest {
       ]   
     }
         };
+
+        if (window.ALEAF_CONTENT?.quizzes && this.isValidTestCollection(window.ALEAF_CONTENT.quizzes)) {
+            this.tests = window.ALEAF_CONTENT.quizzes;
+        }
+    }
+
+    isValidTestCollection(tests) {
+        const required = ['political', 'philosophical', 'eeveelution'];
+        return required.every((key) => {
+            const test = tests[key];
+            return test && typeof test.name === 'string' && Array.isArray(test.ideologies) && test.ideologies.length > 0 &&
+                Array.isArray(test.questions) && test.questions.length > 0 && test.questions.every((question) =>
+                    typeof question.q === 'string' && Array.isArray(question.options) && question.options.length === 4 &&
+                    question.weights && test.ideologies.every((ideology) =>
+                        Array.isArray(question.weights[ideology]) && question.weights[ideology].length === 4 &&
+                        question.weights[ideology].every(Number.isFinite)
+                    )
+                );
+        });
     }
     
     bindEvents() {
@@ -334,6 +354,14 @@ class IdeologyTest {
         // Option buttons
         this.elements.options.forEach((btn, index) => {
             btn.addEventListener('click', () => this.selectOption(index));
+            btn.addEventListener('keydown', (event) => {
+                if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
+                event.preventDefault();
+                const direction = ['ArrowRight', 'ArrowDown'].includes(event.key) ? 1 : -1;
+                const next = (index + direction + this.elements.options.length) % this.elements.options.length;
+                this.selectOption(next);
+                this.elements.options[next].focus();
+            });
         });
     }
     
@@ -366,6 +394,7 @@ class IdeologyTest {
         setTimeout(() => {
             this.showTest();
             this.loadQuestion();
+            this.elements.question.focus();
         }, 1500);
     }
     
@@ -407,11 +436,15 @@ class IdeologyTest {
         this.elements.options.forEach((btn, index) => {
             btn.textContent = question.options[index];
             btn.classList.remove('selected');
+            btn.setAttribute('aria-checked', 'false');
+            btn.tabIndex = index === 0 ? 0 : -1;
         });
         
         // Restore previous answer if exists
         if (this.answers[this.currentQuestion] !== undefined) {
             this.elements.options[this.answers[this.currentQuestion]].classList.add('selected');
+            this.elements.options[this.answers[this.currentQuestion]].setAttribute('aria-checked', 'true');
+            this.elements.options.forEach((btn, index) => { btn.tabIndex = index === this.answers[this.currentQuestion] ? 0 : -1; });
         }
         
         // Update progress
@@ -424,9 +457,12 @@ class IdeologyTest {
     selectOption(optionIndex) {
         // Clear previous selection
         this.elements.options.forEach(btn => btn.classList.remove('selected'));
+        this.elements.options.forEach(btn => btn.setAttribute('aria-checked', 'false'));
         
         // Select new option
         this.elements.options[optionIndex].classList.add('selected');
+        this.elements.options[optionIndex].setAttribute('aria-checked', 'true');
+        this.elements.options.forEach((btn, index) => { btn.tabIndex = index === optionIndex ? 0 : -1; });
         
         // Store answer
         this.answers[this.currentQuestion] = optionIndex;
@@ -441,6 +477,7 @@ class IdeologyTest {
         if (this.currentQuestion < this.tests[this.currentTest].questions.length - 1) {
             this.currentQuestion++;
             this.loadQuestion();
+            this.elements.question.focus();
         }
     }
     
@@ -448,6 +485,7 @@ class IdeologyTest {
         if (this.currentQuestion > 0) {
             this.currentQuestion--;
             this.loadQuestion();
+            this.elements.question.focus();
         }
     }
     
@@ -455,6 +493,8 @@ class IdeologyTest {
         this.elements.currentQ.textContent = this.currentQuestion + 1;
         const progress = ((this.currentQuestion + 1) / this.tests[this.currentTest].questions.length) * 100;
         this.elements.progressFill.style.width = progress + '%';
+        this.elements.progressBar.setAttribute('aria-valuenow', String(Math.round(progress)));
+        this.elements.progressBar.setAttribute('aria-valuetext', `Question ${this.currentQuestion + 1} of ${this.tests[this.currentTest].questions.length}`);
     }
     
     updateButtons() {
@@ -508,15 +548,23 @@ class IdeologyTest {
         
         // Display result
         this.elements.resultTitle.textContent = `Your Result: ${topIdeology}`;
-        this.elements.resultDesc.innerHTML = this.getIdeologyDescription(topIdeology) + 
-            '<br><br><strong>Score Breakdown:</strong><br>' +
-            Object.entries(this.scores)
-                .sort((a, b) => b[1] - a[1])
-                .map(([ideology, score]) => `${ideology}: ${score}`)
-                .join('<br>');
+        this.elements.resultDesc.replaceChildren();
+        this.elements.resultDesc.append(document.createTextNode(this.getIdeologyDescription(topIdeology)));
+        this.elements.resultDesc.append(document.createElement('br'), document.createElement('br'));
+        const heading = document.createElement('strong');
+        heading.textContent = 'Score Breakdown:';
+        this.elements.resultDesc.append(heading, document.createElement('br'));
+        Object.entries(this.scores).sort((a, b) => b[1] - a[1]).forEach(([ideology, score], index, entries) => {
+            this.elements.resultDesc.append(document.createTextNode(`${ideology}: ${score}`));
+            if (index < entries.length - 1) this.elements.resultDesc.append(document.createElement('br'));
+        });
+        this.elements.resultTitle.focus();
     }
     
     getIdeologyDescription(ideology) {
+        if (window.ALEAF_CONTENT?.quizDescriptions?.[ideology]) {
+            return window.ALEAF_CONTENT.quizDescriptions[ideology];
+        }
         const descriptions = {
             // Political ideologies
             'Communism': 'A socio-economic system advocating for collective ownership and a classless society.',
@@ -568,5 +616,5 @@ class IdeologyTest {
 
 // Initialize the test when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    new IdeologyTest();
+    (window.ALEAF_CONTENT_READY || Promise.resolve()).then(() => new IdeologyTest());
 });
