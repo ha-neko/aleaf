@@ -17,7 +17,7 @@ window.ALEAF_DEFAULT_CONTENT = {
         { label: 'NAME', value: 'a leaf or kuro neko' },
         { label: 'AGE', value: '', type: 'age' },
         { label: 'GENDER', value: 'enby (amab) fem lean' },
-        { label: 'SEXUALITY', value: 'anything feminime' },
+        { label: 'SEXUALITY', value: 'anything feminine' },
         { label: 'MONO/AMBI/POLY', value: 'mono' },
         { label: 'PRONOUNS', value: 'any' },
         { label: 'TIMEZONE', value: 'i forgor' },
