@@ -16,10 +16,10 @@ window.ALEAF_DEFAULT_CONTENT = {
     profile: [
         { label: 'NAME', value: 'a leaf or kuro neko' },
         { label: 'AGE', value: '', type: 'age' },
-        { label: 'GENDER', value: 'male' },
-        { label: 'SEXUALITY', value: 'straighter than your aim' },
+        { label: 'GENDER', value: 'enby (amab) fem lean' },
+        { label: 'SEXUALITY', value: 'anything feminime' },
         { label: 'MONO/AMBI/POLY', value: 'mono' },
-        { label: 'PRONOUNS', value: 'he/him' },
+        { label: 'PRONOUNS', value: 'any' },
         { label: 'TIMEZONE', value: 'i forgor' },
         { label: 'ONLINE ACTIVITY', value: '5 hours on weekday, available on weekend' },
         { label: 'INTERESTS', value: 'anime, language, programming, IT fields, gaming, and tanks (military vehicles)' },
