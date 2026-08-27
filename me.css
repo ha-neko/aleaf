@@ -358,3 +358,10 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
     *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
     .booting .browser { opacity: 1; transform: none; }
 }
+
+/* hide mizuki cutouts on mobile viewports */
+@media (max-width: 768px) {
+    .mizuki-cutouts {
+        display: none;
+    }
+}
