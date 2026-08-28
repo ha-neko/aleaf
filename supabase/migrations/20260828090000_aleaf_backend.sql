@@ -1,6 +1,4 @@
--- Dashboard alternative to the migration in supabase/migrations.
--- Run this in Supabase SQL Editor, then enroll the administrator separately
--- with supabase/enroll-admin.example.sql.
+-- Aleaf public content, administrator authorization, and media storage.
 
 create table if not exists public.admin_users (
     user_id uuid primary key references auth.users(id) on delete cascade,
@@ -33,7 +31,9 @@ security definer
 set search_path = ''
 as $$
     select exists (
-        select 1 from public.admin_users where user_id = (select auth.uid())
+        select 1
+        from public.admin_users
+        where user_id = (select auth.uid())
     );
 $$;
 
@@ -63,7 +63,6 @@ insert into public.site_content (id, content)
 values ('main', '{}'::jsonb)
 on conflict (id) do nothing;
 
--- Public media bucket. Uploads and changes are restricted to the administrator.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values (
     'site-media',

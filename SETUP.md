@@ -5,15 +5,32 @@ The frontend remains static and can be hosted on GitHub Pages or Vercel. Supabas
 ## 1. Create the free backend
 
 1. Create a project at [supabase.com](https://supabase.com/).
-2. Open **Authentication > Users > Add user** and create the administrator account. Disable automatic email confirmation only if you understand the trade-off; creating the user from the dashboard is simpler.
-3. Copy that user's UUID.
-4. Open `supabase/schema.sql`, replace `00000000-0000-0000-0000-000000000000` with the UUID, and run the complete file in **SQL Editor**.
-5. Open **Project Settings > API** and copy:
+2. Keep public email registration disabled for this private editor.
+3. Deploy the database with either the CLI or SQL Editor instructions below.
+4. Open **Authentication > Users > Add user** and create the administrator account.
+5. Open `supabase/enroll-admin.example.sql`, replace `admin@example.com`, and run it in **SQL Editor**.
+6. Open **Project Settings > API** and copy:
    - Project URL
    - Publishable key, or the legacy `anon` key
-6. Put those values in `config.js`.
+7. Put those values in `config.js`.
 
 The browser key in `config.js` is intentionally public. Security comes from Row Level Security. Never place the `service_role` or secret key in this repository.
+
+### Deploy the schema with Supabase CLI
+
+The repository includes `supabase/config.toml` and an idempotent migration.
+
+```bash
+npx supabase login
+npx supabase link --project-ref YOUR_PROJECT_REF
+npx supabase db push
+```
+
+The project reference is the subdomain in `https://YOUR_PROJECT_REF.supabase.co`. Login opens an interactive browser/token flow; do not commit the generated `.temp` directory or any access token.
+
+### Deploy with SQL Editor instead
+
+Open **SQL Editor**, paste all of `supabase/schema.sql`, and run it once. Do not also run `db push` for the same initial setup unless you first repair migration history.
 
 ## 2. Use the admin dashboard
 
@@ -27,6 +44,7 @@ Sign in with the user created above. The dashboard edits:
 
 - General titles, image, date, music, and page visibility
 - Profile rows
+- Current-obsessions scrapbook and polaroid
 - Favorite games and outbound URLs
 - Social links
 - Theme colors
