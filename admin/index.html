@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,600&family=Montserrat:wght@500;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="admin.css?v=2500-sakura-3">
+    <link rel="stylesheet" href="admin.css?v=2500-sakura-4">
 </head>
 <body>
     <a class="skip-link" href="#adminMain">Skip to dashboard</a>
@@ -57,6 +57,7 @@
                 <nav class="editor-nav" aria-label="Editor sections">
                     <button class="active" data-editor-tab="site">General</button>
                     <button data-editor-tab="profile">Profile</button>
+                    <button data-editor-tab="scrapbook">Scrapbook</button>
                     <button data-editor-tab="games">Games</button>
                     <button data-editor-tab="socials">Social links</button>
                     <button data-editor-tab="theme">Appearance</button>
@@ -73,6 +74,12 @@
                         <div class="panel-heading"><p class="eyebrow">identity.dat</p><h2>Profile fields</h2><p>One row per field. Drag-free and painfully sensible.</p></div>
                         <div id="profileEditor" class="repeater"></div>
                         <button class="add-button" data-add="profile">Add profile field</button>
+                    </section>
+                    <section class="editor-panel" data-editor-panel="scrapbook" hidden>
+                        <div class="panel-heading"><p class="eyebrow">current-obsessions.dat</p><h2>Scrapbook</h2><p>Edit the card heading, Mizuki polaroid, footer stamp, and obsession tiles.</p></div>
+                        <div id="scrapbookFields" class="form-grid"></div>
+                        <div id="scrapbookEditor" class="repeater scrapbook-editor"></div>
+                        <button class="add-button" data-add="scrapbook">Add scrapbook item</button>
                     </section>
                     <section class="editor-panel" data-editor-panel="games" hidden>
                         <div class="panel-heading"><p class="eyebrow">favorites.dir</p><h2>Game collection</h2></div>
@@ -110,6 +117,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../config.js"></script>
     <script src="../default-content.js"></script>
-    <script src="admin.js?v=2500-sakura-3"></script>
+    <script src="admin.js?v=2500-sakura-4"></script>
 </body>
 </html>

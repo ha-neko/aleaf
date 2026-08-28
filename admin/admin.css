@@ -86,6 +86,7 @@ body.embedded .login-card { margin-top: clamp(42px, 10vh, 90px); }
 .editor-nav button:nth-child(5)::before { content: "05"; }
 .editor-nav button:nth-child(6)::before { content: "06"; }
 .editor-nav button:nth-child(7)::before { content: "07"; }
+.editor-nav button:nth-child(8)::before { content: "08"; }
 .editor-nav button:hover, .editor-nav button.active { color: var(--purple-deep); border-color: #dcb6cd; background: rgba(255,255,255,.82); box-shadow: 0 5px 14px rgba(122,50,92,.08); }
 .editor-nav button.active { box-shadow: inset 4px 0 var(--pink-strong), 0 5px 14px rgba(122,50,92,.08); }
 .editor-content { min-width: 0; padding: 29px 31px 45px; background: rgba(255,248,252,.78); }
@@ -103,6 +104,8 @@ textarea { resize: vertical; line-height: 1.55; }
 .repeater { display: grid; gap: 10px; }
 .repeat-row { padding: 12px; display: grid; grid-template-columns: repeat(2, minmax(0,1fr)) auto; align-items: end; gap: 10px; border: 1px solid #e1bfd4; border-radius: 15px; background: linear-gradient(145deg, rgba(255,255,255,.9), rgba(250,237,245,.74)); box-shadow: 0 6px 16px rgba(86,42,73,.06); }
 .repeat-row.game-row { grid-template-columns: 1fr 1.2fr 1.2fr auto; }
+.repeat-row.scrapbook-row { grid-template-columns: .7fr 1fr 1.4fr auto; }
+.scrapbook-editor { margin-top: 18px; }
 .repeat-row .checkbox-field, .repeat-row .remove-button { align-self: end; }
 .remove-button { min-height: 42px; padding: 0 14px; border: 1px solid #dca8bd; border-radius: 999px; color: var(--danger); background: #fff5f8; cursor: pointer; font-weight: 700; font-size: 11px; }
 .remove-button:hover { color: #fff; background: var(--danger); }
@@ -126,7 +129,7 @@ textarea { resize: vertical; line-height: 1.55; }
     .editor-nav { padding: 11px 16px; flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid #ead0df; }
     .editor-nav button { min-width: max-content; }
     .editor-nav button.active { box-shadow: inset 0 -3px var(--pink-strong); }
-    .repeat-row.game-row { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .repeat-row.game-row, .repeat-row.scrapbook-row { grid-template-columns: repeat(2, minmax(0,1fr)); }
     .repeat-row.game-row .remove-button { grid-column: 2; justify-self: end; }
 }
 @media (max-width: 700px) {
@@ -141,7 +144,7 @@ textarea { resize: vertical; line-height: 1.55; }
     .header-actions .button { flex: 1 1 120px; }
     .editor-nav { padding: 9px 12px; }
     .editor-content { padding: 24px 14px 42px; }
-    .form-grid, .color-grid, .repeat-row, .repeat-row.game-row { grid-template-columns: 1fr; }
+    .form-grid, .color-grid, .repeat-row, .repeat-row.game-row, .repeat-row.scrapbook-row { grid-template-columns: 1fr; }
     .repeat-row.game-row .remove-button { grid-column: auto; justify-self: stretch; }
     .remove-button { width: 100%; }
     .upload-box { align-items: stretch; flex-direction: column; }

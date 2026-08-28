@@ -59,7 +59,7 @@
     }
 
     function render(content) {
-        const { site, profile, games, socials, theme } = content;
+        const { site, profile, scrapbook, games, socials, theme } = content;
         document.title = site.title;
         document.querySelector('[data-content="profile-heading"]').textContent = site.profileHeading;
         document.querySelector('[data-content="games-heading"]').textContent = site.gamesHeading;
@@ -93,6 +93,33 @@
             row.append(iconWrap, label, value);
             profileList.append(row);
         });
+
+        const scrapbookContent = scrapbook && typeof scrapbook === 'object' ? scrapbook : window.ALEAF_DEFAULT_CONTENT.scrapbook;
+        document.querySelector('[data-content="scrapbook-heading"]').textContent = scrapbookContent.heading;
+        const scrapbookItems = document.querySelector('.scrapbook-items');
+        scrapbookItems.replaceChildren();
+        const scrapbookIconMap = { game: 'i-game', book: 'i-book', volume: 'i-volume', star: 'i-star', moon: 'i-moon', heart: 'i-heart' };
+        (Array.isArray(scrapbookContent.items) ? scrapbookContent.items : []).forEach((item) => {
+            const card = document.createElement('div');
+            card.className = 'scrapbook-item';
+            const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            icon.setAttribute('class', 'icon ui-icon');
+            icon.setAttribute('aria-hidden', 'true');
+            const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+            use.setAttribute('href', `#${scrapbookIconMap[item.icon] || 'i-star'}`);
+            icon.append(use);
+            const label = document.createElement('span');
+            label.textContent = item.label || '';
+            const value = document.createElement('strong');
+            value.textContent = item.value || '';
+            card.append(icon, label, value);
+            scrapbookItems.append(card);
+        });
+        const scrapbookImage = document.getElementById('scrapbookImage');
+        scrapbookImage.src = safeUrl(scrapbookContent.image, true) || window.ALEAF_DEFAULT_CONTENT.scrapbook.image;
+        scrapbookImage.alt = `${scrapbookContent.heading || 'Scrapbook'} accent`;
+        document.getElementById('scrapbookCaption').textContent = scrapbookContent.caption;
+        document.getElementById('scrapbookStamp').textContent = scrapbookContent.stamp;
 
         const gameList = document.querySelector('.game-images');
         gameList.replaceChildren();
@@ -145,6 +172,7 @@
         document.querySelector('[data-page="library"]').hidden = !site.gamesEnabled;
         document.querySelector('[data-page="tests"]').hidden = !site.quizzesEnabled;
         document.querySelector('.links-panel').hidden = !site.socialsEnabled;
+        document.querySelector('.scrapbook-panel').hidden = scrapbookContent.enabled === false;
         const music = document.getElementById('backgroundMusic');
         music.querySelector('source').src = safeUrl(site.musicUrl, true) || '';
         music.load();

@@ -40,7 +40,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Montserrat:wght@500;600;700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="me.css?v=2500-browser-7">
+    <link rel="stylesheet" href="me.css?v=2500-browser-25">
 </head>
 <body>
     <a class="skip-link" href="#mainContent">Skip to main content</a>
@@ -89,7 +89,11 @@
         <svg class="bow-float bow-float-c"><use href="#i-bow"/></svg>
     </div>
     <main class="browser" id="mainContent" tabindex="-1">
+        <div class="celestial-frame" aria-hidden="true">
+            <span class="frame-crest frame-crest-top"><b></b><i></i><svg><use href="#i-moon"/></svg><strong>25:00 NIGHTCORD</strong><i></i><b></b></span>
+        </div>
         <header class="browser-chrome">
+            <div class="chrome-celestial" aria-hidden="true"><svg class="chrome-moon"><use href="#i-moon"/></svg><span></span><span></span><span></span><svg class="chrome-star"><use href="#i-star"/></svg></div>
             <div class="chrome-top">
                 <div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
                 <nav class="tab-strip" role="tablist" aria-label="Main pages">
@@ -140,7 +144,7 @@
                             </div>
                             <div id="discordActivities" class="presence-activities"><p id="discordActivity">Loading rich presence...</p></div>
                         </div>
-                        <div class="signal-stars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                        <div class="signal-stars" aria-hidden="true"></div>
                     </article>
 
                     <article class="panel notes-panel lace-trim">
@@ -149,9 +153,23 @@
                         <div id="profileFields" class="profile-fields" aria-live="polite"></div>
                     </article>
 
+                    <article class="panel scrapbook-panel lace-trim">
+                        <header class="panel-heading"><div><span class="panel-index">04 / scrapbook</span><h2 data-content="scrapbook-heading">current obsessions</h2></div><span class="heading-icon"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-star"/></svg></span></header>
+                        <div class="scrapbook-body">
+                            <div class="scrapbook-items">
+                                <div class="scrapbook-item"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-game"/></svg><span>currently playing</span><strong>Project SEKAI</strong></div>
+                                <div class="scrapbook-item"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-book"/></svg><span>currently reading</span><strong>manga reading list</strong></div>
+                                <div class="scrapbook-item"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-volume"/></svg><span>on repeat</span><strong>First Date</strong></div>
+                                <div class="scrapbook-item"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-star"/></svg><span>current project</span><strong>this little corner of the web</strong></div>
+                            </div>
+                            <figure class="scrapbook-polaroid"><img id="scrapbookImage" src="cutouts/mizuki-cutout-1.png" alt="Scrapbook accent"><figcaption id="scrapbookCaption">anything cute belongs here.</figcaption></figure>
+                        </div>
+                        <p class="scrapbook-stamp"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-moon"/></svg><span id="scrapbookStamp">updated at 25:00</span></p>
+                    </article>
+
                     <article class="panel links-panel lace-trim">
                         <svg class="links-sakura" aria-hidden="true"><use href="#i-sakura"/></svg>
-                        <header class="panel-heading"><div><span class="panel-index">04 / links</span><h2>find me online</h2></div><span class="heading-icon"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-link"/></svg></span></header>
+                        <header class="panel-heading"><div><span class="panel-index">05 / links</span><h2>find me online</h2></div><span class="heading-icon"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-link"/></svg></span></header>
                         <div class="social-links" aria-label="Social links">
                             <a href="https://github.com/ha-neko" target="_blank" rel="noopener noreferrer" data-social="github" aria-label="GitHub"><svg class="icon"><use href="#i-github"/></svg><span>GitHub</span></a>
                             <a href="https://instagram.com/96_._neko" target="_blank" rel="noopener noreferrer" data-social="instagram" aria-label="Instagram"><svg class="icon"><use href="#i-instagram"/></svg><span>Instagram</span></a>
@@ -171,10 +189,10 @@
             <section id="panel-tests" class="page-panel quiz-page" role="tabpanel" aria-labelledby="tab-tests" data-page-panel="tests" hidden>
                 <header class="page-title"><span class="title-icon"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-book"/></svg></span><h1 data-content="quiz-heading">ideology test</h1><svg class="page-bow" aria-hidden="true"><use href="#i-bow"/></svg><div class="bead-line"></div></header>
                 <div class="test-container"><div class="test-card lace-trim">
-                    <div class="home"><p data-content="quiz-intro">pick one of the following subjects to test.</p><div class="test-menu"><button class="politics"><span>01</span>Political ideology</button><button class="psychology"><span>02</span>Philosophical ideology</button><button class="eeveelution"><span>03</span>Eeveelution type</button></div></div>
-                    <div class="test"><p class="questions" id="quizQuestion" tabindex="-1"></p><div class="options" role="radiogroup" aria-labelledby="quizQuestion"><button class="option1" role="radio" aria-checked="false"></button><button class="option2" role="radio" aria-checked="false"></button><button class="option3" role="radio" aria-checked="false"></button><button class="option4" role="radio" aria-checked="false"></button></div><div class="control"><button class="previous">Previous</button><button class="next">Next</button><button class="submit">Submit</button></div><div class="progress"><p class="progress-text">Question <span class="current-question">1</span> of <span class="total-questions"></span></p><div class="progress-bar" role="progressbar" aria-label="Quiz progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill"></div></div></div></div>
+                    <div class="home"><p data-content="quiz-intro">pick one of the following subjects to test.</p><div class="test-menu"><button class="politics"><span>01</span><span class="test-menu-copy"><strong>Political ideology</strong><small>power, society, and governance</small></span><i></i></button><button class="psychology"><span>02</span><span class="test-menu-copy"><strong>Philosophical ideology</strong><small>meaning, ethics, and existence</small></span><i></i></button><button class="eeveelution"><span>03</span><span class="test-menu-copy"><strong>Eeveelution type</strong><small>temperament, affinity, and style</small></span><i></i></button></div></div>
+                    <div class="test"><p class="questions" id="quizQuestion" tabindex="-1"></p><div class="options" role="radiogroup" aria-labelledby="quizQuestion"><button class="option1" role="radio" aria-checked="false"></button><button class="option2" role="radio" aria-checked="false"></button><button class="option3" role="radio" aria-checked="false"></button><button class="option4" role="radio" aria-checked="false"></button></div><div class="control"><button class="previous">Previous</button><button class="next">Next</button><button class="submit">Submit</button></div><div class="progress"><p class="progress-text"><span>Question <strong class="current-question">1</strong> of <strong class="total-questions"></strong></span><span class="progress-time">25:00</span></p><div class="progress-bar" role="progressbar" aria-label="Quiz progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill"></div></div></div></div>
                     <div class="loading" role="status" aria-live="polite"><img src="mizuki-walking.gif" alt=""><p class="loading-text">Loading...</p><div class="loading-bar"></div></div>
-                    <div class="result" aria-live="polite"><h2 class="result-title" tabindex="-1"></h2><p class="result-description"></p><button class="restart">Restart</button></div>
+                    <div class="result" aria-live="polite"><h2 class="result-title" tabindex="-1"></h2><div class="result-description"></div><button class="restart">Restart</button></div>
                 </div></div>
             </section>
             <section id="panel-web" class="page-panel web-page" role="tabpanel" aria-labelledby="tab-web" data-page-panel="web" hidden>
@@ -193,6 +211,6 @@
     <button id="musicToggle" class="music-button" type="button" aria-label="Play background music" aria-pressed="false" aria-describedby="musicStatus"><svg class="icon ui-icon sound-on" aria-hidden="true"><use href="#i-volume"/></svg><svg class="icon ui-icon sound-off" aria-hidden="true"><use href="#i-volume-off"/></svg></button>
     <span id="musicStatus" class="sr-only" role="status" aria-live="polite">Background music paused</span>
     <audio id="backgroundMusic" loop preload="metadata"><source src="First Date.mp3" type="audio/mpeg"></audio>
-    <script src="config.js"></script><script src="default-content.js"></script><script src="content.js"></script><script src="test.js"></script><script src="me.js?v=2500-browser-4"></script>
+    <script src="config.js"></script><script src="default-content.js"></script><script src="content.js"></script><script src="test.js?v=2500-quiz-2"></script><script src="me.js?v=2500-browser-7"></script>
 </body>
 </html>

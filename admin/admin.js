@@ -56,6 +56,8 @@
         const siteBooleans = ['musicEnabled','gamesEnabled','quizzesEnabled','socialsEnabled'];
         if (!siteStrings.every((key) => typeof candidate.site[key] === 'string') || !siteBooleans.every((key) => typeof candidate.site[key] === 'boolean')) throw new Error('General settings are incomplete or have invalid types.');
         if (!Array.isArray(candidate.profile) || !candidate.profile.every((item) => typeof item?.label === 'string' && typeof item?.value === 'string')) throw new Error('Profile must contain label and value strings.');
+        if (!candidate.scrapbook || typeof candidate.scrapbook !== 'object' || typeof candidate.scrapbook.enabled !== 'boolean' || !['heading','image','caption','stamp'].every((key) => typeof candidate.scrapbook[key] === 'string')) throw new Error('Scrapbook settings are incomplete or invalid.');
+        if (!Array.isArray(candidate.scrapbook.items) || !candidate.scrapbook.items.every((item) => ['icon','label','value'].every((key) => typeof item?.[key] === 'string'))) throw new Error('Every scrapbook item requires icon, label, and value strings.');
         if (!Array.isArray(candidate.games) || !candidate.games.every((item) => ['title','image','url'].every((key) => typeof item?.[key] === 'string'))) throw new Error('Every game requires title, image, and URL strings.');
         if (!Array.isArray(candidate.socials) || !candidate.socials.every((item) => ['id','label','url'].every((key) => typeof item?.[key] === 'string') && typeof item.enabled === 'boolean')) throw new Error('Every social link requires id, label, URL, and enabled fields.');
         if (!candidate.theme || !Object.values(candidate.theme).every((value) => /^#[0-9a-f]{6}$/i.test(value))) throw new Error('Theme values must be six-digit hex colors.');
@@ -120,6 +122,25 @@
         });
     }
 
+    function renderScrapbook() {
+        const fieldsRoot = document.getElementById('scrapbookFields'); fieldsRoot.replaceChildren();
+        fieldsRoot.append(
+            field('Card heading', content.scrapbook.heading, (v) => { content.scrapbook.heading = v; }),
+            field('Polaroid image URL or file', content.scrapbook.image, (v) => { content.scrapbook.image = v; }),
+            field('Polaroid caption', content.scrapbook.caption, (v) => { content.scrapbook.caption = v; }),
+            field('Footer stamp', content.scrapbook.stamp, (v) => { content.scrapbook.stamp = v; }),
+            checkbox('Show scrapbook card', content.scrapbook.enabled, (v) => { content.scrapbook.enabled = v; })
+        );
+        const root = document.getElementById('scrapbookEditor'); root.replaceChildren();
+        content.scrapbook.items.forEach((item,index) => {
+            const row = document.createElement('div'); row.className = 'repeat-row scrapbook-row';
+            const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'remove-button'; remove.textContent = 'Remove';
+            remove.addEventListener('click', () => { content.scrapbook.items.splice(index, 1); renderScrapbook(); setDirty(); syncAdvanced(); });
+            row.append(field('Icon id',item.icon,(v)=>{item.icon=v;}), field('Label',item.label,(v)=>{item.label=v;}), field('Value',item.value,(v)=>{item.value=v;}), remove);
+            root.append(row);
+        });
+    }
+
     function renderSocials() {
         const root = document.getElementById('socialsEditor'); root.replaceChildren();
         content.socials.forEach((item,index) => {
@@ -134,7 +155,7 @@
     }
 
     function syncAdvanced() { document.getElementById('advancedJson').value = JSON.stringify(content, null, 2); }
-    function renderAll() { renderSite(); renderProfile(); renderGames(); renderSocials(); renderTheme(); syncAdvanced(); }
+    function renderAll() { renderSite(); renderProfile(); renderScrapbook(); renderGames(); renderSocials(); renderTheme(); syncAdvanced(); }
 
     async function loadContent() {
         const { data, error } = await client.from('site_content').select('content').eq('id','main').maybeSingle();
@@ -176,6 +197,7 @@
     document.querySelectorAll('[data-add]').forEach((button) => button.addEventListener('click', () => {
         const type = button.dataset.add;
         if (type === 'profile') { content.profile.push({label:'NEW FIELD',value:''}); renderProfile(); }
+        if (type === 'scrapbook') { content.scrapbook.items.push({icon:'star',label:'new obsession',value:''}); renderScrapbook(); }
         if (type === 'games') { content.games.push({title:'New game',image:'',url:''}); renderGames(); }
         if (type === 'socials') { content.socials.push({id:'github',label:'New link',url:'',enabled:true}); renderSocials(); }
         setDirty(); syncAdvanced();

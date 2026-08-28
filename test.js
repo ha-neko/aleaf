@@ -549,15 +549,32 @@ class IdeologyTest {
         // Display result
         this.elements.resultTitle.textContent = `Your Result: ${topIdeology}`;
         this.elements.resultDesc.replaceChildren();
-        this.elements.resultDesc.append(document.createTextNode(this.getIdeologyDescription(topIdeology)));
-        this.elements.resultDesc.append(document.createElement('br'), document.createElement('br'));
-        const heading = document.createElement('strong');
-        heading.textContent = 'Score Breakdown:';
-        this.elements.resultDesc.append(heading, document.createElement('br'));
-        Object.entries(this.scores).sort((a, b) => b[1] - a[1]).forEach(([ideology, score], index, entries) => {
-            this.elements.resultDesc.append(document.createTextNode(`${ideology}: ${score}`));
-            if (index < entries.length - 1) this.elements.resultDesc.append(document.createElement('br'));
+        const summary = document.createElement('p');
+        summary.className = 'result-summary';
+        summary.textContent = this.getIdeologyDescription(topIdeology);
+        const heading = document.createElement('p');
+        heading.className = 'score-heading';
+        heading.textContent = 'Score breakdown';
+        const scoreList = document.createElement('div');
+        scoreList.className = 'score-list';
+        const entries = Object.entries(this.scores).sort((a, b) => b[1] - a[1]);
+        entries.forEach(([ideology, score]) => {
+            const row = document.createElement('div');
+            row.className = 'score-row';
+            const label = document.createElement('span');
+            label.textContent = ideology;
+            const track = document.createElement('span');
+            track.className = 'score-track';
+            const fill = document.createElement('i');
+            fill.style.width = `${maxScore ? (score / maxScore) * 100 : 0}%`;
+            track.append(fill);
+            const value = document.createElement('span');
+            value.className = 'score-value';
+            value.textContent = score;
+            row.append(label, track, value);
+            scoreList.append(row);
         });
+        this.elements.resultDesc.append(summary, heading, scoreList);
         this.elements.resultTitle.focus();
     }
     

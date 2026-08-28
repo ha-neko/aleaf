@@ -26,6 +26,19 @@ window.ALEAF_DEFAULT_CONTENT = {
         { label: 'HOBBIES', value: 'Gaming, reading manga, playing chess' },
         { label: 'EXTRA', value: 'tank brrrr' }
     ],
+    scrapbook: {
+        enabled: true,
+        heading: 'current obsessions',
+        image: 'cutouts/mizuki-cutout-1.png',
+        caption: 'anything cute belongs here.',
+        stamp: 'updated at 25:00',
+        items: [
+            { icon: 'game', label: 'currently playing', value: 'Project SEKAI' },
+            { icon: 'book', label: 'currently reading', value: 'manga reading list' },
+            { icon: 'volume', label: 'on repeat', value: 'First Date' },
+            { icon: 'star', label: 'current project', value: 'this little corner of the web' }
+        ]
+    },
     games: [
         { title: 'Needy Streamer Overload', image: 'nso.jpg', url: 'https://store.steampowered.com/app/1451940/NEEDY_STREAMER_OVERLOAD/' },
         { title: 'Doki Doki Literature Club', image: 'ddlc.jpg', url: 'https://store.steampowered.com/app/698780/Doki_Doki_Literature_Club/' },
