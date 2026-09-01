@@ -240,7 +240,7 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .scrapbook-item span { display: block; color: #a44a7f; text-transform: uppercase; font: 700 7px "Montserrat", sans-serif; letter-spacing: .09em; }
 .scrapbook-item strong { display: block; margin-top: 7px; overflow-wrap: anywhere; color: #63475a; font-size: 11px; line-height: 1.35; }
 .scrapbook-polaroid { min-width: 0; margin: 0; padding: 7px 7px 24px; position: relative; overflow: hidden; border: 1px solid #e2bfd3; border-radius: 8px; background: #fff; box-shadow: 0 9px 20px rgba(91,43,75,.12); transform: rotate(1.5deg); }
-.scrapbook-polaroid img { width: 100%; height: 165px; display: block; object-fit: contain; object-position: center top; border-radius: 4px; background: linear-gradient(145deg, #f9e7f1, #ead8e8); }
+.scrapbook-polaroid img { width: 100%; height: auto; aspect-ratio: 843 / 981; display: block; object-fit: contain; object-position: center top; border-radius: 4px; background: linear-gradient(145deg, #f9e7f1, #ead8e8); }
 .scrapbook-polaroid figcaption { position: absolute; right: 7px; bottom: 6px; left: 7px; overflow: hidden; color: #8e7183; text-align: center; text-overflow: ellipsis; white-space: nowrap; font: 600 italic 8px "Nunito", sans-serif; }
 .scrapbook-stamp { margin: 12px 0 0; display: flex; align-items: center; justify-content: flex-end; gap: 5px; color: #9b5b83; text-transform: uppercase; font: 700 7px "Montserrat", sans-serif; letter-spacing: .12em; }
 .scrapbook-stamp .icon { width: 11px; height: 11px; }
@@ -407,7 +407,7 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
     .scrapbook-panel { min-height: 0; }
     .scrapbook-body { grid-template-columns: 1fr; }
     .scrapbook-polaroid { width: min(190px, 72%); margin: 4px auto 0; }
-    .scrapbook-polaroid img { height: 190px; }
+    .scrapbook-polaroid img { height: auto; }
     .notes-panel, .scrapbook-panel, .links-panel { isolation: isolate; }
     .notes-panel > *, .scrapbook-panel > *, .links-panel > * { position: relative; z-index: 1; }
     .notes-panel {
