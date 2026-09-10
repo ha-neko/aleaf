@@ -105,6 +105,8 @@ create table public.guestbook_entries (
     approved boolean not null default false,
     created_at timestamptz not null default now(),
     moderated_at timestamptz,
+    owner_reply text,
+    replied_at timestamptz,
     constraint guestbook_display_name_valid check (
         display_name = btrim(display_name)
         and char_length(display_name) between 1 and 80
@@ -112,23 +114,25 @@ create table public.guestbook_entries (
     constraint guestbook_message_valid check (
         message = btrim(message)
         and char_length(message) between 1 and 2000
+    ),
+    constraint guestbook_owner_reply_valid check (
+        owner_reply is null
+        or (
+            owner_reply = pg_catalog.btrim(owner_reply)
+            and pg_catalog.char_length(owner_reply) between 1 and 2000
+        )
     )
 );
 
 create table public.inbox_messages (
     id bigint generated always as identity primary key,
     sender_name text not null,
-    reply_contact text,
     message text not null,
     is_read boolean not null default false,
     created_at timestamptz not null default now(),
     constraint inbox_sender_name_valid check (
         sender_name = btrim(sender_name)
         and char_length(sender_name) between 1 and 80
-    ),
-    constraint inbox_reply_contact_valid check (
-        reply_contact is null
-        or (reply_contact = btrim(reply_contact) and char_length(reply_contact) between 1 and 320)
     ),
     constraint inbox_message_valid check (
         message = btrim(message)
@@ -172,10 +176,12 @@ create table public.gallery_items (
     )
 );
 
-create table private.site_visitors (
-    visitor_id uuid primary key,
-    first_seen_at timestamptz not null default now(),
-    constraint visitor_id_not_nil check (visitor_id <> '00000000-0000-0000-0000-000000000000'::uuid)
+create table private.site_visitor_ips (
+    ip_hash text primary key,
+    first_seen_at timestamptz not null default pg_catalog.now(),
+    constraint site_visitor_ip_hash_valid check (
+        ip_hash operator(pg_catalog.~) '^[0-9a-f]{64}$'
+    )
 );
 
 create table private.guestbook_captcha_catalog (
@@ -202,14 +208,14 @@ on private.guestbook_captcha_challenges (expires_at);
 alter table public.guestbook_entries enable row level security;
 alter table public.inbox_messages enable row level security;
 alter table public.gallery_items enable row level security;
-alter table private.site_visitors enable row level security;
+alter table private.site_visitor_ips enable row level security;
 alter table private.guestbook_captcha_catalog enable row level security;
 alter table private.guestbook_captcha_challenges enable row level security;
 
 revoke all on table public.guestbook_entries from public, anon, authenticated;
 revoke all on table public.inbox_messages from public, anon, authenticated;
 revoke all on table public.gallery_items from public, anon, authenticated;
-revoke all on table private.site_visitors from public, anon, authenticated;
+revoke all on table private.site_visitor_ips from public, anon, authenticated, service_role;
 revoke all on table private.guestbook_captcha_catalog from public, anon, authenticated, service_role;
 revoke all on table private.guestbook_captcha_challenges from public, anon, authenticated, service_role;
 revoke all on sequence public.guestbook_entries_id_seq from public, anon, authenticated;
@@ -426,7 +432,6 @@ $$;
 
 create or replace function public.submit_inbox_message(
     p_sender_name text,
-    p_reply_contact text,
     p_body text
 )
 returns bigint
@@ -436,32 +441,29 @@ security definer
 set search_path = ''
 as $$
 declare
-    v_sender_name text := btrim(p_sender_name);
-    v_reply_contact text := nullif(btrim(p_reply_contact), '');
-    v_message text := btrim(p_body);
+    v_sender_name text := pg_catalog.btrim(p_sender_name);
+    v_message text := pg_catalog.btrim(p_body);
     v_id bigint;
 begin
-    if v_sender_name is null or char_length(v_sender_name) not between 1 and 80 then
+    if v_sender_name is null
+       or pg_catalog.char_length(v_sender_name) not between 1 and 80 then
         raise exception using errcode = '22023', message = 'sender_name must be between 1 and 80 characters';
     end if;
 
-    if v_reply_contact is not null and char_length(v_reply_contact) not between 1 and 320 then
-        raise exception using errcode = '22023', message = 'reply_contact must be at most 320 characters';
-    end if;
-
-    if v_message is null or char_length(v_message) not between 1 and 5000 then
+    if v_message is null
+       or pg_catalog.char_length(v_message) not between 1 and 5000 then
         raise exception using errcode = '22023', message = 'message must be between 1 and 5000 characters';
     end if;
 
-    insert into public.inbox_messages (sender_name, reply_contact, message)
-    values (v_sender_name, v_reply_contact, v_message)
+    insert into public.inbox_messages (sender_name, message)
+    values (v_sender_name, v_message)
     returning id into v_id;
 
     return v_id;
 end;
 $$;
 
-create or replace function public.record_visit(p_visitor_id uuid)
+create function public.record_ip_visit(p_ip_hash text)
 returns bigint
 language plpgsql
 volatile
@@ -471,27 +473,31 @@ as $$
 declare
     v_total bigint;
 begin
-    if p_visitor_id is null or p_visitor_id = '00000000-0000-0000-0000-000000000000'::uuid then
-        raise exception using errcode = '22023', message = 'visitor_id must be a non-nil UUID';
+    if p_ip_hash is null
+       or p_ip_hash operator(pg_catalog.!~) '^[0-9a-f]{64}$' then
+        raise exception using errcode = '22023', message = 'ip_hash must be a lowercase SHA-256 hex digest';
     end if;
 
-    insert into private.site_visitors (visitor_id)
-    values (p_visitor_id)
-    on conflict (visitor_id) do nothing;
+    insert into private.site_visitor_ips (ip_hash)
+    values (p_ip_hash)
+    on conflict (ip_hash) do nothing;
 
-    select count(*) into v_total from private.site_visitors;
+    select pg_catalog.count(*)
+    into v_total
+    from private.site_visitor_ips;
+
     return v_total;
 end;
 $$;
 
-create or replace function public.get_total_visitors()
+create function public.get_total_visitors()
 returns bigint
 language sql
 stable
 security definer
 set search_path = ''
 as $$
-    select count(*) from private.site_visitors;
+    select pg_catalog.count(*) from private.site_visitor_ips;
 $$;
 
 create or replace function public.is_current_user_admin()
@@ -506,15 +512,15 @@ $$;
 
 revoke all on function public.issue_guestbook_captcha() from public, anon, authenticated, service_role;
 revoke all on function public.submit_guestbook_entry(text, text, uuid, uuid[]) from public, anon, authenticated, service_role;
-revoke all on function public.submit_inbox_message(text, text, text) from public;
-revoke all on function public.record_visit(uuid) from public;
-revoke all on function public.get_total_visitors() from public;
+revoke all on function public.submit_inbox_message(text, text) from public, anon, authenticated, service_role;
+revoke all on function public.record_ip_visit(text) from public, anon, authenticated, service_role;
+revoke all on function public.get_total_visitors() from public, anon, authenticated, service_role;
 revoke all on function public.is_current_user_admin() from public;
 
 grant execute on function public.issue_guestbook_captcha() to anon, authenticated;
 grant execute on function public.submit_guestbook_entry(text, text, uuid, uuid[]) to anon, authenticated;
-grant execute on function public.submit_inbox_message(text, text, text) to anon, authenticated;
-grant execute on function public.record_visit(uuid) to anon, authenticated;
+grant execute on function public.submit_inbox_message(text, text) to anon, authenticated;
+grant execute on function public.record_ip_visit(text) to service_role;
 grant execute on function public.get_total_visitors() to anon, authenticated;
 grant execute on function public.is_current_user_admin() to authenticated;
 

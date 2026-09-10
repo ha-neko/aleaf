@@ -286,21 +286,60 @@
         root.replaceChildren();
         if (!data.length) { renderEmpty(root, 'No guestbook entries yet.'); setSectionStatus('guestbook', 'No entries.'); return; }
         data.forEach((entry) => {
+            const displayName = entry.display_name || 'Anonymous';
             const card = document.createElement('article'); card.className = 'management-card';
             const header = document.createElement('div'); header.className = 'management-card-header';
             const moderationState = entry.approved ? 'approved' : (entry.moderated_at ? 'rejected' : 'pending');
-            header.append(textElement('h3', '', entry.display_name || 'Anonymous'), textElement('span', 'state-badge', moderationState));
+            header.append(textElement('h3', '', displayName), textElement('span', 'state-badge', moderationState));
             const meta = textElement('p', 'management-meta', formatDate(entry.created_at));
             const body = textElement('p', '', entry.message);
+            const replyField = document.createElement('label'); replyField.className = 'owner-reply-field';
+            const replyTextarea = document.createElement('textarea');
+            replyTextarea.rows = 4;
+            replyTextarea.maxLength = 2000;
+            replyTextarea.value = entry.owner_reply ?? '';
+            replyTextarea.setAttribute('aria-describedby', `guestbook-reply-state-${entry.id} guestbook-reply-status-${entry.id}`);
+            replyField.append(document.createTextNode(`Owner reply to ${displayName}`), replyTextarea);
+            const replyState = textElement('p', 'owner-reply-state', '');
+            replyState.id = `guestbook-reply-state-${entry.id}`;
+            setGuestbookReplyState(replyState, entry.owner_reply, entry.replied_at);
+            const replyStatus = textElement('p', 'card-action-status', '');
+            replyStatus.id = `guestbook-reply-status-${entry.id}`;
+            replyStatus.setAttribute('role', 'status');
             const actions = document.createElement('div'); actions.className = 'management-actions';
             actions.append(
-                actionButton('Approve', () => updateGuestbookStatus(entry.id, true), false, `Approve guestbook entry from ${entry.display_name}`),
-                actionButton('Reject', () => updateGuestbookStatus(entry.id, false), false, `Reject guestbook entry from ${entry.display_name}`),
-                actionButton('Delete', () => deleteGuestbookEntry(entry.id), true, `Delete guestbook entry from ${entry.display_name}`)
+                actionButton('Save reply', () => updateGuestbookReply(entry, replyTextarea.value, replyTextarea, replyState, replyStatus), false, `Save owner reply to ${displayName}`),
+                actionButton('Clear reply', () => updateGuestbookReply(entry, '', replyTextarea, replyState, replyStatus), false, `Clear owner reply to ${displayName}`),
+                actionButton('Approve', () => updateGuestbookStatus(entry.id, true), false, `Approve guestbook entry from ${displayName}`),
+                actionButton('Reject', () => updateGuestbookStatus(entry.id, false), false, `Reject guestbook entry from ${displayName}`),
+                actionButton('Delete', () => deleteGuestbookEntry(entry.id), true, `Delete guestbook entry from ${displayName}`)
             );
-            card.append(header, meta, body, actions); root.append(card);
+            card.append(header, meta, body, replyField, replyState, actions, replyStatus); root.append(card);
         });
         setSectionStatus('guestbook', `${data.length} ${data.length === 1 ? 'entry' : 'entries'} loaded.`);
+    }
+
+    function setGuestbookReplyState(element, reply, repliedAt) {
+        element.textContent = reply ? `Reply saved${repliedAt ? ` ${formatDate(repliedAt)}` : ''}.` : 'No owner reply.';
+        element.classList.toggle('has-reply', Boolean(reply));
+    }
+
+    async function updateGuestbookReply(entry, value, textarea, replyState, replyStatus) {
+        const ownerReply = value.trim() || null;
+        const repliedAt = ownerReply ? new Date().toISOString() : null;
+        replyStatus.textContent = ownerReply ? 'Saving reply...' : 'Clearing reply...';
+        replyStatus.classList.remove('error');
+        const { error } = await client.from('guestbook_entries').update({ owner_reply: ownerReply, replied_at: repliedAt }).eq('id', entry.id);
+        if (error) {
+            replyStatus.textContent = `Reply update failed: ${error.message}`;
+            replyStatus.classList.add('error');
+            return;
+        }
+        entry.owner_reply = ownerReply;
+        entry.replied_at = repliedAt;
+        textarea.value = ownerReply ?? '';
+        setGuestbookReplyState(replyState, ownerReply, repliedAt);
+        replyStatus.textContent = ownerReply ? 'Reply saved.' : 'Reply cleared.';
     }
 
     async function updateGuestbookStatus(id, approved) {
@@ -327,12 +366,11 @@
         root.replaceChildren();
         if (!data.length) { renderEmpty(root, 'Your inbox is empty.'); setSectionStatus('inbox', 'No messages.'); return; }
         data.forEach((item) => {
+            const sender = item.sender_name || 'Anonymous';
             const card = document.createElement('article'); card.className = `management-card${item.is_read ? '' : ' is-unread'}`;
             const header = document.createElement('div'); header.className = 'management-card-header';
-            header.append(textElement('h3', '', item.sender_name || 'Anonymous'), textElement('span', 'state-badge', item.is_read ? 'read' : 'unread'));
-            const sender = item.sender_name || item.name || 'Anonymous';
-            const contact = item.reply_contact;
-            card.append(header, textElement('p', 'management-meta', `${contact || sender} / ${formatDate(item.created_at)}`), textElement('p', '', item.message));
+            header.append(textElement('h3', '', sender), textElement('span', 'state-badge', item.is_read ? 'read' : 'unread'));
+            card.append(header, textElement('p', 'management-meta', formatDate(item.created_at)), textElement('p', '', item.message));
             const actions = document.createElement('div'); actions.className = 'management-actions';
             actions.append(
                 actionButton(item.is_read ? 'Mark unread' : 'Mark read', () => updateInboxRead(item.id, !item.is_read), false, `Mark message from ${sender} ${item.is_read ? 'unread' : 'read'}`),

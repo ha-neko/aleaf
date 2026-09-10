@@ -296,10 +296,13 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .community-status.is-error, .form-status.is-error { color: #a3365c; }
 .guestbook-entries { margin-top: 12px; display: grid; gap: 9px; }
 .guestbook-entry { padding: 14px 15px; border: 1px solid #e3c4d7; border-radius: 13px; background: linear-gradient(145deg, rgba(255,255,255,.92), rgba(248,232,241,.72)); }
-.guestbook-entry > div { display: flex; align-items: baseline; justify-content: space-between; gap: 15px; }
-.guestbook-entry strong { color: #713d62; font-size: 12px; overflow-wrap: anywhere; }
+.guestbook-entry-heading, .guestbook-reply-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 15px; }
+.guestbook-entry-heading strong { color: #713d62; font-size: 12px; overflow-wrap: anywhere; }
 .guestbook-entry time { flex: none; color: #9a788e; text-transform: uppercase; font: 600 8px "Montserrat", sans-serif; }
-.guestbook-entry p { margin: 8px 0 0; color: #614959; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; white-space: pre-wrap; }
+.guestbook-entry > p, .guestbook-owner-reply p { margin: 8px 0 0; color: #614959; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; white-space: pre-wrap; }
+.guestbook-owner-reply { margin-top: 13px; padding: 11px 12px; border-left: 3px solid #a95587; border-radius: 4px 10px 10px 4px; background: rgba(169,85,135,.09); }
+.guestbook-reply-heading strong { color: #8b3f72; text-transform: uppercase; letter-spacing: .1em; font: 700 8px "Montserrat", sans-serif; }
+.guestbook-owner-reply p { color: #6c3f5d; }
 .community-form-column { display: grid; gap: 16px; }
 .community-form { padding: 20px; display: grid; gap: 7px; }
 .community-form .community-card-heading { margin-bottom: 2px; }
@@ -596,6 +599,8 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
     .game-item { grid-template-columns: 1fr; }
     .game-meta { min-height: 52px; }
     .guestbook-entries-card { min-height: 0; padding: 18px 15px; }
+    .guestbook-entry-heading, .guestbook-reply-heading { align-items: flex-start; flex-direction: column; gap: 3px; }
+    .guestbook-owner-reply { padding: 10px; }
     .community-form { padding: 18px 15px; }
     .guestbook-dialog { width: calc(100% - 16px); max-height: calc(100dvh - 16px); }
     .guestbook-dialog-form { max-height: calc(100dvh - 16px); padding: 16px 12px; }

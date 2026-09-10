@@ -40,7 +40,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Montserrat:wght@500;600;700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="me.css?v=2500-community-2">
+    <link rel="stylesheet" href="me.css?v=2500-community-3">
 </head>
 <body>
     <a class="skip-link" href="#mainContent">Skip to main content</a>
@@ -220,11 +220,9 @@
                           </section>
                          <form id="inboxForm" class="community-card community-form private-form">
                              <div class="community-card-heading"><div><span class="panel-index">private channel</span><h2 data-content="private-message-heading">send a private message</h2></div></div>
-                             <p class="private-notice"><strong>Private:</strong> this message goes only to Leaf and is never shown in the guestbook.</p>
+                             <p class="private-notice"><strong>Private and one-way:</strong> this note goes only to Leaf, is never shown in the guestbook, and does not request a reply.</p>
                              <label for="inboxName">Your name</label>
                              <input id="inboxName" name="sender_name" type="text" required minlength="1" maxlength="60" autocomplete="name">
-                             <label for="inboxContact">Reply contact <span>(optional)</span></label>
-                             <input id="inboxContact" name="reply_contact" type="text" maxlength="120" autocomplete="email" placeholder="email, Discord, or another contact">
                              <label for="inboxBody">Private message</label>
                              <textarea id="inboxBody" name="body" required minlength="2" maxlength="1000" rows="5"></textarea>
                              <button type="submit">send privately</button>
@@ -282,6 +280,6 @@
     <button id="musicToggle" class="music-button" type="button" aria-label="Play background music" aria-pressed="false" aria-describedby="musicStatus"><svg class="icon ui-icon sound-on" aria-hidden="true"><use href="#i-volume"/></svg><svg class="icon ui-icon sound-off" aria-hidden="true"><use href="#i-volume-off"/></svg></button>
     <span id="musicStatus" class="sr-only" role="status" aria-live="polite">Background music paused</span>
     <audio id="backgroundMusic" loop preload="metadata"><source src="First Date.mp3" type="audio/mpeg"></audio>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="default-content.js?v=2500-community-1"></script><script src="content.js?v=2500-community-1"></script><script src="test.js?v=2500-quiz-2"></script><script src="community.js?v=2500-community-2"></script><script src="me.js?v=2500-community-1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="default-content.js?v=2500-community-1"></script><script src="content.js?v=2500-community-1"></script><script src="test.js?v=2500-quiz-2"></script><script src="community.js?v=2500-community-3"></script><script src="me.js?v=2500-community-1"></script>
 </body>
 </html>

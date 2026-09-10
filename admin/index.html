@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,600&family=Montserrat:wght@500;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="admin.css?v=2500-community-1">
+    <link rel="stylesheet" href="admin.css?v=2500-community-2">
 </head>
 <body>
     <a class="skip-link" href="#adminMain">Skip to dashboard</a>
@@ -107,7 +107,7 @@
                         <label class="full-field">Latest public URL<input id="uploadedUrl" readonly placeholder="Uploaded URL appears here"></label>
                     </section>
                     <section class="editor-panel" data-editor-panel="guestbook" hidden>
-                        <div class="panel-heading"><p class="eyebrow">moderation queue</p><h2>Guestbook</h2><p>Approve entries for the public guestbook, reject them, or delete them permanently.</p></div>
+                        <div class="panel-heading"><p class="eyebrow">moderation queue</p><h2>Guestbook</h2><p>Moderate public entries and write or clear owner replies.</p></div>
                         <div class="management-heading"><button id="refreshGuestbook" class="button secondary" type="button">Refresh entries</button><p id="guestbookStatus" class="section-status" role="status">Open this section to load entries.</p></div>
                         <div id="guestbookList" class="management-list"></div>
                     </section>
@@ -144,6 +144,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../config.js"></script>
     <script src="../default-content.js"></script>
-    <script src="admin.js?v=2500-community-1"></script>
+    <script src="admin.js?v=2500-community-2"></script>
 </body>
 </html>

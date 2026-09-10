@@ -138,6 +138,12 @@ textarea { resize: vertical; line-height: 1.55; }
 .management-actions button:hover { background: #f9e3ef; }
 .management-actions .danger-action { color: var(--danger); border-color: #dca8bd; }
 .management-actions button:disabled, .gallery-upload-form button:disabled { opacity: .55; cursor: wait; }
+.owner-reply-field { margin-top: 3px; }
+.owner-reply-field textarea { min-height: 96px; }
+.owner-reply-state { color: var(--muted); font-size: 11px !important; font-weight: 700; }
+.owner-reply-state.has-reply { color: var(--purple-deep); }
+.card-action-status { min-height: 17px; color: var(--purple-deep); font-size: 11px !important; font-weight: 700; }
+.card-action-status.error { color: var(--danger); }
 .gallery-upload-form { padding: 17px; display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; border: 1px dashed #ba79a0; border-radius: 16px; background: linear-gradient(145deg, #fffafd, #f8e6f1); }
 .gallery-upload-form .full-span { grid-column: 1 / -1; }
 .gallery-upload-form .checkbox-field { align-self: end; }
@@ -179,6 +185,7 @@ textarea { resize: vertical; line-height: 1.55; }
     .gallery-upload-form .full-span { grid-column: auto; }
     .gallery-thumbnail { width: 100%; height: min(55vw, 260px); }
     .management-heading, .management-card-header { align-items: stretch; flex-direction: column; }
+    .management-actions button { flex: 1 1 120px; }
     .admin-shell::after { display: none; }
 }
 @media (max-width: 390px) {

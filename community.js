@@ -66,6 +66,7 @@
                 const article = document.createElement('article');
                 article.className = 'guestbook-entry';
                 const heading = document.createElement('div');
+                heading.className = 'guestbook-entry-heading';
                 const name = document.createElement('strong');
                 name.textContent = entry.display_name || 'anonymous visitor';
                 const time = document.createElement('time');
@@ -77,6 +78,24 @@
                 const body = document.createElement('p');
                 body.textContent = entry.body || entry.message || '';
                 article.append(heading, body);
+                if (typeof entry.owner_reply === 'string' && entry.owner_reply.trim()) {
+                    const reply = document.createElement('div');
+                    reply.className = 'guestbook-owner-reply';
+                    const replyHeading = document.createElement('div');
+                    replyHeading.className = 'guestbook-reply-heading';
+                    const replyLabel = document.createElement('strong');
+                    replyLabel.textContent = 'leaf replied';
+                    const replyTime = document.createElement('time');
+                    const replyDateText = displayDate(entry.replied_at);
+                    replyTime.textContent = replyDateText;
+                    if (entry.replied_at) replyTime.dateTime = entry.replied_at;
+                    replyTime.hidden = !replyDateText;
+                    const replyBody = document.createElement('p');
+                    replyBody.textContent = entry.owner_reply.trim();
+                    replyHeading.append(replyLabel, replyTime);
+                    reply.append(replyHeading, replyBody);
+                    article.append(reply);
+                }
                 root.append(article);
             });
             setStatus(guestbookStatus, entries.length ? `${entries.length} approved ${entries.length === 1 ? 'entry' : 'entries'}.` : 'No approved entries yet. Be the first to leave a note.');
@@ -305,19 +324,27 @@
         }
     }
 
-    async function loadTotalVisitors(client, id) {
+    async function loadTotalVisitors(client) {
         const output = document.getElementById('totalVisitors');
         try {
-            const recorded = await client.rpc('record_visit', { p_visitor_id: id });
-            if (recorded.error) throw recorded.error;
-            const total = await client.rpc('get_total_visitors');
-            if (total.error) throw total.error;
-            output.textContent = String(total.data ?? recorded.data ?? 0);
+            const { data, error } = await client.functions.invoke('visitor-counter');
+            if (error) throw error;
+            if (!data || !Number.isFinite(Number(data.total))) throw new Error('Invalid visitor total');
+            output.textContent = String(data.total);
             setStatus(visitorStatus, `${output.textContent} total visitors. Connecting current visitors.`);
         } catch (error) {
-            output.textContent = '--';
-            setStatus(visitorStatus, 'Total visitor count is unavailable.', true);
-            console.warn('visitor total:', error.message);
+            console.warn('visitor-counter:', error.message);
+            try {
+                const fallback = await client.rpc('get_total_visitors');
+                if (fallback.error) throw fallback.error;
+                if (!Number.isFinite(Number(fallback.data))) throw new Error('Invalid visitor total');
+                output.textContent = String(fallback.data);
+                setStatus(visitorStatus, `${output.textContent} total visitors. Connecting current visitors.`);
+            } catch (fallbackError) {
+                output.textContent = '--';
+                setStatus(visitorStatus, 'Total visitor count is unavailable.', true);
+                console.warn('visitor total fallback:', fallbackError.message);
+            }
         }
     }
 
@@ -362,7 +389,6 @@
             rpc: 'submit_inbox_message',
             values: (form) => ({
                 p_sender_name: { text: form.elements.sender_name.value, required: true },
-                p_reply_contact: { text: form.elements.reply_contact.value, required: false },
                 p_body: { text: form.elements.body.value, required: true }
             }),
             loading: 'Sending privately...',
@@ -371,14 +397,14 @@
         });
 
         const id = visitorId();
-        loadTotalVisitors(client, id);
+        loadTotalVisitors(client);
         connectPresence(client, id);
         if (window.ALEAF_CONTENT?.site?.guestbookEnabled !== false) loadGuestbook(client);
         if (window.ALEAF_CONTENT?.site?.galleryEnabled !== false) loadGallery(client);
         window.addEventListener('aleaf:refresh', (event) => {
             if (event.detail === 'guestbook') loadGuestbook(client);
             if (event.detail === 'gallery') loadGallery(client);
-            if (event.detail === 'profile') loadTotalVisitors(client, id);
+            if (event.detail === 'profile') loadTotalVisitors(client);
         });
     }
 
