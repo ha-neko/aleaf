@@ -15,15 +15,11 @@
     }
 
     function disableForms(message) {
-        ['inboxForm'].forEach((id) => {
-            const form = document.getElementById(id);
-            if (!form) return;
-            [...form.elements].forEach((control) => { control.disabled = true; });
-            setStatus(form.querySelector('.form-status'), message, true);
-        });
-        const guestbookOpen = document.getElementById('guestbookOpen');
-        if (guestbookOpen) guestbookOpen.disabled = true;
-        setStatus(document.getElementById('guestbookSubmissionStatus'), message, true);
+        const composeSend = document.getElementById('composeSend');
+        if (composeSend) composeSend.disabled = true;
+        const composeBody = document.getElementById('composeBody');
+        if (composeBody) composeBody.disabled = true;
+        setStatus(document.getElementById('composeStatus'), message, true);
     }
 
     function safePublicUrl(value) {
@@ -38,9 +34,11 @@
     function safeCaptchaUrl(value) {
         try {
             const url = new URL(value);
-            return url.protocol === 'https:' && url.hostname === 'cdn.donmai.us' && !url.port && !url.username && !url.password
-                ? url.href
-                : '';
+            if (url.protocol !== 'https:' || url.port || url.username || url.password) return '';
+            // Accept direct CDN images or Edge Function proxy URLs from our project.
+            if (url.hostname === 'cdn.donmai.us') return url.href;
+            if (url.hostname.endsWith('.supabase.co') && url.pathname.includes('/functions/v1/guestbook-captcha')) return url.href;
+            return '';
         } catch (_) {
             return '';
         }
@@ -170,47 +168,18 @@
         }
     }
 
-    function bindRpcForm(client, options) {
-        const form = document.getElementById(options.formId);
-        const status = document.getElementById(options.statusId);
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            if (!form.reportValidity()) return;
-            const values = options.values(form);
-            if (Object.values(values).some((value) => value.required && !value.text.trim())) {
-                setStatus(status, 'Please complete the required fields.', true);
-                return;
-            }
-            const button = form.querySelector('button[type="submit"]');
-            button.disabled = true;
-            setStatus(status, options.loading);
-            const parameters = {};
-            Object.entries(values).forEach(([key, value]) => { parameters[key] = value.text.trim(); });
-            try {
-                const { error } = await client.rpc(options.rpc, parameters);
-                if (error) throw error;
-                form.reset();
-                setStatus(status, options.success);
-            } catch (error) {
-                setStatus(status, options.failure, true);
-                console.warn(`${options.rpc}:`, error.message);
-            } finally {
-                button.disabled = false;
-            }
-        });
-    }
 
     function bindGuestbookDialog(client) {
         const dialog = document.getElementById('guestbookDialog');
         const form = document.getElementById('guestbookForm');
-        const openButton = document.getElementById('guestbookOpen');
         const closeButton = document.getElementById('guestbookClose');
         const cancelButton = document.getElementById('guestbookCancel');
         const refreshButton = document.getElementById('guestbookCaptchaRefresh');
         const choicesRoot = document.getElementById('guestbookCaptchaChoices');
         const captchaStatus = document.getElementById('guestbookCaptchaStatus');
         const formStatus = document.getElementById('guestbookFormStatus');
-        const submissionStatus = document.getElementById('guestbookSubmissionStatus');
+        const composeStatus = document.getElementById('composeStatus');
+        const composeTextarea = document.getElementById('composeBody');
         const submitButton = form.querySelector('button[type="submit"]');
         let challenge = null;
         let challengeRequest = 0;
@@ -265,9 +234,8 @@
             }
         }
 
-        openButton.addEventListener('click', () => {
+        dialog.addEventListener('compose-open', () => {
             if (dialog.open) return;
-            setStatus(submissionStatus, '');
             setStatus(formStatus, '');
             dialog.showModal();
             loadChallenge();
@@ -321,11 +289,116 @@
                 }
                 form.reset();
                 dialog.close();
-                setStatus(submissionStatus, 'Note received. It will appear after approval.');
+                if (composeTextarea) {
+                    composeTextarea.value = '';
+                    document.getElementById('composeCharCount').textContent = '0 / 1000';
+                }
+                setStatus(composeStatus, 'Note received. It will appear after approval.');
             } catch (error) {
                 setStatus(formStatus, 'Your note could not be sent. Please try the new verification images.', true);
                 console.warn('submit_guestbook_entry:', error.message);
                 await loadChallenge();
+            }
+        });
+    }
+
+    function bindComposeCard(client) {
+        const toggle = document.getElementById('composeModeToggle');
+        const hint = document.getElementById('composeHint');
+        const textarea = document.getElementById('composeBody');
+        const charCount = document.getElementById('composeCharCount');
+        const sendBtn = document.getElementById('composeSend');
+        const status = document.getElementById('composeStatus');
+        const guestbookDialog = document.getElementById('guestbookDialog');
+        const privateDialog = document.getElementById('privateDialog');
+        const privateBody = document.getElementById('privateBody');
+        const guestbookBody = document.getElementById('guestbookBody');
+
+        function isPrivate() { return toggle.checked; }
+
+        function updateMode() {
+            const privateMode = isPrivate();
+            toggle.setAttribute('aria-checked', String(privateMode));
+            const publicLabel = document.querySelector('.compose-toggle-label[data-mode="public"]');
+            const privateLabel = document.querySelector('.compose-toggle-label[data-mode="private"]');
+            if (publicLabel) publicLabel.style.color = privateMode ? '' : '#ffe5f3';
+            if (privateLabel) privateLabel.style.color = privateMode ? '#ffe5f3' : '';
+            hint.textContent = privateMode
+                ? 'Visible only to Leaf. Fully anonymous, no reply possible.'
+                : 'Visible to everyone after approval. Includes a CAPTCHA.';
+            textarea.placeholder = privateMode
+                ? 'Write something only Leaf will see...'
+                : 'Write a note for everyone passing through...';
+        }
+
+        toggle.addEventListener('change', updateMode);
+        textarea.addEventListener('input', () => {
+            charCount.textContent = `${textarea.value.length} / 1000`;
+        });
+
+        sendBtn.addEventListener('click', () => {
+            const body = textarea.value.trim();
+            if (body.length < 2) {
+                setStatus(status, 'Please write at least a couple of characters.', true);
+                return;
+            }
+            setStatus(status, '');
+            if (isPrivate()) {
+                privateBody.value = body;
+                privateDialog.showModal();
+            } else {
+                guestbookBody.value = body;
+                guestbookDialog.showModal();
+                // Trigger the captcha load via the existing open handler
+                const event = new Event('compose-open');
+                guestbookDialog.dispatchEvent(event);
+            }
+        });
+
+        updateMode();
+    }
+
+    function bindPrivateDialog(client) {
+        const dialog = document.getElementById('privateDialog');
+        const form = document.getElementById('privateForm');
+        const closeBtn = document.getElementById('privateClose');
+        const cancelBtn = document.getElementById('privateCancel');
+        const formStatus = document.getElementById('privateFormStatus');
+        const composeStatus = document.getElementById('composeStatus');
+        const textarea = document.getElementById('composeBody');
+
+        closeBtn.addEventListener('click', () => dialog.close());
+        cancelBtn.addEventListener('click', () => dialog.close());
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!form.reportValidity()) return;
+
+            const body = document.getElementById('privateBody').value.trim();
+            if (!body) {
+                setStatus(formStatus, 'Please enter a message.', true);
+                return;
+            }
+
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            setStatus(formStatus, 'Sending anonymously...');
+
+            try {
+                const { error } = await client.rpc('submit_inbox_message', {
+                    p_body: body
+                });
+                if (error) throw error;
+                form.reset();
+                dialog.close();
+                textarea.value = '';
+                document.getElementById('composeCharCount').textContent = '0 / 1000';
+                setStatus(composeStatus, 'Anonymous message delivered. It cannot be replied to or shown publicly.');
+            } catch (error) {
+                setStatus(formStatus, 'Your message could not be sent. Please try again.', true);
+                console.warn('submit_inbox_message:', error.message);
+            } finally {
+                submitBtn.disabled = false;
             }
         });
     }
@@ -410,17 +483,8 @@
 
         const client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
         bindGuestbookDialog(client);
-        bindRpcForm(client, {
-            formId: 'inboxForm',
-            statusId: 'inboxFormStatus',
-            rpc: 'submit_inbox_message',
-            values: (form) => ({
-                p_body: { text: form.elements.body.value, required: true }
-            }),
-            loading: 'Sending privately...',
-            success: 'Anonymous message delivered. It cannot be replied to or shown publicly.',
-            failure: 'Your private message could not be sent. Please try again.'
-        });
+        bindComposeCard(client);
+        bindPrivateDialog(client);
 
         const id = visitorId();
         loadTotalVisitors(client);

@@ -40,7 +40,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Montserrat:wght@500;600;700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="me.css?v=2500-community-4">
+    <link rel="stylesheet" href="me.css?v=2500-community-5">
 </head>
 <body>
     <a class="skip-link" href="#mainContent">Skip to main content</a>
@@ -118,6 +118,13 @@
                  </form>
                  <div class="chrome-clock" aria-label="Local time"><span class="signal-light" aria-hidden="true"></span><span id="desktopClock">25:00</span></div>
             </div>
+            <nav class="bookmark-bar" id="bookmarkBar" role="tablist" aria-label="Pages">
+                 <button class="bookmark-item" role="tab" aria-selected="true" data-page="profile">home</button>
+                 <button class="bookmark-item" role="tab" aria-selected="false" tabindex="-1" data-page="library">games</button>
+                 <button class="bookmark-item" role="tab" aria-selected="false" tabindex="-1" data-page="tests">quiz</button>
+                 <button class="bookmark-item" role="tab" aria-selected="false" tabindex="-1" data-page="guestbook">guestbook</button>
+                 <button class="bookmark-item" role="tab" aria-selected="false" tabindex="-1" data-page="gallery">gallery</button>
+            </nav>
             <svg class="chrome-bow" aria-hidden="true"><use href="#i-bow"/></svg>
             <svg class="chrome-sakura" aria-hidden="true"><use href="#i-sakura"/></svg>
         </header>
@@ -213,50 +220,72 @@
                          <p id="guestbookListStatus" class="community-status" role="status" aria-live="polite">Loading guestbook entries...</p>
                          <div id="guestbookEntries" class="guestbook-entries" aria-live="polite"></div>
                      </section>
-                     <aside class="community-form-column" aria-label="Guestbook message options">
-                          <section class="community-card guestbook-sign-card" aria-labelledby="guestbookSignHeading">
-                              <div class="compose-mark" aria-hidden="true"><svg class="icon ui-icon"><use href="#i-comment"/></svg></div>
-                              <div class="community-card-heading"><div><span class="panel-index">join the board</span><h2 id="guestbookSignHeading">leave a public signal</h2></div></div>
-                              <p>Write a note for everyone passing through. It joins the feed after approval.</p>
-                              <button id="guestbookOpen" type="button" aria-haspopup="dialog" aria-controls="guestbookDialog"><span>compose a public note</span><span aria-hidden="true">&rarr;</span></button>
-                              <p id="guestbookSubmissionStatus" class="form-status" role="status" aria-live="polite"></p>
-                          </section>
-                         <form id="inboxForm" class="community-card community-form private-form">
-                             <div class="community-card-heading"><div><span class="panel-index">anonymous / private / one-way</span><h2 data-content="private-message-heading">send a private message</h2></div></div>
-                             <p class="private-notice"><strong>Anonymous and one-way.</strong> No name or contact details are requested. Only the message is sent to Leaf, it is never published, and no reply is possible.</p>
-                             <label for="inboxBody">Your anonymous message</label>
-                             <textarea id="inboxBody" name="body" required minlength="2" maxlength="1000" rows="6" autocomplete="off" placeholder="Write something only Leaf will see..."></textarea>
-                             <button type="submit">send anonymous message</button>
-                             <p id="inboxFormStatus" class="form-status" role="status" aria-live="polite"></p>
-                         </form>
-                     </aside>
+                      <aside class="community-form-column" aria-label="Guestbook message options">
+                           <section class="community-card compose-card" aria-labelledby="composeHeading">
+                               <div class="compose-header">
+                                   <div class="compose-mark" aria-hidden="true"><svg class="icon ui-icon"><use href="#i-comment"/></svg></div>
+                                   <div class="compose-header-text"><span class="panel-index">send a signal</span><h2 id="composeHeading">leave a message</h2></div>
+                               </div>
+                               <div class="compose-toggle-row">
+                                   <span class="compose-toggle-label" data-mode="public">public</span>
+                                   <label class="compose-toggle" aria-label="Toggle between public and private message">
+                                       <input id="composeModeToggle" type="checkbox" role="switch" aria-checked="false">
+                                       <span class="compose-toggle-track"><span class="compose-toggle-thumb"></span></span>
+                                   </label>
+                                   <span class="compose-toggle-label" data-mode="private">private</span>
+                               </div>
+                               <p class="compose-hint" id="composeHint">Visible to everyone after approval. Includes a CAPTCHA.</p>
+                               <textarea id="composeBody" class="compose-textarea" required minlength="2" maxlength="1000" rows="4" autocomplete="off" placeholder="Write your message here..."></textarea>
+                               <div class="compose-footer">
+                                   <span class="compose-char-count" id="composeCharCount">0 / 1000</span>
+                                   <button id="composeSend" type="button" class="compose-send-btn"><span>send</span><span aria-hidden="true">&rarr;</span></button>
+                               </div>
+                               <p id="composeStatus" class="form-status" role="status" aria-live="polite"></p>
+                           </section>
+                      </aside>
                   </div>
-                  <dialog id="guestbookDialog" class="guestbook-dialog" aria-labelledby="guestbookDialogHeading" aria-describedby="guestbookDialogNote">
-                      <form id="guestbookForm" class="community-form guestbook-dialog-form">
-                          <div class="guestbook-dialog-heading">
-                              <div><span class="panel-index">public note</span><h2 id="guestbookDialogHeading">sign the guestbook</h2></div>
-                              <button id="guestbookClose" class="dialog-close" type="button" aria-label="Close guestbook form">&times;</button>
-                          </div>
-                          <p id="guestbookDialogNote" class="form-note">Submitted notes appear here only after approval.</p>
-                          <label for="guestbookName">Display name</label>
-                          <input id="guestbookName" name="display_name" type="text" required minlength="1" maxlength="40" autocomplete="nickname" autofocus>
-                          <label for="guestbookBody">Message</label>
-                          <textarea id="guestbookBody" name="body" required minlength="2" maxlength="500" rows="4"></textarea>
-                          <fieldset class="guestbook-captcha">
-                              <legend>Select the three images containing Mizuki.</legend>
-                              <div id="guestbookCaptchaChoices" class="captcha-grid"></div>
-                              <div class="captcha-controls">
-                                  <button id="guestbookCaptchaRefresh" class="secondary-button" type="button">refresh images</button>
-                                  <p id="guestbookCaptchaStatus" class="form-status" role="status" aria-live="polite"></p>
-                              </div>
-                          </fieldset>
-                          <div class="dialog-actions">
-                              <button id="guestbookCancel" class="secondary-button" type="button">cancel</button>
-                              <button type="submit">send public note</button>
-                          </div>
-                          <p id="guestbookFormStatus" class="form-status" role="status" aria-live="polite"></p>
-                      </form>
-                  </dialog>
+                   <dialog id="guestbookDialog" class="guestbook-dialog" aria-labelledby="guestbookDialogHeading" aria-describedby="guestbookDialogNote">
+                       <form id="guestbookForm" class="community-form guestbook-dialog-form">
+                           <div class="guestbook-dialog-heading">
+                               <div><span class="panel-index">public note</span><h2 id="guestbookDialogHeading">sign the guestbook</h2></div>
+                               <button id="guestbookClose" class="dialog-close" type="button" aria-label="Close guestbook form">&times;</button>
+                           </div>
+                           <p id="guestbookDialogNote" class="form-note">Submitted notes appear here only after approval.</p>
+                           <label for="guestbookName">Display name</label>
+                           <input id="guestbookName" name="display_name" type="text" required minlength="1" maxlength="40" autocomplete="nickname" autofocus>
+                           <label for="guestbookBody">Message</label>
+                           <textarea id="guestbookBody" name="body" required minlength="2" maxlength="500" rows="4"></textarea>
+                           <fieldset class="guestbook-captcha">
+                               <legend>Select the three images containing Mizuki.</legend>
+                               <div id="guestbookCaptchaChoices" class="captcha-grid"></div>
+                               <div class="captcha-controls">
+                                   <button id="guestbookCaptchaRefresh" class="secondary-button" type="button">refresh images</button>
+                                   <p id="guestbookCaptchaStatus" class="form-status" role="status" aria-live="polite"></p>
+                               </div>
+                           </fieldset>
+                           <div class="dialog-actions">
+                               <button id="guestbookCancel" class="secondary-button" type="button">cancel</button>
+                               <button type="submit">send public note</button>
+                           </div>
+                           <p id="guestbookFormStatus" class="form-status" role="status" aria-live="polite"></p>
+                       </form>
+                   </dialog>
+                   <dialog id="privateDialog" class="guestbook-dialog private-dialog" aria-labelledby="privateDialogHeading">
+                       <form id="privateForm" class="community-form guestbook-dialog-form">
+                           <div class="guestbook-dialog-heading">
+                               <div><span class="panel-index">anonymous / private / one-way</span><h2 id="privateDialogHeading" data-content="private-message-heading">send a private message</h2></div>
+                               <button id="privateClose" class="dialog-close" type="button" aria-label="Close private message form">&times;</button>
+                           </div>
+                           <p class="form-note"><strong>Anonymous and one-way.</strong> No name or contact details are requested. Only the message is sent to Leaf, it is never published, and no reply is possible.</p>
+                           <label for="privateBody">Your anonymous message</label>
+                           <textarea id="privateBody" name="body" required minlength="2" maxlength="1000" rows="5" readonly></textarea>
+                           <div class="dialog-actions">
+                               <button id="privateCancel" class="secondary-button" type="button">cancel</button>
+                               <button type="submit">send anonymous message</button>
+                           </div>
+                           <p id="privateFormStatus" class="form-status" role="status" aria-live="polite"></p>
+                       </form>
+                   </dialog>
               </section>
 
              <section id="panel-gallery" class="page-panel community-page gallery-page" role="tabpanel" aria-labelledby="tab-gallery" data-page-panel="gallery" hidden>
@@ -281,6 +310,6 @@
     <button id="musicToggle" class="music-button" type="button" aria-label="Play background music" aria-pressed="false" aria-describedby="musicStatus"><svg class="icon ui-icon sound-on" aria-hidden="true"><use href="#i-volume"/></svg><svg class="icon ui-icon sound-off" aria-hidden="true"><use href="#i-volume-off"/></svg></button>
     <span id="musicStatus" class="sr-only" role="status" aria-live="polite">Background music paused</span>
     <audio id="backgroundMusic" loop preload="metadata"><source src="First Date.mp3" type="audio/mpeg"></audio>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="default-content.js?v=2500-community-1"></script><script src="content.js?v=2500-community-1"></script><script src="test.js?v=2500-quiz-2"></script><script src="community.js?v=2500-community-4"></script><script src="me.js?v=2500-community-1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="default-content.js?v=2500-community-1"></script><script src="content.js?v=2500-community-1"></script><script src="test.js?v=2500-quiz-2"></script><script src="community.js?v=2500-community-5"></script><script src="me.js?v=2500-community-6"></script>
 </body>
 </html>

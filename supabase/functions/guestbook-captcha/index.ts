@@ -286,7 +286,48 @@ function parseChallenge(value: unknown): { challenge_id: string; expires_at: str
   return { challenge_id: record.challenge_id, expires_at: record.expires_at };
 }
 
+async function proxyImage(imageUrl: string, origin: string | null): Promise<Response> {
+  // Only allow proxying known safe CDN URLs.
+  let parsed: URL;
+  try {
+    parsed = new URL(imageUrl);
+  } catch {
+    return jsonResponse({ error: "Invalid image URL" }, 400, origin);
+  }
+  if (parsed.origin !== "https://cdn.donmai.us" ||
+    (!parsed.pathname.startsWith("/360x360/") && !parsed.pathname.startsWith("/sample/"))) {
+    return jsonResponse({ error: "Image URL not allowed" }, 403, origin);
+  }
+
+  try {
+    const upstream = await fetch(imageUrl, {
+      headers: {
+        "User-Agent": DANBOORU_USER_AGENT,
+        "Accept": "image/*",
+      },
+      signal: AbortSignal.timeout(10_000),
+    });
+
+    if (!upstream.ok || !upstream.body) {
+      return jsonResponse({ error: "Image unavailable" }, 502, origin);
+    }
+
+    const contentType = upstream.headers.get("Content-Type") || "image/jpeg";
+    return new Response(upstream.body, {
+      status: 200,
+      headers: {
+        "Content-Type": contentType,
+        "Cache-Control": "public, max-age=604800, immutable",
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
+  } catch {
+    return jsonResponse({ error: "Image unavailable" }, 502, origin);
+  }
+}
+
 Deno.serve(async (request) => {
+  const url = new URL(request.url);
   const requestOrigin = request.headers.get("origin");
   const origin = allowedOrigin(request);
 
@@ -296,6 +337,12 @@ Deno.serve(async (request) => {
 
   if (request.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders(origin) });
+  }
+
+  // Image proxy mode: GET with ?image_url=
+  const imageUrlParam = url.searchParams.get("image_url");
+  if (imageUrlParam && request.method === "GET") {
+    return proxyImage(imageUrlParam, origin);
   }
 
   if (request.method !== "POST") {
@@ -315,6 +362,8 @@ Deno.serve(async (request) => {
     return jsonResponse({ error: "Unable to generate challenge" }, 500, origin);
   }
 
+  const proxyBase = `${supabaseUrl.replace(/\/$/, "")}/functions/v1/guestbook-captcha`;
+
   try {
     const [mizukiPosts, distractorPosts] = await Promise.all([
       collectCandidates(true, 3),
@@ -328,7 +377,8 @@ Deno.serve(async (request) => {
 
       const token = crypto.randomUUID();
       if (index < mizukiPosts.length) mizukiTokens.push(token);
-      return { token, image_url: post.imageUrl };
+      const proxyUrl = `${proxyBase}?image_url=${encodeURIComponent(post.imageUrl)}`;
+      return { token, image_url: proxyUrl };
     }));
 
     const rpcResponse = await fetch(

@@ -104,7 +104,9 @@
     }
 
     tabs.forEach((tab, index) => {
-        tab.addEventListener('click', () => activate(tab.dataset.page));
+        tab.addEventListener('click', () => {
+            activate(tab.dataset.page);
+        });
         tab.addEventListener('keydown', (event) => {
             if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
             event.preventDefault();
@@ -119,6 +121,7 @@
             activate(availableTabs[next].dataset.page);
         });
     });
+
 
     function classifyAddress(rawValue) {
         const value = rawValue.trim();
