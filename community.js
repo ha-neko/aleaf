@@ -15,12 +15,15 @@
     }
 
     function disableForms(message) {
-        ['guestbookForm', 'inboxForm'].forEach((id) => {
+        ['inboxForm'].forEach((id) => {
             const form = document.getElementById(id);
             if (!form) return;
             [...form.elements].forEach((control) => { control.disabled = true; });
             setStatus(form.querySelector('.form-status'), message, true);
         });
+        const guestbookOpen = document.getElementById('guestbookOpen');
+        if (guestbookOpen) guestbookOpen.disabled = true;
+        setStatus(document.getElementById('guestbookSubmissionStatus'), message, true);
     }
 
     function safePublicUrl(value) {
@@ -158,6 +161,129 @@
         });
     }
 
+    function bindGuestbookDialog(client) {
+        const dialog = document.getElementById('guestbookDialog');
+        const form = document.getElementById('guestbookForm');
+        const openButton = document.getElementById('guestbookOpen');
+        const closeButton = document.getElementById('guestbookClose');
+        const cancelButton = document.getElementById('guestbookCancel');
+        const refreshButton = document.getElementById('guestbookCaptchaRefresh');
+        const choicesRoot = document.getElementById('guestbookCaptchaChoices');
+        const captchaStatus = document.getElementById('guestbookCaptchaStatus');
+        const formStatus = document.getElementById('guestbookFormStatus');
+        const submissionStatus = document.getElementById('guestbookSubmissionStatus');
+        const submitButton = form.querySelector('button[type="submit"]');
+        let challenge = null;
+        let challengeRequest = 0;
+
+        async function loadChallenge() {
+            const request = ++challengeRequest;
+            challenge = null;
+            choicesRoot.replaceChildren();
+            submitButton.disabled = true;
+            refreshButton.disabled = true;
+            setStatus(captchaStatus, 'Loading verification images...');
+            try {
+                const { data, error } = await client.rpc('issue_guestbook_captcha');
+                if (error) throw error;
+                if (request !== challengeRequest || !dialog.open) return;
+                if (!data || !data.challenge_id || !Array.isArray(data.choices) || data.choices.length !== 6) {
+                    throw new Error('Invalid CAPTCHA challenge');
+                }
+                const fragment = document.createDocumentFragment();
+                data.choices.forEach((choice, index) => {
+                    if (!choice || !choice.token || !choice.asset_path) throw new Error('Invalid CAPTCHA choice');
+                    const label = document.createElement('label');
+                    label.className = 'captcha-choice';
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.name = 'captcha_choice';
+                    checkbox.value = choice.token;
+                    const visual = document.createElement('span');
+                    visual.className = 'captcha-choice-visual';
+                    const image = document.createElement('img');
+                    image.src = new URL(choice.asset_path, window.location.href).href;
+                    image.alt = `Verification image ${index + 1}`;
+                    visual.append(image);
+                    label.append(checkbox, visual);
+                    fragment.append(label);
+                });
+                challenge = {
+                    id: data.challenge_id,
+                    expiresAt: data.expires_at || data.expiry ? new Date(data.expires_at || data.expiry).valueOf() : null
+                };
+                choicesRoot.append(fragment);
+                setStatus(captchaStatus, 'Verification images ready.');
+                submitButton.disabled = false;
+            } catch (error) {
+                if (request !== challengeRequest || !dialog.open) return;
+                setStatus(captchaStatus, 'Verification images could not be loaded. Please refresh them.', true);
+                console.warn('issue_guestbook_captcha:', error.message);
+            } finally {
+                if (request === challengeRequest) refreshButton.disabled = false;
+            }
+        }
+
+        openButton.addEventListener('click', () => {
+            if (dialog.open) return;
+            setStatus(submissionStatus, '');
+            setStatus(formStatus, '');
+            dialog.showModal();
+            loadChallenge();
+        });
+        refreshButton.addEventListener('click', () => {
+            setStatus(formStatus, '');
+            loadChallenge();
+        });
+        closeButton.addEventListener('click', () => dialog.close());
+        cancelButton.addEventListener('click', () => dialog.close());
+        dialog.addEventListener('close', () => {
+            challengeRequest += 1;
+            challenge = null;
+            choicesRoot.replaceChildren();
+        });
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!form.reportValidity()) return;
+            const selectedTokens = [...form.elements.captcha_choice || []]
+                .filter((choice) => choice.checked)
+                .map((choice) => choice.value);
+            if (!challenge || (challenge.expiresAt && challenge.expiresAt <= Date.now())) {
+                setStatus(formStatus, 'Verification expired. Please complete the new challenge.', true);
+                loadChallenge();
+                return;
+            }
+            if (!selectedTokens.length) {
+                setStatus(formStatus, 'Select every matching image before sending.', true);
+                return;
+            }
+
+            submitButton.disabled = true;
+            refreshButton.disabled = true;
+            setStatus(formStatus, 'Sending your note...');
+            try {
+                const { data, error } = await client.rpc('submit_guestbook_entry', {
+                    p_display_name: form.elements.display_name.value.trim(),
+                    p_message: form.elements.body.value.trim(),
+                    p_challenge_id: challenge.id,
+                    p_selected_tokens: selectedTokens
+                });
+                if (error) throw error;
+                if (data === null || data === false || data === '' || (typeof data === 'object' && data.success === false)) {
+                    throw new Error('Submission was rejected');
+                }
+                form.reset();
+                dialog.close();
+                setStatus(submissionStatus, 'Note received. It will appear after approval.');
+            } catch (error) {
+                setStatus(formStatus, 'Your note could not be sent. Please try the new verification images.', true);
+                console.warn('submit_guestbook_entry:', error.message);
+                await loadChallenge();
+            }
+        });
+    }
+
     function visitorId() {
         const key = 'aleaf-visitor-id';
         const create = () => {
@@ -229,18 +355,7 @@
         }
 
         const client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
-        bindRpcForm(client, {
-            formId: 'guestbookForm',
-            statusId: 'guestbookFormStatus',
-            rpc: 'submit_guestbook_entry',
-            values: (form) => ({
-                p_display_name: { text: form.elements.display_name.value, required: true },
-                p_message: { text: form.elements.body.value, required: true }
-            }),
-            loading: 'Sending your note...',
-            success: 'Note received. It will appear after approval.',
-            failure: 'Your note could not be sent. Please try again.'
-        });
+        bindGuestbookDialog(client);
         bindRpcForm(client, {
             formId: 'inboxForm',
             statusId: 'inboxFormStatus',
