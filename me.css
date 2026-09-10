@@ -282,29 +282,38 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .game-item:hover img { filter: saturate(1); transform: scale(1.025); }
 .game-item:hover .game-meta { background: #f3deea; }
 
-.community-page { background: radial-gradient(circle at 92% 5%, rgba(136,68,153,.1), transparent 18rem), linear-gradient(145deg, #f8eaf2, #fffafd 48%, #eee1f0); }
-.community-title { margin-bottom: 20px; }
-.community-card { position: relative; overflow: hidden; border: 1px solid #d8b4cb; border-radius: var(--radius); background: rgba(255,250,253,.92); box-shadow: 0 12px 28px rgba(86,42,73,.1), inset 0 1px rgba(255,255,255,.9); }
+.community-page { background: radial-gradient(circle at 92% 5%, rgba(136,68,153,.12), transparent 18rem), linear-gradient(145deg, #f8eaf2, #fffafd 48%, #eee1f0); }
+.community-title { margin-bottom: 24px; }
+.community-card { position: relative; overflow: hidden; border: 1px solid #d8b4cb; border-radius: var(--radius); background: rgba(255,250,253,.94); box-shadow: 0 14px 32px rgba(86,42,73,.1), inset 0 1px rgba(255,255,255,.9); }
 .community-card::before { content: ""; position: absolute; top: 0; right: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--accent-dark), var(--primary), var(--sakura)); }
 .community-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
 .community-card-heading h2 { margin: 3px 0 0; color: var(--ink); font: 600 italic 25px "Cormorant Garamond", serif; }
-.guestbook-layout { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(300px,.8fr); gap: 16px; align-items: start; }
-.guestbook-entries-card { min-height: 420px; padding: 22px; }
-.guestbook-entries-card .signal-light { flex: none; background: #a75288; box-shadow: 0 0 9px rgba(167,82,136,.5); }
-.community-status { margin: 14px 0 0; color: var(--muted); font-size: 11px; }
-.community-status.is-empty { padding: 35px 16px; border: 1px dashed #d8b4cb; border-radius: 12px; text-align: center; background: rgba(247,229,239,.45); }
+.guestbook-layout { display: grid; grid-template-columns: minmax(0,1.45fr) minmax(280px,.68fr); gap: 20px; align-items: start; }
+.guestbook-entries-card { min-height: 480px; padding: 0; }
+.guestbook-feed-header { padding: 23px 24px 17px; border-bottom: 1px solid #ead4e1; background: linear-gradient(145deg, rgba(255,255,255,.76), rgba(249,235,243,.55)); }
+.guestbook-entries-card .signal-light { width: 8px; height: 8px; flex: none; border: 3px solid #f7deec; border-radius: 50%; background: #a75288; box-shadow: 0 0 0 1px #ba7ca2, 0 0 11px rgba(167,82,136,.55); }
+.community-status { margin: 12px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+.guestbook-entries-card > .community-status:not(.is-empty) { margin: 0; padding: 10px 24px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #eedce7; background: rgba(255,255,255,.46); }
+.guestbook-entries-card > .community-status:not(.is-empty)::before { content: ""; width: 5px; height: 5px; flex: none; border-radius: 50%; background: #bc729d; }
+.community-status.is-empty { margin: 18px 0; padding: 38px 18px; border: 1px dashed #d8b4cb; border-radius: 12px; text-align: center; background: rgba(247,229,239,.45); }
+.guestbook-entries-card > .community-status.is-empty { margin: 18px; }
 .community-status.is-error, .form-status.is-error { color: #a3365c; }
-.guestbook-entries { margin-top: 12px; display: grid; gap: 9px; }
-.guestbook-entry { padding: 14px 15px; border: 1px solid #e3c4d7; border-radius: 13px; background: linear-gradient(145deg, rgba(255,255,255,.92), rgba(248,232,241,.72)); }
+.guestbook-entries { padding: 18px; display: grid; gap: 12px; }
+.guestbook-entries:empty { display: none; }
+.guestbook-entry { position: relative; padding: 17px 18px 17px 22px; border: 1px solid #e3c4d7; border-radius: 14px; background: linear-gradient(145deg, #fff, rgba(249,235,243,.78)); box-shadow: 0 7px 17px rgba(91,45,76,.07); }
+.guestbook-entry::before { content: attr(data-entry-index); position: absolute; top: 19px; left: -8px; width: 17px; height: 17px; display: grid; place-items: center; border: 1px solid #d29ab9; border-radius: 50%; color: #8b4a72; background: #fff8fc; box-shadow: 0 2px 6px rgba(91,45,76,.12); font: 700 6px "Montserrat", sans-serif; }
 .guestbook-entry-heading, .guestbook-reply-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 15px; }
-.guestbook-entry-heading strong { color: #713d62; font-size: 12px; overflow-wrap: anywhere; }
+.guestbook-author { min-width: 0; display: flex; align-items: center; gap: 9px; }
+.guestbook-author-mark { width: 27px; height: 27px; display: grid; flex: none; place-items: center; border: 1px solid #dab2c9; border-radius: 9px; color: #88476f; background: linear-gradient(145deg, #f9e3ef, #f1d3e3); font: 700 9px "Montserrat", sans-serif; }
+.guestbook-entry-heading strong { color: #65364f; font-size: 12px; overflow-wrap: anywhere; }
 .guestbook-entry time { flex: none; color: #9a788e; text-transform: uppercase; font: 600 8px "Montserrat", sans-serif; }
-.guestbook-entry > p, .guestbook-owner-reply p { margin: 8px 0 0; color: #614959; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; white-space: pre-wrap; }
-.guestbook-owner-reply { margin-top: 13px; padding: 11px 12px; border-left: 3px solid #a95587; border-radius: 4px 10px 10px 4px; background: rgba(169,85,135,.09); }
+.guestbook-entry > p, .guestbook-owner-reply p { margin: 12px 0 0; color: #59424f; font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; white-space: pre-wrap; }
+.guestbook-owner-reply { position: relative; margin: 16px 0 0 20px; padding: 13px 14px; border: 1px solid #dec0d2; border-radius: 4px 11px 11px 11px; background: rgba(169,85,135,.075); }
+.guestbook-owner-reply::before { content: ""; position: absolute; top: -17px; left: -12px; width: 18px; height: 24px; border-bottom: 1px solid #c58cad; border-left: 1px solid #c58cad; border-radius: 0 0 0 8px; }
 .guestbook-reply-heading strong { color: #8b3f72; text-transform: uppercase; letter-spacing: .1em; font: 700 8px "Montserrat", sans-serif; }
-.guestbook-owner-reply p { color: #6c3f5d; }
-.community-form-column { display: grid; gap: 16px; }
-.community-form { padding: 20px; display: grid; gap: 7px; }
+.guestbook-owner-reply p { margin-top: 7px; color: #633b55; }
+.community-form-column { display: grid; gap: 18px; }
+.community-form { padding: 21px; display: grid; gap: 9px; }
 .community-form .community-card-heading { margin-bottom: 2px; }
 .form-note, .private-notice { margin: 0 0 5px; color: var(--muted); font-size: 10px; line-height: 1.5; }
 .community-form label { margin-top: 3px; color: #6e4562; text-transform: uppercase; letter-spacing: .08em; font: 700 8px "Montserrat", sans-serif; }
@@ -316,10 +325,16 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .community-form button:hover { background: linear-gradient(135deg, #9c4b8f, #c16398); }
 .community-form button:disabled { opacity: .58; }
 .form-status { min-height: 16px; margin: 2px 0 0; color: #76566c; font-size: 10px; line-height: 1.4; }
-.guestbook-sign-card { padding: 20px; display: grid; gap: 10px; }
-.guestbook-sign-card p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
-.guestbook-sign-card > button { min-height: 42px; padding: 0 18px; border: 1px solid #754079; border-radius: 999px; color: #fff; background: linear-gradient(135deg, #88427f, #ad538b); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
-.guestbook-sign-card > button:hover { background: linear-gradient(135deg, #9c4b8f, #c16398); }
+.guestbook-sign-card { min-height: 230px; padding: 24px; display: grid; align-content: start; gap: 13px; color: #fdf4fa; border-color: #6f476f; background: radial-gradient(circle at 92% 10%, rgba(226,154,194,.22), transparent 8rem), linear-gradient(145deg, #38243c, #211824); box-shadow: 0 17px 34px rgba(35,20,36,.2); }
+.guestbook-sign-card::before { height: 4px; }
+.guestbook-sign-card .compose-mark { width: 37px; height: 37px; display: grid; place-items: center; border: 1px solid rgba(239,187,218,.3); border-radius: 50%; color: #f3c8df; background: rgba(255,255,255,.07); }
+.guestbook-sign-card .compose-mark .icon { width: 17px; height: 17px; }
+.guestbook-sign-card .panel-index { color: #e6a8ca; }
+.guestbook-sign-card .community-card-heading h2 { color: #fff8fc; font-size: 28px; }
+.guestbook-sign-card p { margin: 0; color: #cbb2c4; font-size: 10px; line-height: 1.6; }
+.guestbook-sign-card > button { min-height: 48px; padding: 0 19px; display: flex; align-items: center; justify-content: space-between; gap: 14px; border: 1px solid #e3a7c8; border-radius: 12px; color: #3d2034; background: linear-gradient(135deg, #f6d2e5, #d98db7); box-shadow: 0 8px 20px rgba(9,4,10,.24); font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; transition: transform .18s, box-shadow .18s, background .18s; }
+.guestbook-sign-card > button span:last-child { font-size: 16px; }
+.guestbook-sign-card > button:hover { background: linear-gradient(135deg, #ffe4f1, #eaa3c8); box-shadow: 0 11px 24px rgba(9,4,10,.3); transform: translateY(-2px); }
 .guestbook-sign-card > button:disabled { opacity: .58; }
 .guestbook-dialog { width: min(620px, calc(100% - 28px)); max-height: calc(100dvh - 28px); padding: 0; overflow: hidden; border: 1px solid #c995b5; border-radius: 18px; color: var(--ink); background: #fffafd; box-shadow: 0 24px 70px rgba(35,18,32,.38); }
 .guestbook-dialog::backdrop { background: rgba(24,15,25,.68); backdrop-filter: blur(3px); }
@@ -327,14 +342,14 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .guestbook-dialog-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
 .guestbook-dialog-heading h2 { margin: 3px 0 0; color: var(--ink); font: 600 italic 28px "Cormorant Garamond", serif; }
 .community-form .dialog-close { width: 38px; min-height: 38px; margin: 0; padding: 0; flex: none; border-color: #d2a9c2; color: #74416d; background: #fff; font-size: 24px; line-height: 1; text-transform: none; }
-.guestbook-captcha { min-width: 0; margin: 8px 0 0; padding: 12px; border: 1px solid #d8b4cb; border-radius: 12px; }
+.guestbook-captcha { min-width: 0; margin: 8px 0 0; padding: 14px; border: 1px solid #d8b4cb; border-radius: 12px; background: rgba(248,232,241,.46); }
 .guestbook-captcha legend { padding: 0 6px; color: #6e4562; font-size: 11px; font-weight: 700; }
-.captcha-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 7px; }
+.captcha-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
 .captcha-choice { position: relative; min-width: 0; cursor: pointer; }
 .captcha-choice input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .captcha-choice-visual { position: relative; display: block; overflow: hidden; border: 2px solid transparent; border-radius: 9px; background: #eadce6; transition: border-color .15s, box-shadow .15s, transform .15s; }
 .captcha-choice-visual::after { content: ""; position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; border: 2px solid #fff; border-radius: 50%; background: rgba(42,24,38,.62); box-shadow: 0 1px 4px rgba(0,0,0,.3); }
-.captcha-choice img { width: 100%; aspect-ratio: 4 / 3; display: block; object-fit: cover; }
+.captcha-choice img { width: 100%; aspect-ratio: 1; display: block; object-fit: cover; }
 .captcha-choice input:checked + .captcha-choice-visual { border-color: #9f477f; box-shadow: 0 0 0 2px rgba(159,71,127,.2); transform: translateY(-1px); }
 .captcha-choice input:checked + .captcha-choice-visual::after { content: "\2713"; display: grid; place-items: center; color: #fff; border-color: #fff; background: #9f477f; font: 700 12px "Montserrat", sans-serif; }
 .captcha-choice input:focus-visible + .captcha-choice-visual { outline: 3px solid var(--focus); outline-offset: 2px; }
@@ -349,11 +364,12 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .private-form .panel-index { color: var(--primary); }
 .private-form .community-card-heading h2 { color: #fff7fb; }
 .private-form .private-notice, .private-form .form-status { color: var(--night-muted); }
-.private-form .private-notice { padding: 8px 10px; border-left: 2px solid var(--primary); background: rgba(255,255,255,.04); }
+.private-form .private-notice { margin: 3px 0 5px; padding: 11px 12px; border: 1px solid rgba(221,170,204,.18); border-left: 3px solid var(--primary); border-radius: 0 8px 8px 0; background: rgba(255,255,255,.04); }
+.private-form .private-notice strong { display: block; margin-bottom: 3px; color: #ffe5f3; }
 .private-form label { color: #ead4e3; }
 .private-form label span { color: var(--night-muted); }
 .private-form input, .private-form textarea { color: #fff7fb; border-color: #684c70; background: rgba(255,255,255,.06); }
-.private-form input::placeholder { color: #a98da3; }
+.private-form input::placeholder, .private-form textarea::placeholder { color: #a98da3; }
 .private-form input:focus, .private-form textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(221,170,204,.12); }
 .private-form .form-status.is-error { color: #ffb2c8; }
 .gallery-status { margin: 0 0 14px; }
@@ -474,6 +490,7 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
     .profile-fields { grid-template-columns: repeat(2, minmax(0,1fr)); }
     .game-images { grid-template-columns: 1fr; }
     .guestbook-layout { grid-template-columns: 1fr; }
+    .community-form-column { grid-template-columns: repeat(2, minmax(0,1fr)); }
     .gallery-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
     .browser { min-height: calc(100vh - 40px); }
 }
@@ -598,9 +615,13 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
     .social-links a { flex: 1 1 120px; }
     .game-item { grid-template-columns: 1fr; }
     .game-meta { min-height: 52px; }
-    .guestbook-entries-card { min-height: 0; padding: 18px 15px; }
+    .guestbook-entries-card { min-height: 0; padding: 0; }
+    .guestbook-feed-header { padding: 20px 18px 15px; }
+    .guestbook-entries { padding: 15px; }
     .guestbook-entry-heading, .guestbook-reply-heading { align-items: flex-start; flex-direction: column; gap: 3px; }
-    .guestbook-owner-reply { padding: 10px; }
+    .guestbook-owner-reply { margin-left: 13px; padding: 10px; }
+    .community-form-column { grid-template-columns: 1fr; }
+    .guestbook-sign-card { min-height: 0; padding: 21px 18px; }
     .community-form { padding: 18px 15px; }
     .guestbook-dialog { width: calc(100% - 16px); max-height: calc(100dvh - 16px); }
     .guestbook-dialog-form { max-height: calc(100dvh - 16px); padding: 16px 12px; }

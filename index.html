@@ -40,7 +40,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Montserrat:wght@500;600;700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="me.css?v=2500-community-3">
+    <link rel="stylesheet" href="me.css?v=2500-community-4">
 </head>
 <body>
     <a class="skip-link" href="#mainContent">Skip to main content</a>
@@ -207,28 +207,29 @@
                  <header class="page-title community-title"><span class="title-icon"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-comment"/></svg></span><h1 data-content="guestbook-heading">nightcord guestbook</h1><div class="bead-line"></div><p data-content="guestbook-intro">leave a little signal for the next visitor.</p></header>
                  <div class="guestbook-layout">
                      <section class="community-card guestbook-entries-card" aria-labelledby="guestbookEntriesHeading">
-                         <div class="community-card-heading"><div><span class="panel-index">approved signals</span><h2 id="guestbookEntriesHeading">notes from visitors</h2></div><span class="signal-light" aria-hidden="true"></span></div>
+                         <div class="guestbook-feed-header">
+                             <div class="community-card-heading"><div><span class="panel-index">approved signals / public feed</span><h2 id="guestbookEntriesHeading">notes from visitors</h2></div><span class="signal-light" aria-hidden="true"></span></div>
+                         </div>
                          <p id="guestbookListStatus" class="community-status" role="status" aria-live="polite">Loading guestbook entries...</p>
                          <div id="guestbookEntries" class="guestbook-entries" aria-live="polite"></div>
                      </section>
-                     <div class="community-form-column">
+                     <aside class="community-form-column" aria-label="Guestbook message options">
                           <section class="community-card guestbook-sign-card" aria-labelledby="guestbookSignHeading">
-                              <div class="community-card-heading"><div><span class="panel-index">public note</span><h2 id="guestbookSignHeading">sign the guestbook</h2></div></div>
-                              <p>Leave a note for other visitors. Submissions appear after approval.</p>
-                              <button id="guestbookOpen" type="button" aria-haspopup="dialog">write a public note</button>
+                              <div class="compose-mark" aria-hidden="true"><svg class="icon ui-icon"><use href="#i-comment"/></svg></div>
+                              <div class="community-card-heading"><div><span class="panel-index">join the board</span><h2 id="guestbookSignHeading">leave a public signal</h2></div></div>
+                              <p>Write a note for everyone passing through. It joins the feed after approval.</p>
+                              <button id="guestbookOpen" type="button" aria-haspopup="dialog" aria-controls="guestbookDialog"><span>compose a public note</span><span aria-hidden="true">&rarr;</span></button>
                               <p id="guestbookSubmissionStatus" class="form-status" role="status" aria-live="polite"></p>
                           </section>
                          <form id="inboxForm" class="community-card community-form private-form">
-                             <div class="community-card-heading"><div><span class="panel-index">private channel</span><h2 data-content="private-message-heading">send a private message</h2></div></div>
-                             <p class="private-notice"><strong>Private and one-way:</strong> this note goes only to Leaf, is never shown in the guestbook, and does not request a reply.</p>
-                             <label for="inboxName">Your name</label>
-                             <input id="inboxName" name="sender_name" type="text" required minlength="1" maxlength="60" autocomplete="name">
-                             <label for="inboxBody">Private message</label>
-                             <textarea id="inboxBody" name="body" required minlength="2" maxlength="1000" rows="5"></textarea>
-                             <button type="submit">send privately</button>
+                             <div class="community-card-heading"><div><span class="panel-index">anonymous / private / one-way</span><h2 data-content="private-message-heading">send a private message</h2></div></div>
+                             <p class="private-notice"><strong>Anonymous and one-way.</strong> No name or contact details are requested. Only the message is sent to Leaf, it is never published, and no reply is possible.</p>
+                             <label for="inboxBody">Your anonymous message</label>
+                             <textarea id="inboxBody" name="body" required minlength="2" maxlength="1000" rows="6" autocomplete="off" placeholder="Write something only Leaf will see..."></textarea>
+                             <button type="submit">send anonymous message</button>
                              <p id="inboxFormStatus" class="form-status" role="status" aria-live="polite"></p>
                          </form>
-                     </div>
+                     </aside>
                   </div>
                   <dialog id="guestbookDialog" class="guestbook-dialog" aria-labelledby="guestbookDialogHeading" aria-describedby="guestbookDialogNote">
                       <form id="guestbookForm" class="community-form guestbook-dialog-form">
@@ -242,7 +243,7 @@
                           <label for="guestbookBody">Message</label>
                           <textarea id="guestbookBody" name="body" required minlength="2" maxlength="500" rows="4"></textarea>
                           <fieldset class="guestbook-captcha">
-                              <legend>Select every image containing Mizuki.</legend>
+                              <legend>Select the three images containing Mizuki.</legend>
                               <div id="guestbookCaptchaChoices" class="captcha-grid"></div>
                               <div class="captcha-controls">
                                   <button id="guestbookCaptchaRefresh" class="secondary-button" type="button">refresh images</button>
@@ -280,6 +281,6 @@
     <button id="musicToggle" class="music-button" type="button" aria-label="Play background music" aria-pressed="false" aria-describedby="musicStatus"><svg class="icon ui-icon sound-on" aria-hidden="true"><use href="#i-volume"/></svg><svg class="icon ui-icon sound-off" aria-hidden="true"><use href="#i-volume-off"/></svg></button>
     <span id="musicStatus" class="sr-only" role="status" aria-live="polite">Background music paused</span>
     <audio id="backgroundMusic" loop preload="metadata"><source src="First Date.mp3" type="audio/mpeg"></audio>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="default-content.js?v=2500-community-1"></script><script src="content.js?v=2500-community-1"></script><script src="test.js?v=2500-quiz-2"></script><script src="community.js?v=2500-community-3"></script><script src="me.js?v=2500-community-1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="default-content.js?v=2500-community-1"></script><script src="content.js?v=2500-community-1"></script><script src="test.js?v=2500-quiz-2"></script><script src="community.js?v=2500-community-4"></script><script src="me.js?v=2500-community-1"></script>
 </body>
 </html>

@@ -35,6 +35,17 @@
         }
     }
 
+    function safeCaptchaUrl(value) {
+        try {
+            const url = new URL(value);
+            return url.protocol === 'https:' && url.hostname === 'cdn.donmai.us' && !url.port && !url.username && !url.password
+                ? url.href
+                : '';
+        } catch (_) {
+            return '';
+        }
+    }
+
     function displayDate(value) {
         const date = new Date(value);
         if (Number.isNaN(date.valueOf())) return '';
@@ -62,11 +73,18 @@
             if (error) throw error;
             const entries = (Array.isArray(data) ? data : []).filter(isApproved);
             root.replaceChildren();
-            entries.forEach((entry) => {
+            entries.forEach((entry, index) => {
                 const article = document.createElement('article');
                 article.className = 'guestbook-entry';
+                article.dataset.entryIndex = String(entries.length - index).padStart(2, '0');
                 const heading = document.createElement('div');
                 heading.className = 'guestbook-entry-heading';
+                const author = document.createElement('div');
+                author.className = 'guestbook-author';
+                const authorMark = document.createElement('span');
+                authorMark.className = 'guestbook-author-mark';
+                authorMark.textContent = (entry.display_name || 'anonymous visitor').trim().charAt(0).toUpperCase() || '?';
+                authorMark.setAttribute('aria-hidden', 'true');
                 const name = document.createElement('strong');
                 name.textContent = entry.display_name || 'anonymous visitor';
                 const time = document.createElement('time');
@@ -74,7 +92,8 @@
                 time.textContent = dateText;
                 if (entry.created_at) time.dateTime = entry.created_at;
                 time.hidden = !dateText;
-                heading.append(name, time);
+                author.append(authorMark, name);
+                heading.append(author, time);
                 const body = document.createElement('p');
                 body.textContent = entry.body || entry.message || '';
                 article.append(heading, body);
@@ -102,6 +121,7 @@
             guestbookStatus.classList.toggle('is-empty', entries.length === 0);
         } catch (error) {
             root.replaceChildren();
+            guestbookStatus.classList.remove('is-empty');
             setStatus(guestbookStatus, 'The guestbook could not be loaded right now.', true);
             console.warn('guestbook:', error.message);
         }
@@ -203,26 +223,29 @@
             refreshButton.disabled = true;
             setStatus(captchaStatus, 'Loading verification images...');
             try {
-                const { data, error } = await client.rpc('issue_guestbook_captcha');
+                const { data, error } = await client.functions.invoke('guestbook-captcha');
                 if (error) throw error;
                 if (request !== challengeRequest || !dialog.open) return;
-                if (!data || !data.challenge_id || !Array.isArray(data.choices) || data.choices.length !== 6) {
+                if (!data || !data.challenge_id || !Array.isArray(data.choices) || data.choices.length !== 9) {
                     throw new Error('Invalid CAPTCHA challenge');
                 }
                 const fragment = document.createDocumentFragment();
                 data.choices.forEach((choice, index) => {
-                    if (!choice || !choice.token || !choice.asset_path) throw new Error('Invalid CAPTCHA choice');
+                    const imageUrl = choice && safeCaptchaUrl(choice.image_url);
+                    if (!choice || typeof choice.token !== 'string' || !choice.token || !imageUrl) throw new Error('Invalid CAPTCHA choice');
                     const label = document.createElement('label');
                     label.className = 'captcha-choice';
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
                     checkbox.name = 'captcha_choice';
                     checkbox.value = choice.token;
+                    checkbox.setAttribute('aria-label', `Verification image ${index + 1}`);
                     const visual = document.createElement('span');
                     visual.className = 'captcha-choice-visual';
                     const image = document.createElement('img');
-                    image.src = new URL(choice.asset_path, window.location.href).href;
-                    image.alt = `Verification image ${index + 1}`;
+                    image.src = imageUrl;
+                    image.alt = '';
+                    image.referrerPolicy = 'no-referrer';
                     visual.append(image);
                     label.append(checkbox, visual);
                     fragment.append(label);
@@ -232,12 +255,11 @@
                     expiresAt: data.expires_at || data.expiry ? new Date(data.expires_at || data.expiry).valueOf() : null
                 };
                 choicesRoot.append(fragment);
-                setStatus(captchaStatus, 'Verification images ready.');
-                submitButton.disabled = false;
+                setStatus(captchaStatus, 'Choose the three Mizuki images.');
             } catch (error) {
                 if (request !== challengeRequest || !dialog.open) return;
                 setStatus(captchaStatus, 'Verification images could not be loaded. Please refresh them.', true);
-                console.warn('issue_guestbook_captcha:', error.message);
+                console.warn('guestbook-captcha:', error.message);
             } finally {
                 if (request === challengeRequest) refreshButton.disabled = false;
             }
@@ -253,6 +275,11 @@
         refreshButton.addEventListener('click', () => {
             setStatus(formStatus, '');
             loadChallenge();
+        });
+        choicesRoot.addEventListener('change', () => {
+            const selectedCount = [...choicesRoot.querySelectorAll('input[type="checkbox"]')].filter((choice) => choice.checked).length;
+            submitButton.disabled = !challenge || selectedCount !== 3;
+            setStatus(captchaStatus, selectedCount === 3 ? 'Three selected. Ready.' : `${selectedCount} of 3 selected.`);
         });
         closeButton.addEventListener('click', () => dialog.close());
         cancelButton.addEventListener('click', () => dialog.close());
@@ -273,8 +300,8 @@
                 loadChallenge();
                 return;
             }
-            if (!selectedTokens.length) {
-                setStatus(formStatus, 'Select every matching image before sending.', true);
+            if (selectedTokens.length !== 3) {
+                setStatus(formStatus, 'Select exactly three matching images before sending.', true);
                 return;
             }
 
@@ -388,11 +415,10 @@
             statusId: 'inboxFormStatus',
             rpc: 'submit_inbox_message',
             values: (form) => ({
-                p_sender_name: { text: form.elements.sender_name.value, required: true },
                 p_body: { text: form.elements.body.value, required: true }
             }),
             loading: 'Sending privately...',
-            success: 'Private message delivered. It will not appear publicly.',
+            success: 'Anonymous message delivered. It cannot be replied to or shown publicly.',
             failure: 'Your private message could not be sent. Please try again.'
         });
 

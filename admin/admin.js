@@ -361,20 +361,19 @@
     async function loadInbox() {
         const root = document.getElementById('inboxList');
         setSectionStatus('inbox', 'Loading messages...');
-        const { data, error } = await client.from('inbox_messages').select('*').order('created_at', { ascending: false });
+        const { data, error } = await client.from('inbox_messages').select('id, message, is_read, created_at').order('created_at', { ascending: false });
         if (error) { renderEmpty(root, 'Inbox messages could not be loaded.'); setSectionStatus('inbox', `Load failed: ${error.message}`, true); return; }
         root.replaceChildren();
         if (!data.length) { renderEmpty(root, 'Your inbox is empty.'); setSectionStatus('inbox', 'No messages.'); return; }
         data.forEach((item) => {
-            const sender = item.sender_name || 'Anonymous';
             const card = document.createElement('article'); card.className = `management-card${item.is_read ? '' : ' is-unread'}`;
             const header = document.createElement('div'); header.className = 'management-card-header';
-            header.append(textElement('h3', '', sender), textElement('span', 'state-badge', item.is_read ? 'read' : 'unread'));
+            header.append(textElement('h3', '', 'anonymous message'), textElement('span', 'state-badge', item.is_read ? 'read' : 'unread'));
             card.append(header, textElement('p', 'management-meta', formatDate(item.created_at)), textElement('p', '', item.message));
             const actions = document.createElement('div'); actions.className = 'management-actions';
             actions.append(
-                actionButton(item.is_read ? 'Mark unread' : 'Mark read', () => updateInboxRead(item.id, !item.is_read), false, `Mark message from ${sender} ${item.is_read ? 'unread' : 'read'}`),
-                actionButton('Delete', () => deleteInboxMessage(item.id), true, `Delete message from ${sender}`)
+                actionButton(item.is_read ? 'Mark unread' : 'Mark read', () => updateInboxRead(item.id, !item.is_read), false, `Mark anonymous message ${item.is_read ? 'unread' : 'read'}`),
+                actionButton('Delete', () => deleteInboxMessage(item.id), true, 'Delete anonymous message')
             );
             card.append(actions); root.append(card);
         });
