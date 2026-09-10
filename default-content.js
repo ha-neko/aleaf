@@ -5,13 +5,20 @@ window.ALEAF_DEFAULT_CONTENT = {
         gamesHeading: 'Favorite Games',
         quizHeading: 'ideology test',
         quizIntro: 'pick one of the following subject to test your each of ideology type',
+        guestbookHeading: 'nightcord guestbook',
+        guestbookIntro: 'leave a little signal for the next visitor.',
+        privateMessageHeading: 'send a private message',
+        galleryHeading: 'midnight gallery',
+        galleryIntro: 'published pieces from the archive.',
         profileImage: 'https://pjsekai.sega.jp/assets/data/webp/character/unite05/mizuki/now/navi_icon.png.webp',
         birthDate: '2008-12-06',
         musicUrl: 'First Date.mp3',
         musicEnabled: true,
         gamesEnabled: true,
         quizzesEnabled: true,
-        socialsEnabled: true
+        socialsEnabled: true,
+        guestbookEnabled: true,
+        galleryEnabled: true
     },
     profile: [
         { label: 'NAME', value: 'a leaf or kuro neko' },

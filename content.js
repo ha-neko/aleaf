@@ -65,6 +65,11 @@
         document.querySelector('[data-content="games-heading"]').textContent = site.gamesHeading;
         document.querySelector('[data-content="quiz-heading"]').textContent = site.quizHeading;
         document.querySelector('[data-content="quiz-intro"]').textContent = site.quizIntro;
+        document.querySelector('[data-content="guestbook-heading"]').textContent = site.guestbookHeading;
+        document.querySelector('[data-content="guestbook-intro"]').textContent = site.guestbookIntro;
+        document.querySelector('[data-content="private-message-heading"]').textContent = site.privateMessageHeading;
+        document.querySelector('[data-content="gallery-heading"]').textContent = site.galleryHeading;
+        document.querySelector('[data-content="gallery-intro"]').textContent = site.galleryIntro;
 
         const pfp = document.getElementById('pfp');
         pfp.src = safeUrl(site.profileImage, true) || window.ALEAF_DEFAULT_CONTENT.site.profileImage;
@@ -171,6 +176,8 @@
 
         document.querySelector('[data-page="library"]').hidden = !site.gamesEnabled;
         document.querySelector('[data-page="tests"]').hidden = !site.quizzesEnabled;
+        document.querySelector('[data-page="guestbook"]').hidden = !site.guestbookEnabled;
+        document.querySelector('[data-page="gallery"]').hidden = !site.galleryEnabled;
         document.querySelector('.links-panel').hidden = !site.socialsEnabled;
         document.querySelector('.scrapbook-panel').hidden = scrapbookContent.enabled === false;
         const music = document.getElementById('backgroundMusic');

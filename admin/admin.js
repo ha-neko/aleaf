@@ -52,8 +52,8 @@
     function validateContent(candidate) {
         if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) throw new Error('The root value must be an object.');
         if (!candidate.site || typeof candidate.site !== 'object') throw new Error('The site object is required.');
-        const siteStrings = ['title','profileHeading','gamesHeading','quizHeading','quizIntro','profileImage','birthDate','musicUrl'];
-        const siteBooleans = ['musicEnabled','gamesEnabled','quizzesEnabled','socialsEnabled'];
+        const siteStrings = ['title','profileHeading','gamesHeading','quizHeading','quizIntro','guestbookHeading','guestbookIntro','privateMessageHeading','galleryHeading','galleryIntro','profileImage','birthDate','musicUrl'];
+        const siteBooleans = ['musicEnabled','gamesEnabled','quizzesEnabled','socialsEnabled','guestbookEnabled','galleryEnabled'];
         if (!siteStrings.every((key) => typeof candidate.site[key] === 'string') || !siteBooleans.every((key) => typeof candidate.site[key] === 'boolean')) throw new Error('General settings are incomplete or have invalid types.');
         if (!Array.isArray(candidate.profile) || !candidate.profile.every((item) => typeof item?.label === 'string' && typeof item?.value === 'string')) throw new Error('Profile must contain label and value strings.');
         if (!candidate.scrapbook || typeof candidate.scrapbook !== 'object' || typeof candidate.scrapbook.enabled !== 'boolean' || !['heading','image','caption','stamp'].every((key) => typeof candidate.scrapbook[key] === 'string')) throw new Error('Scrapbook settings are incomplete or invalid.');
@@ -92,10 +92,12 @@
         const root = document.getElementById('siteFields'); root.replaceChildren();
         const fields = [
             ['Site title','title'],['Profile heading','profileHeading'],['Games heading','gamesHeading'],['Quiz heading','quizHeading'],
-            ['Quiz introduction','quizIntro'],['Profile image URL','profileImage'],['Birth date','birthDate','date'],['Music URL','musicUrl']
+            ['Quiz introduction','quizIntro'],['Guestbook heading','guestbookHeading'],['Guestbook introduction','guestbookIntro'],
+            ['Private message heading','privateMessageHeading'],['Gallery heading','galleryHeading'],['Gallery introduction','galleryIntro'],
+            ['Profile image URL','profileImage'],['Birth date','birthDate','date'],['Music URL','musicUrl']
         ];
         fields.forEach(([label,key,type]) => root.append(field(label, content.site[key], (v) => { content.site[key] = v; }, type)));
-        [['Enable music','musicEnabled'],['Show games tab','gamesEnabled'],['Show tests tab','quizzesEnabled'],['Show social tab','socialsEnabled']].forEach(([label,key]) => root.append(checkbox(label, content.site[key], (v) => { content.site[key] = v; })));
+        [['Enable music','musicEnabled'],['Show games tab','gamesEnabled'],['Show tests tab','quizzesEnabled'],['Show social tab','socialsEnabled'],['Show guestbook','guestbookEnabled'],['Show gallery','galleryEnabled']].forEach(([label,key]) => root.append(checkbox(label, content.site[key], (v) => { content.site[key] = v; })));
     }
 
     function removeButton(collection, index, render) {
@@ -169,13 +171,26 @@
         try { await loadContent(); } catch (error) { status.textContent = `Could not load content: ${error.message}`; status.classList.add('dirty'); }
     }
 
+    async function verifyAdminAndShowDashboard() {
+        const { data, error } = await client.rpc('is_current_user_admin');
+        if (error) throw error;
+        if (data !== true) {
+            await client.auth.signOut();
+            throw new Error('This account is not authorized to use the dashboard.');
+        }
+        message.textContent = '';
+        await showDashboard();
+    }
+
     document.getElementById('loginForm').addEventListener('submit', async (event) => {
         event.preventDefault();
         if (!client) { message.textContent = 'Backend not configured. Complete SETUP.md first.'; return; }
         message.textContent = 'Signing in...';
         const { error } = await client.auth.signInWithPassword({ email: document.getElementById('email').value, password: document.getElementById('password').value });
         if (error) { message.textContent = error.message; return; }
-        message.textContent = ''; await showDashboard();
+        message.textContent = 'Verifying administrator access...';
+        try { await verifyAdminAndShowDashboard(); }
+        catch (verifyError) { message.textContent = `Sign in failed: ${verifyError.message}`; }
     });
 
     document.getElementById('logoutButton').addEventListener('click', async () => { await client.auth.signOut(); location.reload(); });
@@ -192,6 +207,9 @@
     document.querySelectorAll('[data-editor-tab]').forEach((button) => button.addEventListener('click', () => {
         document.querySelectorAll('[data-editor-tab]').forEach((item) => item.classList.toggle('active', item === button));
         document.querySelectorAll('[data-editor-panel]').forEach((panel) => { panel.hidden = panel.dataset.editorPanel !== button.dataset.editorTab; });
+        if (button.dataset.editorTab === 'guestbook') loadGuestbook();
+        if (button.dataset.editorTab === 'inbox') loadInbox();
+        if (button.dataset.editorTab === 'gallery') loadGallery();
     }));
 
     document.querySelectorAll('[data-add]').forEach((button) => button.addEventListener('click', () => {
@@ -222,8 +240,214 @@
         if(error){status.textContent=`Upload failed: ${error.message}`;status.classList.add('dirty');return;}
         const {data}=client.storage.from('site-media').getPublicUrl(path); document.getElementById('uploadedUrl').value=data.publicUrl; status.textContent='Upload complete. Copy the URL into a content field.';
     });
+
+    function setSectionStatus(section, text, isError = false) {
+        const output = document.getElementById(`${section}Status`);
+        output.textContent = text;
+        output.classList.toggle('error', isError);
+    }
+
+    function textElement(tag, className, text) {
+        const element = document.createElement(tag);
+        if (className) element.className = className;
+        element.textContent = text ?? '';
+        return element;
+    }
+
+    function actionButton(label, onClick, danger = false, accessibleLabel = label) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = label;
+        button.setAttribute('aria-label', accessibleLabel);
+        if (danger) button.className = 'danger-action';
+        button.addEventListener('click', async () => {
+            button.disabled = true;
+            try { await onClick(); }
+            finally { if (button.isConnected) button.disabled = false; }
+        });
+        return button;
+    }
+
+    function renderEmpty(root, text) {
+        root.replaceChildren(textElement('p', 'empty-state', text));
+    }
+
+    function formatDate(value) {
+        if (!value) return 'Date unavailable';
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
+    }
+
+    async function loadGuestbook() {
+        const root = document.getElementById('guestbookList');
+        setSectionStatus('guestbook', 'Loading entries...');
+        const { data, error } = await client.from('guestbook_entries').select('*').order('created_at', { ascending: false });
+        if (error) { renderEmpty(root, 'Guestbook entries could not be loaded.'); setSectionStatus('guestbook', `Load failed: ${error.message}`, true); return; }
+        root.replaceChildren();
+        if (!data.length) { renderEmpty(root, 'No guestbook entries yet.'); setSectionStatus('guestbook', 'No entries.'); return; }
+        data.forEach((entry) => {
+            const card = document.createElement('article'); card.className = 'management-card';
+            const header = document.createElement('div'); header.className = 'management-card-header';
+            const moderationState = entry.approved ? 'approved' : (entry.moderated_at ? 'rejected' : 'pending');
+            header.append(textElement('h3', '', entry.display_name || 'Anonymous'), textElement('span', 'state-badge', moderationState));
+            const meta = textElement('p', 'management-meta', formatDate(entry.created_at));
+            const body = textElement('p', '', entry.message);
+            const actions = document.createElement('div'); actions.className = 'management-actions';
+            actions.append(
+                actionButton('Approve', () => updateGuestbookStatus(entry.id, true), false, `Approve guestbook entry from ${entry.display_name}`),
+                actionButton('Reject', () => updateGuestbookStatus(entry.id, false), false, `Reject guestbook entry from ${entry.display_name}`),
+                actionButton('Delete', () => deleteGuestbookEntry(entry.id), true, `Delete guestbook entry from ${entry.display_name}`)
+            );
+            card.append(header, meta, body, actions); root.append(card);
+        });
+        setSectionStatus('guestbook', `${data.length} ${data.length === 1 ? 'entry' : 'entries'} loaded.`);
+    }
+
+    async function updateGuestbookStatus(id, approved) {
+        const nextStatus = approved ? 'approved' : 'rejected';
+        setSectionStatus('guestbook', `${approved ? 'Approving' : 'Rejecting'} entry...`);
+        const { error } = await client.from('guestbook_entries').update({ approved, moderated_at: new Date().toISOString() }).eq('id', id);
+        if (error) { setSectionStatus('guestbook', `Update failed: ${error.message}`, true); return; }
+        setSectionStatus('guestbook', `Entry ${nextStatus}.`); await loadGuestbook();
+    }
+
+    async function deleteGuestbookEntry(id) {
+        if (!window.confirm('Permanently delete this guestbook entry?')) return;
+        setSectionStatus('guestbook', 'Deleting entry...');
+        const { error } = await client.from('guestbook_entries').delete().eq('id', id);
+        if (error) { setSectionStatus('guestbook', `Delete failed: ${error.message}`, true); return; }
+        setSectionStatus('guestbook', 'Entry deleted.'); await loadGuestbook();
+    }
+
+    async function loadInbox() {
+        const root = document.getElementById('inboxList');
+        setSectionStatus('inbox', 'Loading messages...');
+        const { data, error } = await client.from('inbox_messages').select('*').order('created_at', { ascending: false });
+        if (error) { renderEmpty(root, 'Inbox messages could not be loaded.'); setSectionStatus('inbox', `Load failed: ${error.message}`, true); return; }
+        root.replaceChildren();
+        if (!data.length) { renderEmpty(root, 'Your inbox is empty.'); setSectionStatus('inbox', 'No messages.'); return; }
+        data.forEach((item) => {
+            const card = document.createElement('article'); card.className = `management-card${item.is_read ? '' : ' is-unread'}`;
+            const header = document.createElement('div'); header.className = 'management-card-header';
+            header.append(textElement('h3', '', item.sender_name || 'Anonymous'), textElement('span', 'state-badge', item.is_read ? 'read' : 'unread'));
+            const sender = item.sender_name || item.name || 'Anonymous';
+            const contact = item.reply_contact;
+            card.append(header, textElement('p', 'management-meta', `${contact || sender} / ${formatDate(item.created_at)}`), textElement('p', '', item.message));
+            const actions = document.createElement('div'); actions.className = 'management-actions';
+            actions.append(
+                actionButton(item.is_read ? 'Mark unread' : 'Mark read', () => updateInboxRead(item.id, !item.is_read), false, `Mark message from ${sender} ${item.is_read ? 'unread' : 'read'}`),
+                actionButton('Delete', () => deleteInboxMessage(item.id), true, `Delete message from ${sender}`)
+            );
+            card.append(actions); root.append(card);
+        });
+        setSectionStatus('inbox', `${data.length} ${data.length === 1 ? 'message' : 'messages'} loaded.`);
+    }
+
+    async function updateInboxRead(id, isRead) {
+        setSectionStatus('inbox', `Marking message ${isRead ? 'read' : 'unread'}...`);
+        const { error } = await client.from('inbox_messages').update({ is_read: isRead }).eq('id', id);
+        if (error) { setSectionStatus('inbox', `Update failed: ${error.message}`, true); return; }
+        await loadInbox();
+    }
+
+    async function deleteInboxMessage(id) {
+        if (!window.confirm('Permanently delete this private message?')) return;
+        setSectionStatus('inbox', 'Deleting message...');
+        const { error } = await client.from('inbox_messages').delete().eq('id', id);
+        if (error) { setSectionStatus('inbox', `Delete failed: ${error.message}`, true); return; }
+        setSectionStatus('inbox', 'Message deleted.'); await loadInbox();
+    }
+
+    async function loadGallery() {
+        const root = document.getElementById('galleryList');
+        setSectionStatus('gallery', 'Loading gallery...');
+        const { data, error } = await client.from('gallery_items').select('*').order('sort_order', { ascending: true }).order('created_at', { ascending: false });
+        if (error) { renderEmpty(root, 'Gallery items could not be loaded.'); setSectionStatus('gallery', `Load failed: ${error.message}`, true); return; }
+        root.replaceChildren();
+        if (!data.length) { renderEmpty(root, 'No gallery images yet.'); setSectionStatus('gallery', 'No images.'); return; }
+        data.forEach((item) => {
+            const card = document.createElement('article'); card.className = 'management-card gallery-card';
+            const image = document.createElement('img'); image.className = 'gallery-thumbnail'; image.src = item.public_url; image.alt = item.alt_text || ''; image.loading = 'lazy';
+            const body = document.createElement('div'); body.className = 'gallery-card-body';
+            const header = document.createElement('div'); header.className = 'management-card-header';
+            header.append(textElement('h3', '', item.title), textElement('span', 'state-badge', item.published ? 'published' : 'draft'));
+            body.append(header, textElement('p', 'management-meta', `Sort order ${item.sort_order} / ${formatDate(item.created_at)}`));
+            if (item.caption) body.append(textElement('p', '', item.caption));
+            body.append(textElement('p', 'management-meta', `Alt: ${item.alt_text || 'Not provided'}`));
+            const actions = document.createElement('div'); actions.className = 'management-actions';
+            actions.append(
+                actionButton(item.published ? 'Unpublish' : 'Publish', () => updateGalleryPublished(item.id, !item.published), false, `${item.published ? 'Unpublish' : 'Publish'} ${item.title}`),
+                actionButton('Delete image', () => deleteGalleryItem(item), true, `Delete ${item.title}`)
+            );
+            body.append(actions); card.append(image, body); root.append(card);
+        });
+        setSectionStatus('gallery', `${data.length} ${data.length === 1 ? 'image' : 'images'} loaded.`);
+    }
+
+    async function updateGalleryPublished(id, published) {
+        setSectionStatus('gallery', `${published ? 'Publishing' : 'Unpublishing'} image...`);
+        const { error } = await client.from('gallery_items').update({ published }).eq('id', id);
+        if (error) { setSectionStatus('gallery', `Update failed: ${error.message}`, true); return; }
+        await loadGallery();
+    }
+
+    async function deleteGalleryItem(item) {
+        if (!window.confirm(`Permanently delete "${item.title || 'this image'}" and its stored file?`)) return;
+        setSectionStatus('gallery', 'Deleting stored image...');
+        const { error: storageError } = await client.storage.from('gallery-media').remove([item.storage_path]);
+        if (storageError) { setSectionStatus('gallery', `Storage delete failed: ${storageError.message}`, true); return; }
+        const { error } = await client.from('gallery_items').delete().eq('id', item.id);
+        if (error) { setSectionStatus('gallery', `Metadata delete failed: ${error.message}`, true); return; }
+        setSectionStatus('gallery', 'Gallery image deleted.'); await loadGallery();
+    }
+
+    document.getElementById('refreshGuestbook').addEventListener('click', loadGuestbook);
+    document.getElementById('refreshInbox').addEventListener('click', loadInbox);
+    document.getElementById('refreshGallery').addEventListener('click', loadGallery);
+    document.getElementById('galleryUploadForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const submit = form.querySelector('button[type="submit"]');
+        const file = document.getElementById('galleryFile').files[0];
+        if (!file) return;
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif'];
+        if (!allowedTypes.includes(file.type) || file.size > 10 * 1024 * 1024) {
+            setSectionStatus('gallery', 'Choose a JPEG, PNG, GIF, WebP, or AVIF image no larger than 10 MB.', true);
+            return;
+        }
+        const extensionMatch = file.name.toLowerCase().match(/\.([a-z0-9]{1,10})$/);
+        const path = `${crypto.randomUUID()}${extensionMatch ? `.${extensionMatch[1]}` : ''}`;
+        submit.disabled = true; setSectionStatus('gallery', 'Uploading image...');
+        const { error: uploadError } = await client.storage.from('gallery-media').upload(path, file, { upsert: false, contentType: file.type });
+        if (uploadError) { setSectionStatus('gallery', `Upload failed: ${uploadError.message}`, true); submit.disabled = false; return; }
+        const { data: urlData } = client.storage.from('gallery-media').getPublicUrl(path);
+        const metadata = {
+            title: document.getElementById('galleryTitle').value.trim(),
+            alt_text: document.getElementById('galleryAlt').value.trim(),
+            caption: document.getElementById('galleryCaption').value.trim() || null,
+            public_url: urlData.publicUrl,
+            storage_path: path,
+            sort_order: Number(document.getElementById('gallerySortOrder').value),
+            published: document.getElementById('galleryPublished').checked
+        };
+        setSectionStatus('gallery', 'Saving image details...');
+        const { error } = await client.from('gallery_items').insert(metadata);
+        if (error) {
+            const { error: cleanupError } = await client.storage.from('gallery-media').remove([path]);
+            const cleanupMessage = cleanupError ? ` Cleanup also failed: ${cleanupError.message}` : ' The uploaded file was removed.';
+            setSectionStatus('gallery', `Metadata save failed: ${error.message}.${cleanupMessage}`, true);
+            submit.disabled = false; return;
+        }
+        form.reset(); document.getElementById('gallerySortOrder').value = '0'; submit.disabled = false;
+        setSectionStatus('gallery', 'Gallery image uploaded.'); await loadGallery();
+    });
     window.addEventListener('beforeunload',(event)=>{if(dirty){event.preventDefault();event.returnValue='';}});
 
     if (!configured) message.textContent = 'Backend not configured. Complete SETUP.md first.';
-    else client.auth.getSession().then(({data}) => { if (data.session) showDashboard(); });
+    else client.auth.getSession().then(async ({data}) => {
+        if (!data.session) return;
+        message.textContent = 'Verifying administrator access...';
+        try { await verifyAdminAndShowDashboard(); }
+        catch (error) { message.textContent = `Session verification failed: ${error.message}`; }
+    });
 })();

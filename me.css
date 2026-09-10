@@ -186,7 +186,11 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .signal-bow { display: none; }
 .nightcord-badge { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid rgba(243,183,200,.3); border-radius: 5px; color: #f5d7e7; background: rgba(0,0,0,.15); font: 700 11px "Montserrat", sans-serif; letter-spacing: .1em; position: relative; }
 .nightcord-badge::after { content: ""; position: absolute; top: -1px; right: -1px; width: 8px; height: 8px; background: var(--primary); border-radius: 50%; border: 1px solid rgba(0,0,0,.2); }
-.presence-card { position: relative; z-index: 1; margin-top: 20px; padding: 16px; border: 1px solid rgba(221,170,204,.22); border-radius: 8px; background: rgba(255,255,255,.035); }
+.visitor-stats { position: relative; z-index: 1; margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.visitor-stats > div { min-width: 0; padding: 7px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid rgba(221,170,204,.18); border-radius: 6px; background: rgba(255,255,255,.035); }
+.visitor-stats span { color: var(--night-muted); text-transform: uppercase; letter-spacing: .08em; font: 600 7px "Montserrat", sans-serif; }
+.visitor-stats strong { color: #fff; font: 700 13px "Montserrat", sans-serif; }
+.presence-card { position: relative; z-index: 1; margin-top: 9px; padding: 14px; border: 1px solid rgba(221,170,204,.22); border-radius: 8px; background: rgba(255,255,255,.035); }
 .presence-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(243,183,200,.4), transparent); }
 .presence-account { display: grid; grid-template-columns: 54px minmax(0,1fr); align-items: center; gap: 13px; }
 .presence-avatar-wrap, .presence-avatar { width: 54px; height: 54px; }
@@ -277,6 +281,58 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .game-meta .icon { margin-left: auto; flex: none; color: var(--accent); }
 .game-item:hover img { filter: saturate(1); transform: scale(1.025); }
 .game-item:hover .game-meta { background: #f3deea; }
+
+.community-page { background: radial-gradient(circle at 92% 5%, rgba(136,68,153,.1), transparent 18rem), linear-gradient(145deg, #f8eaf2, #fffafd 48%, #eee1f0); }
+.community-title { margin-bottom: 20px; }
+.community-card { position: relative; overflow: hidden; border: 1px solid #d8b4cb; border-radius: var(--radius); background: rgba(255,250,253,.92); box-shadow: 0 12px 28px rgba(86,42,73,.1), inset 0 1px rgba(255,255,255,.9); }
+.community-card::before { content: ""; position: absolute; top: 0; right: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--accent-dark), var(--primary), var(--sakura)); }
+.community-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.community-card-heading h2 { margin: 3px 0 0; color: var(--ink); font: 600 italic 25px "Cormorant Garamond", serif; }
+.guestbook-layout { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(300px,.8fr); gap: 16px; align-items: start; }
+.guestbook-entries-card { min-height: 420px; padding: 22px; }
+.guestbook-entries-card .signal-light { flex: none; background: #a75288; box-shadow: 0 0 9px rgba(167,82,136,.5); }
+.community-status { margin: 14px 0 0; color: var(--muted); font-size: 11px; }
+.community-status.is-empty { padding: 35px 16px; border: 1px dashed #d8b4cb; border-radius: 12px; text-align: center; background: rgba(247,229,239,.45); }
+.community-status.is-error, .form-status.is-error { color: #a3365c; }
+.guestbook-entries { margin-top: 12px; display: grid; gap: 9px; }
+.guestbook-entry { padding: 14px 15px; border: 1px solid #e3c4d7; border-radius: 13px; background: linear-gradient(145deg, rgba(255,255,255,.92), rgba(248,232,241,.72)); }
+.guestbook-entry > div { display: flex; align-items: baseline; justify-content: space-between; gap: 15px; }
+.guestbook-entry strong { color: #713d62; font-size: 12px; overflow-wrap: anywhere; }
+.guestbook-entry time { flex: none; color: #9a788e; text-transform: uppercase; font: 600 8px "Montserrat", sans-serif; }
+.guestbook-entry p { margin: 8px 0 0; color: #614959; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; white-space: pre-wrap; }
+.community-form-column { display: grid; gap: 16px; }
+.community-form { padding: 20px; display: grid; gap: 7px; }
+.community-form .community-card-heading { margin-bottom: 2px; }
+.form-note, .private-notice { margin: 0 0 5px; color: var(--muted); font-size: 10px; line-height: 1.5; }
+.community-form label { margin-top: 3px; color: #6e4562; text-transform: uppercase; letter-spacing: .08em; font: 700 8px "Montserrat", sans-serif; }
+.community-form label span { color: var(--muted); text-transform: none; font-family: "Nunito", sans-serif; letter-spacing: 0; }
+.community-form input, .community-form textarea { width: 100%; padding: 10px 11px; border: 1px solid #d7b4c9; border-radius: 9px; outline: 0; color: var(--ink); background: rgba(255,255,255,.84); font: 500 12px/1.45 "Nunito", sans-serif; resize: vertical; }
+.community-form input { min-height: 40px; }
+.community-form input:focus, .community-form textarea:focus { border-color: #a95587; box-shadow: 0 0 0 3px rgba(185,79,137,.12); }
+.community-form button { min-height: 42px; margin-top: 5px; padding: 0 18px; border: 1px solid #754079; border-radius: 999px; color: #fff; background: linear-gradient(135deg, #88427f, #ad538b); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.community-form button:hover { background: linear-gradient(135deg, #9c4b8f, #c16398); }
+.community-form button:disabled { opacity: .58; }
+.form-status { min-height: 16px; margin: 2px 0 0; color: #76566c; font-size: 10px; line-height: 1.4; }
+.private-form { color: var(--night-text); border-color: #64466b; background: radial-gradient(circle at 100% 0, rgba(136,68,153,.38), transparent 12rem), linear-gradient(150deg, #2b1f32, #19141e); box-shadow: 0 14px 30px rgba(24,14,27,.25); }
+.private-form::before { background: linear-gradient(90deg, var(--primary), var(--accent)); }
+.private-form .panel-index { color: var(--primary); }
+.private-form .community-card-heading h2 { color: #fff7fb; }
+.private-form .private-notice, .private-form .form-status { color: var(--night-muted); }
+.private-form .private-notice { padding: 8px 10px; border-left: 2px solid var(--primary); background: rgba(255,255,255,.04); }
+.private-form label { color: #ead4e3; }
+.private-form label span { color: var(--night-muted); }
+.private-form input, .private-form textarea { color: #fff7fb; border-color: #684c70; background: rgba(255,255,255,.06); }
+.private-form input::placeholder { color: #a98da3; }
+.private-form input:focus, .private-form textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(221,170,204,.12); }
+.private-form .form-status.is-error { color: #ffb2c8; }
+.gallery-status { margin: 0 0 14px; }
+.gallery-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+.gallery-item { min-width: 0; margin: 0; padding: 8px; overflow: hidden; border: 1px solid #d8b4cb; border-radius: 15px; background: rgba(255,250,253,.94); box-shadow: 0 11px 25px rgba(86,42,73,.11); }
+.gallery-item:nth-child(3n+2) { transform: translateY(7px); }
+.gallery-item img { width: 100%; height: auto; aspect-ratio: 4 / 3; display: block; object-fit: contain; border-radius: 9px; background: linear-gradient(145deg, #f4e3ed, #e8d9e8); }
+.gallery-item figcaption { padding: 10px 6px 5px; display: grid; gap: 3px; }
+.gallery-item figcaption strong { color: #68425d; font: 600 italic 19px "Cormorant Garamond", serif; overflow-wrap: anywhere; }
+.gallery-item figcaption span { color: var(--muted); font-size: 10px; line-height: 1.45; overflow-wrap: anywhere; white-space: pre-wrap; }
 
 .test-container { max-width: 900px; margin: 25px auto; position: relative; }
 .test-container::before { content: "QUIZ ARCHIVE / 25:00"; position: absolute; z-index: 2; top: -10px; left: 50%; min-width: 190px; padding: 5px 15px; transform: translateX(-50%); border: 1px solid #d5a4c2; border-radius: 999px; color: #fff; background: linear-gradient(135deg, #b35d91, #74417f); box-shadow: 0 5px 14px rgba(88,40,76,.18); text-align: center; font: 700 8px "Montserrat", sans-serif; letter-spacing: .16em; }
@@ -386,6 +442,8 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
     .home-grid { grid-template-columns: 1fr; grid-template-areas: "archive" "signal" "notes" "scrapbook" "links"; }
     .profile-fields { grid-template-columns: repeat(2, minmax(0,1fr)); }
     .game-images { grid-template-columns: 1fr; }
+    .guestbook-layout { grid-template-columns: 1fr; }
+    .gallery-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
     .browser { min-height: calc(100vh - 40px); }
 }
 @media (max-width: 640px) {
@@ -509,6 +567,10 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
     .social-links a { flex: 1 1 120px; }
     .game-item { grid-template-columns: 1fr; }
     .game-meta { min-height: 52px; }
+    .guestbook-entries-card { min-height: 0; padding: 18px 15px; }
+    .community-form { padding: 18px 15px; }
+    .gallery-grid { grid-template-columns: 1fr; }
+    .gallery-item:nth-child(3n+2) { transform: none; }
     .test-container { margin: 18px auto; }
     .test-container::before { top: -8px; min-width: 165px; padding: 4px 11px; font-size: 7px; }
     .test-card { min-height: 400px; padding: 38px 14px 24px; border-radius: 16px; }

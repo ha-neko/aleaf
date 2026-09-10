@@ -40,7 +40,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Montserrat:wght@500;600;700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="me.css?v=2500-browser-27">
+    <link rel="stylesheet" href="me.css?v=2500-community-1">
 </head>
 <body>
     <a class="skip-link" href="#mainContent">Skip to main content</a>
@@ -97,9 +97,11 @@
             <div class="chrome-top">
                 <div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
                 <nav class="tab-strip" role="tablist" aria-label="Main pages">
-                    <button id="tab-profile" class="browser-tab" role="tab" aria-selected="true" aria-controls="panel-profile" data-page="profile"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-home"/></svg><span>home</span></button>
-                    <button id="tab-library" class="browser-tab" role="tab" aria-selected="false" aria-controls="panel-library" tabindex="-1" data-page="library"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-game"/></svg><span>games</span></button>
-                    <button id="tab-tests" class="browser-tab" role="tab" aria-selected="false" aria-controls="panel-tests" tabindex="-1" data-page="tests"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-book"/></svg><span>quiz</span></button>
+                     <button id="tab-profile" class="browser-tab" role="tab" aria-selected="true" aria-controls="panel-profile" data-page="profile"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-home"/></svg><span>home</span></button>
+                     <button id="tab-library" class="browser-tab" role="tab" aria-selected="false" aria-controls="panel-library" tabindex="-1" data-page="library"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-game"/></svg><span>games</span></button>
+                     <button id="tab-tests" class="browser-tab" role="tab" aria-selected="false" aria-controls="panel-tests" tabindex="-1" data-page="tests"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-book"/></svg><span>quiz</span></button>
+                     <button id="tab-guestbook" class="browser-tab" role="tab" aria-selected="false" aria-controls="panel-guestbook" tabindex="-1" data-page="guestbook"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-comment"/></svg><span>guestbook</span></button>
+                     <button id="tab-gallery" class="browser-tab" role="tab" aria-selected="false" aria-controls="panel-gallery" tabindex="-1" data-page="gallery"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-star"/></svg><span>gallery</span></button>
                     <span class="web-tab-shell" role="presentation" id="webTabShell" hidden><button id="tab-web" class="browser-tab web-browser-tab" role="tab" aria-selected="false" aria-controls="panel-web" tabindex="-1" data-page="web"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-search"/></svg><span id="webTabTitle">search</span></button><button id="closeWebTab" class="close-web-tab" type="button" aria-label="Close search tab"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-close"/></svg></button></span>
                 </nav>
             </div>
@@ -136,8 +138,13 @@
 
                     <article class="panel signal-panel">
                         <header><div><span class="panel-index">02 / nightcord</span><h2>live signal</h2></div><svg class="signal-bow" aria-hidden="true"><use href="#i-bow"/></svg></header>
-                        <div class="nightcord-badge" aria-hidden="true"><svg class="icon ui-icon"><use href="#i-moon"/></svg><span>25:00</span></div>
-                        <div id="discordPresence" class="presence-card" data-discord-id="1436903955291570208" role="status" aria-live="polite" aria-atomic="false">
+                         <div class="nightcord-badge" aria-hidden="true"><svg class="icon ui-icon"><use href="#i-moon"/></svg><span>25:00</span></div>
+                         <div class="visitor-stats" aria-label="Visitor statistics">
+                             <div><span>total visitors</span><strong id="totalVisitors">...</strong></div>
+                             <div><span>here right now</span><strong id="currentVisitors">...</strong></div>
+                         </div>
+                         <p id="visitorStatus" class="sr-only" role="status" aria-live="polite">Loading visitor statistics</p>
+                         <div id="discordPresence" class="presence-card" data-discord-id="1436903955291570208" role="status" aria-live="polite" aria-atomic="false">
                             <div class="presence-account">
                                 <div class="presence-avatar-wrap"><img id="discordAvatar" class="presence-avatar" alt="" hidden><span id="discordStatusDot" class="presence-dot offline"></span></div>
                                 <div class="presence-copy"><span class="presence-label">Discord account</span><strong id="discordName">Loading...</strong><span id="discordHandle">Checking status</span><span id="discordCustomStatus" class="presence-custom"></span></div>
@@ -186,16 +193,58 @@
                 <div class="gameFavorites"><div class="game-images lace-trim"></div></div>
             </section>
 
-            <section id="panel-tests" class="page-panel quiz-page" role="tabpanel" aria-labelledby="tab-tests" data-page-panel="tests" hidden>
+             <section id="panel-tests" class="page-panel quiz-page" role="tabpanel" aria-labelledby="tab-tests" data-page-panel="tests" hidden>
                 <header class="page-title"><span class="title-icon"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-book"/></svg></span><h1 data-content="quiz-heading">ideology test</h1><svg class="page-bow" aria-hidden="true"><use href="#i-bow"/></svg><div class="bead-line"></div></header>
                 <div class="test-container"><div class="test-card lace-trim">
                     <div class="home"><p data-content="quiz-intro">pick one of the following subjects to test.</p><div class="test-menu"><button class="politics"><span>01</span><span class="test-menu-copy"><strong>Political ideology</strong><small>power, society, and governance</small></span><i></i></button><button class="psychology"><span>02</span><span class="test-menu-copy"><strong>Philosophical ideology</strong><small>meaning, ethics, and existence</small></span><i></i></button><button class="eeveelution"><span>03</span><span class="test-menu-copy"><strong>Eeveelution type</strong><small>temperament, affinity, and style</small></span><i></i></button></div></div>
                     <div class="test"><p class="questions" id="quizQuestion" tabindex="-1"></p><div class="options" role="radiogroup" aria-labelledby="quizQuestion"><button class="option1" role="radio" aria-checked="false"></button><button class="option2" role="radio" aria-checked="false"></button><button class="option3" role="radio" aria-checked="false"></button><button class="option4" role="radio" aria-checked="false"></button></div><div class="control"><button class="previous">Previous</button><button class="next">Next</button><button class="submit">Submit</button></div><div class="progress"><p class="progress-text"><span>Question <strong class="current-question">1</strong> of <strong class="total-questions"></strong></span><span class="progress-time">25:00</span></p><div class="progress-bar" role="progressbar" aria-label="Quiz progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill"></div></div></div></div>
                     <div class="loading" role="status" aria-live="polite"><img src="mizuki-walking.gif" alt=""><p class="loading-text">Loading...</p><div class="loading-bar"></div></div>
                     <div class="result" aria-live="polite"><h2 class="result-title" tabindex="-1"></h2><div class="result-description"></div><button class="restart">Restart</button></div>
-                </div></div>
-            </section>
-            <section id="panel-web" class="page-panel web-page" role="tabpanel" aria-labelledby="tab-web" data-page-panel="web" hidden>
+                 </div></div>
+             </section>
+
+             <section id="panel-guestbook" class="page-panel community-page guestbook-page" role="tabpanel" aria-labelledby="tab-guestbook" data-page-panel="guestbook" hidden>
+                 <header class="page-title community-title"><span class="title-icon"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-comment"/></svg></span><h1 data-content="guestbook-heading">nightcord guestbook</h1><div class="bead-line"></div><p data-content="guestbook-intro">leave a little signal for the next visitor.</p></header>
+                 <div class="guestbook-layout">
+                     <section class="community-card guestbook-entries-card" aria-labelledby="guestbookEntriesHeading">
+                         <div class="community-card-heading"><div><span class="panel-index">approved signals</span><h2 id="guestbookEntriesHeading">notes from visitors</h2></div><span class="signal-light" aria-hidden="true"></span></div>
+                         <p id="guestbookListStatus" class="community-status" role="status" aria-live="polite">Loading guestbook entries...</p>
+                         <div id="guestbookEntries" class="guestbook-entries" aria-live="polite"></div>
+                     </section>
+                     <div class="community-form-column">
+                         <form id="guestbookForm" class="community-card community-form">
+                             <div class="community-card-heading"><div><span class="panel-index">public note</span><h2>sign the guestbook</h2></div></div>
+                             <p class="form-note">Submitted notes appear here only after approval.</p>
+                             <label for="guestbookName">Display name</label>
+                             <input id="guestbookName" name="display_name" type="text" required minlength="1" maxlength="40" autocomplete="nickname">
+                             <label for="guestbookBody">Message</label>
+                             <textarea id="guestbookBody" name="body" required minlength="2" maxlength="500" rows="5"></textarea>
+                             <button type="submit">send public note</button>
+                             <p id="guestbookFormStatus" class="form-status" role="status" aria-live="polite"></p>
+                         </form>
+                         <form id="inboxForm" class="community-card community-form private-form">
+                             <div class="community-card-heading"><div><span class="panel-index">private channel</span><h2 data-content="private-message-heading">send a private message</h2></div></div>
+                             <p class="private-notice"><strong>Private:</strong> this message goes only to Leaf and is never shown in the guestbook.</p>
+                             <label for="inboxName">Your name</label>
+                             <input id="inboxName" name="sender_name" type="text" required minlength="1" maxlength="60" autocomplete="name">
+                             <label for="inboxContact">Reply contact <span>(optional)</span></label>
+                             <input id="inboxContact" name="reply_contact" type="text" maxlength="120" autocomplete="email" placeholder="email, Discord, or another contact">
+                             <label for="inboxBody">Private message</label>
+                             <textarea id="inboxBody" name="body" required minlength="2" maxlength="1000" rows="5"></textarea>
+                             <button type="submit">send privately</button>
+                             <p id="inboxFormStatus" class="form-status" role="status" aria-live="polite"></p>
+                         </form>
+                     </div>
+                 </div>
+             </section>
+
+             <section id="panel-gallery" class="page-panel community-page gallery-page" role="tabpanel" aria-labelledby="tab-gallery" data-page-panel="gallery" hidden>
+                 <header class="page-title community-title"><span class="title-icon"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-star"/></svg></span><h1 data-content="gallery-heading">midnight gallery</h1><div class="bead-line"></div><p data-content="gallery-intro">published pieces from the archive.</p></header>
+                 <p id="galleryStatus" class="community-status gallery-status" role="status" aria-live="polite">Loading gallery...</p>
+                 <div id="galleryItems" class="gallery-grid" aria-live="polite"></div>
+             </section>
+
+             <section id="panel-web" class="page-panel web-page" role="tabpanel" aria-labelledby="tab-web" data-page-panel="web" hidden>
                 <div class="web-frame-bar"><div><span class="web-frame-dot" aria-hidden="true"></span><strong id="webFrameLabel">search results</strong></div><a id="openExternal" href="#" target="_blank" rel="noopener noreferrer">open outside frame</a></div>
                 <iframe id="webFrame" title="Embedded browser tab" src="about:blank" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-downloads allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
                 <p class="frame-note">some websites refuse to load inside frames. use “open outside frame” if they sulk.</p>
@@ -211,6 +260,6 @@
     <button id="musicToggle" class="music-button" type="button" aria-label="Play background music" aria-pressed="false" aria-describedby="musicStatus"><svg class="icon ui-icon sound-on" aria-hidden="true"><use href="#i-volume"/></svg><svg class="icon ui-icon sound-off" aria-hidden="true"><use href="#i-volume-off"/></svg></button>
     <span id="musicStatus" class="sr-only" role="status" aria-live="polite">Background music paused</span>
     <audio id="backgroundMusic" loop preload="metadata"><source src="First Date.mp3" type="audio/mpeg"></audio>
-    <script src="config.js"></script><script src="default-content.js"></script><script src="content.js"></script><script src="test.js?v=2500-quiz-2"></script><script src="me.js?v=2500-browser-7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="default-content.js?v=2500-community-1"></script><script src="content.js?v=2500-community-1"></script><script src="test.js?v=2500-quiz-2"></script><script src="community.js?v=2500-community-1"></script><script src="me.js?v=2500-community-1"></script>
 </body>
 </html>

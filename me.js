@@ -1,8 +1,8 @@
 (function () {
     'use strict';
 
-    const pages = ['profile', 'library', 'tests', 'web'];
-    const fileNames = { profile: 'home', library: 'games', tests: 'quiz', web: 'browser' };
+    const pages = ['profile', 'library', 'tests', 'guestbook', 'gallery', 'web'];
+    const fileNames = { profile: 'home', library: 'games', tests: 'quiz', guestbook: 'guestbook', gallery: 'gallery', web: 'browser' };
     const tabs = [...document.querySelectorAll('[role="tab"]')];
     const panels = [...document.querySelectorAll('[data-page-panel]')];
     const addressInput = document.getElementById('addressInput');
@@ -58,7 +58,7 @@
     }
 
     function validPage(value) {
-        const aliases = { home: 'profile', games: 'library', quiz: 'tests' };
+        const aliases = { home: 'profile', games: 'library', quiz: 'tests', guests: 'guestbook', photos: 'gallery' };
         value = aliases[value] || value;
         if (value === 'admin') return 'admin';
         if (!pages.includes(value)) return 'profile';
@@ -123,7 +123,7 @@
     function classifyAddress(rawValue) {
         const value = rawValue.trim();
         const lower = value.toLowerCase().replace(/\/+$/, '');
-        const internalPages = { home: 'profile', '#home': 'profile', games: 'library', '#games': 'library', quiz: 'tests', '#quiz': 'tests' };
+        const internalPages = { home: 'profile', '#home': 'profile', games: 'library', '#games': 'library', quiz: 'tests', '#quiz': 'tests', guestbook: 'guestbook', '#guestbook': 'guestbook', guests: 'guestbook', gallery: 'gallery', '#gallery': 'gallery', photos: 'gallery' };
         const internalKey = lower.replace(/^aleaf\.me\//, '');
         if (internalPages[internalKey]) return { internal: internalPages[internalKey] };
         if (/^(admin|admin\/|aleaf\.me\/admin|localhost(?::\d+)?\/admin)$/.test(lower)) {
@@ -289,6 +289,7 @@
             loadWebEntry(webEntries[webIndex], false);
             document.getElementById('pageStatusText').textContent = 'browser refreshed';
         } else {
+            window.dispatchEvent(new CustomEvent('aleaf:refresh', { detail: currentPage }));
             activate(currentPage, false);
             document.getElementById('pageStatusText').textContent = `${fileNames[currentPage]} refreshed`;
         }
