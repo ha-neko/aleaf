@@ -1,413 +1,205 @@
 const PRODUCTION_ORIGIN = "https://aleaf.is-a.dev";
 const DANBOORU_API = "https://danbooru.donmai.us/posts.json";
-const DANBOORU_USER_AGENT = "aleaf.is-a.dev guestbook-captcha/1.0";
-const POSTS_PER_PAGE = 100;
-const RECENT_PAGE_COUNT = 8;
-const MAX_PAGE_ATTEMPTS = 4;
+const DANBOORU_USER_AGENT = "aleaf.is-a.dev guestbook-captcha/2.0";
+const POSTS_PER_PAGE = 40;
 
 const STATIC_IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp"]);
-const BLOCKED_TAGS = new Set([
-  "anus",
-  "ass",
-  "ass_focus",
-  "bare_breasts",
-  "bikini",
-  "bikini_bottom",
-  "bikini_top",
-  "bottomless",
-  "bra",
-  "breast_focus",
-  "breasts",
-  "cameltoe",
-  "cleavage",
-  "clothes_lift",
-  "completely_nude",
-  "covered_nipples",
-  "erection",
-  "groin",
-  "groin_tendon",
-  "lingerie",
-  "micro_bikini",
-  "midriff",
-  "naked",
-  "naked_apron",
-  "naked_shirt",
-  "navel",
-  "nipples",
-  "no_bra",
-  "nude",
-  "open_clothes",
-  "panties",
-  "pantyshot",
-  "penis",
-  "pubic_hair",
-  "pussy",
-  "see-through",
-  "see-through_clothes",
-  "sex",
-  "sexually_suggestive",
-  "shirt_lift",
-  "sideboob",
-  "skirt_lift",
-  "swimsuit",
-  "thong",
-  "topless",
-  "underboob",
-  "underwear",
-  "underwear_only",
-  "unbuttoned_clothes",
-  "upskirt",
-  "wet_clothes",
-]);
-const BLOCKED_TAG_PARTS = [
-  "bikini",
-  "breast",
-  "cameltoe",
-  "cleavage",
-  "lingerie",
-  "nipple",
-  "nude",
-  "panties",
-  "see-through",
-  "swimsuit",
-  "underwear",
-];
+const TOLERANCE = 6;
+const PIECE_SIZE = 50;
+const DISPLAY_WIDTH = 280;
+const MIN_X = 8;
+const MAX_X = DISPLAY_WIDTH - PIECE_SIZE - 8;
 
-type DanbooruVariant = {
-  type?: unknown;
-  url?: unknown;
-  file_ext?: unknown;
-};
-
+type DanbooruVariant = { type?: unknown; url?: unknown; file_ext?: unknown };
 type DanbooruPost = {
-  id?: unknown;
-  rating?: unknown;
-  tag_string?: unknown;
-  tag_string_general?: unknown;
-  tag_string_character?: unknown;
-  media_asset?: {
-    file_ext?: unknown;
-    variants?: unknown;
-  } | null;
+  id?: unknown; rating?: unknown; tag_string_character?: unknown;
+  media_asset?: { file_ext?: unknown; variants?: unknown } | null;
 };
-
-type Candidate = {
-  id: number;
-  imageUrl: string;
-};
-
-class SourceError extends Error {}
 
 function allowedOrigin(request: Request): string | null {
   const origin = request.headers.get("origin");
   if (!origin) return null;
-
   try {
     const url = new URL(origin);
-    if (origin !== url.origin) return null;
-
-    const isProduction = origin === PRODUCTION_ORIGIN;
-    const isLocal = (url.hostname === "localhost" || url.hostname === "127.0.0.1") &&
-      (url.protocol === "http:" || url.protocol === "https:");
-
-    return isProduction || isLocal ? url.origin : null;
-  } catch {
-    return null;
-  }
+    return (origin === PRODUCTION_ORIGIN ||
+      ((url.hostname === "localhost" || url.hostname === "127.0.0.1") &&
+        (url.protocol === "http:" || url.protocol === "https:")))
+      ? url.origin : null;
+  } catch { return null; }
 }
 
-function corsHeaders(origin: string | null): Record<string, string> {
-  const headers: Record<string, string> = {
-    "Vary": "Origin",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
+function cors(origin: string | null): Record<string, string> {
+  const h: Record<string, string> = {
+    "Vary": "Origin", "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
     "Access-Control-Max-Age": "86400",
   };
-
-  if (origin) headers["Access-Control-Allow-Origin"] = origin;
-  return headers;
+  if (origin) h["Access-Control-Allow-Origin"] = origin;
+  return h;
 }
 
-function jsonResponse(body: unknown, status: number, origin: string | null): Response {
+function json(body: unknown, status: number, origin: string | null): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: {
-      ...corsHeaders(origin),
-      "Cache-Control": "no-store",
-      "Content-Type": "application/json; charset=utf-8",
-    },
+    headers: { ...cors(origin), "Cache-Control": "no-store", "Content-Type": "application/json; charset=utf-8" },
   });
 }
 
-function randomInt(maxExclusive: number): number {
-  const maximum = Math.floor(0x1_0000_0000 / maxExclusive) * maxExclusive;
-  const value = new Uint32Array(1);
-  do crypto.getRandomValues(value); while (value[0] >= maximum);
-  return value[0] % maxExclusive;
+function randomInt(max: number): number {
+  const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % max;
 }
 
-function shuffle<T>(values: T[]): T[] {
-  for (let index = values.length - 1; index > 0; index--) {
-    const swapIndex = randomInt(index + 1);
-    [values[index], values[swapIndex]] = [values[swapIndex], values[index]];
-  }
-  return values;
+function shuffle<T>(arr: T[]): T[] {
+  for (let i = arr.length - 1; i > 0; i--) { const j = randomInt(i + 1); [arr[i], arr[j]] = [arr[j], arr[i]]; }
+  return arr;
 }
 
-function tagSet(value: unknown): Set<string> | null {
-  if (typeof value !== "string") return null;
-  return new Set(value.split(/\s+/).filter(Boolean));
+function positionToToken(pos: number): string {
+  const rounded = Math.round(pos);
+  const hex = Math.max(0, Math.min(999, rounded)).toString(16).padStart(12, "0");
+  return `00000000-0000-4000-8000-${hex}`;
 }
 
-function containsBlockedTag(tags: Set<string>): boolean {
-  for (const tag of tags) {
-    if (BLOCKED_TAGS.has(tag) || BLOCKED_TAG_PARTS.some((part) => tag.includes(part))) return true;
-  }
-  return false;
-}
-
-function safeImageUrl(mediaAsset: DanbooruPost["media_asset"]): string | null {
-  if (!mediaAsset || typeof mediaAsset.file_ext !== "string" ||
-    !STATIC_IMAGE_EXTENSIONS.has(mediaAsset.file_ext.toLowerCase()) ||
-    !Array.isArray(mediaAsset.variants)) {
-    return null;
-  }
-
-  const variants = mediaAsset.variants as DanbooruVariant[];
-  for (const desiredType of ["360x360", "sample"]) {
-    const variant = variants.find((item) => item?.type === desiredType);
-    if (!variant || typeof variant.url !== "string" || typeof variant.file_ext !== "string" ||
-      !STATIC_IMAGE_EXTENSIONS.has(variant.file_ext.toLowerCase())) continue;
-
+function safeImageUrl(asset: DanbooruPost["media_asset"]): string | null {
+  if (!asset || typeof asset.file_ext !== "string" || !STATIC_IMAGE_EXTENSIONS.has(asset.file_ext.toLowerCase()) ||
+    !Array.isArray(asset.variants)) return null;
+  for (const v of asset.variants as DanbooruVariant[]) {
+    if (!v || typeof v.url !== "string" || typeof v.file_ext !== "string" || !STATIC_IMAGE_EXTENSIONS.has(v.file_ext.toLowerCase())) continue;
     try {
-      const url = new URL(variant.url);
-      const expectedPrefix = desiredType === "360x360" ? "/360x360/" : "/sample/";
-      if (url.origin === "https://cdn.donmai.us" && url.pathname.startsWith(expectedPrefix) &&
-        !url.username && !url.password && !url.search && !url.hash) {
-        return url.href;
-      }
-    } catch {
-      // Ignore malformed upstream variant URLs.
-    }
+      const u = new URL(v.url);
+      if (u.origin === "https://cdn.donmai.us" &&
+        (u.pathname.startsWith("/360x360/") || u.pathname.startsWith("/sample/")) &&
+        !u.username && !u.password && !u.search) return u.href;
+    } catch { /* skip */ }
   }
-
   return null;
 }
 
-function candidateFromPost(post: DanbooruPost, isMizuki: boolean): Candidate | null {
-  if (!Number.isSafeInteger(post.id) || (post.id as number) <= 0 || post.rating !== "g") return null;
-
-  const allTags = tagSet(post.tag_string);
-  const generalTags = tagSet(post.tag_string_general);
-  const characterTags = tagSet(post.tag_string_character);
-  if (!allTags || !generalTags || !characterTags || !generalTags.has("solo") || containsBlockedTag(allTags)) {
-    return null;
-  }
-
-  const hasMizuki = characterTags.has("akiyama_mizuki");
-  if (hasMizuki !== isMizuki) return null;
-  if (!isMizuki && (!generalTags.has("pink_hair") || !generalTags.has("pink_eyes"))) return null;
-
-  const imageUrl = safeImageUrl(post.media_asset);
-  return imageUrl ? { id: post.id as number, imageUrl } : null;
-}
-
-async function fetchPage(tags: string, page: number): Promise<DanbooruPost[]> {
-  const url = new URL(DANBOORU_API);
-  url.searchParams.set("tags", tags);
-  url.searchParams.set("limit", String(POSTS_PER_PAGE));
-  url.searchParams.set("page", String(page));
-  url.searchParams.set(
-    "only",
-    "id,rating,tag_string,tag_string_general,tag_string_character,media_asset",
-  );
-
-  let response: Response;
-  try {
-    response = await fetch(url, {
-      headers: {
-        "Accept": "application/json",
-        "Cache-Control": "no-cache",
-        "User-Agent": DANBOORU_USER_AGENT,
-      },
-      signal: AbortSignal.timeout(8_000),
-    });
-  } catch {
-    throw new SourceError();
-  }
-
-  if (!response.ok) throw new SourceError();
-
-  try {
-    const body: unknown = await response.json();
-    if (!Array.isArray(body) || !body.every((item) => item !== null && typeof item === "object")) {
-      throw new SourceError();
+async function fetchMizukiImage(): Promise<string> {
+  const tags = "akiyama_mizuki solo rating:general";
+  const pages = shuffle([1, 2, 3, 4, 5]);
+  for (const page of pages) {
+    const url = new URL(DANBOORU_API);
+    url.searchParams.set("tags", tags);
+    url.searchParams.set("limit", String(POSTS_PER_PAGE));
+    url.searchParams.set("page", String(page));
+    url.searchParams.set("only", "id,rating,tag_string_character,media_asset");
+    let res: Response;
+    try {
+      res = await fetch(url, {
+        headers: { "Accept": "application/json", "User-Agent": DANBOORU_USER_AGENT },
+        signal: AbortSignal.timeout(8000),
+      });
+    } catch { continue; }
+    if (!res.ok) continue;
+    const body: unknown = await res.json();
+    if (!Array.isArray(body)) continue;
+    const candidates: string[] = [];
+    for (const post of body) {
+      if (!post || typeof post !== "object") continue;
+      const p = post as DanbooruPost;
+      if (p.rating !== "g") continue;
+      const chars = typeof p.tag_string_character === "string" ? p.tag_string_character : "";
+      if (!chars.includes("akiyama_mizuki")) continue;
+      const img = safeImageUrl(p.media_asset);
+      if (img) candidates.push(img);
     }
-    return body as DanbooruPost[];
-  } catch {
-    throw new SourceError();
+    if (candidates.length > 0) return candidates[randomInt(candidates.length)];
   }
-}
-
-async function collectCandidates(isMizuki: boolean, count: number): Promise<Candidate[]> {
-  const tags = isMizuki
-    ? "akiyama_mizuki solo rating:general"
-    : "pink_hair pink_eyes rating:general";
-  const pages = shuffle(Array.from({ length: RECENT_PAGE_COUNT }, (_, index) => index + 1));
-  const candidates = new Map<number, Candidate>();
-  const urls = new Set<string>();
-
-  for (const page of pages.slice(0, MAX_PAGE_ATTEMPTS)) {
-    const posts = await fetchPage(tags, page);
-    for (const post of posts) {
-      const candidate = candidateFromPost(post, isMizuki);
-      if (!candidate || candidates.has(candidate.id) || urls.has(candidate.imageUrl)) continue;
-      candidates.set(candidate.id, candidate);
-      urls.add(candidate.imageUrl);
-    }
-    if (candidates.size >= count) break;
-  }
-
-  if (candidates.size < count) throw new SourceError();
-  return shuffle([...candidates.values()]).slice(0, count);
-}
-
-function parseChallenge(value: unknown): { challenge_id: string; expires_at: string } | null {
-  const candidate = Array.isArray(value) ? value[0] : value;
-  if (!candidate || typeof candidate !== "object") return null;
-
-  const record = candidate as Record<string, unknown>;
-  if (typeof record.challenge_id !== "string" ||
-    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(record.challenge_id) ||
-    typeof record.expires_at !== "string" || !Number.isFinite(Date.parse(record.expires_at))) {
-    return null;
-  }
-
-  return { challenge_id: record.challenge_id, expires_at: record.expires_at };
+  throw new Error("No Mizuki image found");
 }
 
 async function proxyImage(imageUrl: string, origin: string | null): Promise<Response> {
-  // Only allow proxying known safe CDN URLs.
   let parsed: URL;
-  try {
-    parsed = new URL(imageUrl);
-  } catch {
-    return jsonResponse({ error: "Invalid image URL" }, 400, origin);
-  }
+  try { parsed = new URL(imageUrl); } catch { return json({ error: "Invalid URL" }, 400, origin); }
   if (parsed.origin !== "https://cdn.donmai.us" ||
     (!parsed.pathname.startsWith("/360x360/") && !parsed.pathname.startsWith("/sample/"))) {
-    return jsonResponse({ error: "Image URL not allowed" }, 403, origin);
+    return json({ error: "URL not allowed" }, 403, origin);
   }
-
   try {
-    const upstream = await fetch(imageUrl, {
-      headers: {
-        "User-Agent": DANBOORU_USER_AGENT,
-        "Accept": "image/*",
-      },
-      signal: AbortSignal.timeout(10_000),
+    const up = await fetch(imageUrl, {
+      headers: { "User-Agent": DANBOORU_USER_AGENT, "Accept": "image/*" },
+      signal: AbortSignal.timeout(10000),
     });
-
-    if (!upstream.ok || !upstream.body) {
-      return jsonResponse({ error: "Image unavailable" }, 502, origin);
-    }
-
-    const contentType = upstream.headers.get("Content-Type") || "image/jpeg";
-    return new Response(upstream.body, {
+    if (!up.ok || !up.body) return json({ error: "Image unavailable" }, 502, origin);
+    return new Response(up.body, {
       status: 200,
       headers: {
-        "Content-Type": contentType,
+        "Content-Type": up.headers.get("Content-Type") || "image/jpeg",
         "Cache-Control": "public, max-age=604800, immutable",
         "Access-Control-Allow-Origin": "*",
       },
     });
-  } catch {
-    return jsonResponse({ error: "Image unavailable" }, 502, origin);
-  }
+  } catch { return json({ error: "Image unavailable" }, 502, origin); }
+}
+
+function parseChallenge(v: unknown): { challenge_id: string; expires_at: string } | null {
+  const c = Array.isArray(v) ? v[0] : v;
+  if (!c || typeof c !== "object") return null;
+  const r = c as Record<string, unknown>;
+  if (typeof r.challenge_id !== "string" ||
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(r.challenge_id) ||
+    typeof r.expires_at !== "string" || !Number.isFinite(Date.parse(r.expires_at))) return null;
+  return { challenge_id: r.challenge_id, expires_at: r.expires_at };
 }
 
 Deno.serve(async (request) => {
   const url = new URL(request.url);
   const requestOrigin = request.headers.get("origin");
   const origin = allowedOrigin(request);
+  if (requestOrigin && !origin) return json({ error: "Request not allowed" }, 403, null);
+  if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(origin) });
 
-  if (requestOrigin && !origin) {
-    return jsonResponse({ error: "Request not allowed" }, 403, null);
-  }
-
-  if (request.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers: corsHeaders(origin) });
-  }
-
-  // Image proxy mode: GET with ?image_url=
   const imageUrlParam = url.searchParams.get("image_url");
-  if (imageUrlParam && request.method === "GET") {
-    return proxyImage(imageUrlParam, origin);
-  }
+  if (imageUrlParam && request.method === "GET") return proxyImage(imageUrlParam, origin);
 
   if (request.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Request not allowed" }), {
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
-      headers: {
-        ...corsHeaders(origin),
-        "Allow": "POST, OPTIONS",
-        "Content-Type": "application/json; charset=utf-8",
-      },
+      headers: { ...cors(origin), "Allow": "POST, OPTIONS", "Content-Type": "application/json; charset=utf-8" },
     });
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!supabaseUrl || !serviceRoleKey) {
-    return jsonResponse({ error: "Unable to generate challenge" }, 500, origin);
-  }
-
-  const proxyBase = `${supabaseUrl.replace(/\/$/, "")}/functions/v1/guestbook-captcha`;
+  if (!supabaseUrl || !serviceRoleKey) return json({ error: "Unable to generate challenge" }, 500, origin);
 
   try {
-    const [mizukiPosts, distractorPosts] = await Promise.all([
-      collectCandidates(true, 3),
-      collectCandidates(false, 6),
-    ]);
-    const usedPostIds = new Set<number>();
-    const mizukiTokens: string[] = [];
-    const choices = shuffle([...mizukiPosts, ...distractorPosts].map((post, index) => {
-      if (usedPostIds.has(post.id)) throw new SourceError();
-      usedPostIds.add(post.id);
+    const imageUrl = await fetchMizukiImage();
+    const targetX = MIN_X + randomInt(MAX_X - MIN_X + 1);
+    const proxyBase = `${supabaseUrl.replace(/\/$/, "")}/functions/v1/guestbook-captcha`;
+    const proxyUrl = `${proxyBase}?image_url=${encodeURIComponent(imageUrl)}`;
 
-      const token = crypto.randomUUID();
-      if (index < mizukiPosts.length) mizukiTokens.push(token);
-      const proxyUrl = `${proxyBase}?image_url=${encodeURIComponent(post.imageUrl)}`;
-      return { token, image_url: proxyUrl };
-    }));
+    const expectedTokens: string[] = [];
+    for (let offset = -TOLERANCE; offset <= TOLERANCE; offset++) {
+      const px = targetX + offset;
+      if (px >= 0 && px <= MAX_X) expectedTokens.push(positionToToken(px));
+    }
 
     const rpcResponse = await fetch(
       `${supabaseUrl.replace(/\/$/, "")}/rest/v1/rpc/create_guestbook_captcha_challenge`,
       {
         method: "POST",
-        headers: {
-          "apikey": serviceRoleKey,
-          "Authorization": `Bearer ${serviceRoleKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ p_expected_tokens: mizukiTokens }),
+        headers: { "apikey": serviceRoleKey, "Authorization": `Bearer ${serviceRoleKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ p_expected_tokens: expectedTokens }),
       },
     );
-    if (!rpcResponse.ok) {
-      return jsonResponse({ error: "Unable to generate challenge" }, 500, origin);
-    }
+    if (!rpcResponse.ok) return json({ error: "Unable to generate challenge" }, 500, origin);
 
-    let challenge: { challenge_id: string; expires_at: string } | null = null;
-    try {
-      challenge = parseChallenge(await rpcResponse.json());
-    } catch {
-      // Treat malformed database responses as an internal failure.
-    }
-    if (!challenge) return jsonResponse({ error: "Unable to generate challenge" }, 500, origin);
+    const challenge = parseChallenge(await rpcResponse.json());
+    if (!challenge) return json({ error: "Unable to generate challenge" }, 500, origin);
 
-    return jsonResponse({ ...challenge, choices }, 200, origin);
-  } catch (error) {
-    const status = error instanceof SourceError ? 503 : 500;
-    return jsonResponse({ error: "Unable to generate challenge" }, status, origin);
+    return json({
+      challenge_id: challenge.challenge_id,
+      expires_at: challenge.expires_at,
+      image_url: proxyUrl,
+      display_width: DISPLAY_WIDTH,
+      piece_size: PIECE_SIZE,
+      target_x: targetX,
+      min_x: MIN_X,
+      max_x: MAX_X,
+    }, 200, origin);
+  } catch {
+    return json({ error: "Unable to generate challenge" }, 500, origin);
   }
 });

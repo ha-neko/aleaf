@@ -361,15 +361,11 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .community-form .dialog-close { width: 38px; min-height: 38px; margin: 0; padding: 0; flex: none; border-color: #d2a9c2; color: #74416d; background: #fff; font-size: 24px; line-height: 1; text-transform: none; }
 .guestbook-captcha { min-width: 0; margin: 8px 0 0; padding: 14px; border: 1px solid #d8b4cb; border-radius: 12px; background: rgba(248,232,241,.46); }
 .guestbook-captcha legend { padding: 0 6px; color: #6e4562; font-size: 11px; font-weight: 700; }
-.captcha-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
-.captcha-choice { position: relative; min-width: 0; cursor: pointer; }
-.captcha-choice input { position: absolute; width: 1px; height: 1px; opacity: 0; }
-.captcha-choice-visual { position: relative; display: block; overflow: hidden; border: 2px solid transparent; border-radius: 9px; background: #eadce6; transition: border-color .15s, box-shadow .15s, transform .15s; aspect-ratio: 1; }
-.captcha-choice-visual::after { content: ""; position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; border: 2px solid #fff; border-radius: 50%; background: rgba(42,24,38,.62); box-shadow: 0 1px 4px rgba(0,0,0,.3); }
-.captcha-choice img { width: 100%; aspect-ratio: 1; display: block; object-fit: cover; }
-.captcha-choice input:checked + .captcha-choice-visual { border-color: #9f477f; box-shadow: 0 0 0 2px rgba(159,71,127,.2); transform: translateY(-1px); }
-.captcha-choice input:checked + .captcha-choice-visual::after { content: "\2713"; display: grid; place-items: center; color: #fff; border-color: #fff; background: #9f477f; font: 700 12px "Montserrat", sans-serif; }
-.captcha-choice input:focus-visible + .captcha-choice-visual { outline: 3px solid var(--focus); outline-offset: 2px; }
+.captcha-puzzle { position: relative; overflow: hidden; border: 2px solid #d8b4cb; border-radius: 8px; background: #eadce6; user-select: none; }
+.captcha-puzzle-image { position: relative; width: 100%; }
+.captcha-puzzle-image img { width: 100%; display: block; border-radius: 6px; }
+.captcha-puzzle-piece { position: absolute; z-index: 2; border: 2px solid rgba(255,255,255,.85); border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,.35); background-repeat: no-repeat; pointer-events: none; transition: left .05s linear; }
+.captcha-slider { width: 100%; accent-color: #9f477f; cursor: pointer; }
 .captcha-controls { margin-top: 9px; display: flex; align-items: center; gap: 10px; }
 .captcha-controls .form-status { flex: 1; }
 .community-form .secondary-button { min-height: 38px; margin: 0; color: #74416d; border-color: #d2a9c2; background: #fff; }
@@ -656,7 +652,6 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
     .community-form { padding: 18px 15px; }
     .guestbook-dialog { width: calc(100% - 16px); max-height: calc(100dvh - 16px); }
     .guestbook-dialog-form { max-height: calc(100dvh - 16px); padding: 16px 12px; }
-    .captcha-grid { gap: 5px; }
     .captcha-controls { align-items: flex-start; flex-direction: column; }
     .dialog-actions button { flex: 1; padding: 0 10px; }
     .gallery-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }

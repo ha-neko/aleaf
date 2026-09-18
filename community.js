@@ -175,7 +175,9 @@
         const closeButton = document.getElementById('guestbookClose');
         const cancelButton = document.getElementById('guestbookCancel');
         const refreshButton = document.getElementById('guestbookCaptchaRefresh');
-        const choicesRoot = document.getElementById('guestbookCaptchaChoices');
+        const puzzleImage = document.getElementById('captchaPuzzleImage');
+        const puzzlePiece = document.getElementById('captchaPuzzlePiece');
+        const slider = document.getElementById('guestbookCaptchaSlider');
         const captchaStatus = document.getElementById('guestbookCaptchaStatus');
         const formStatus = document.getElementById('guestbookFormStatus');
         const composeStatus = document.getElementById('composeStatus');
@@ -183,56 +185,91 @@
         const submitButton = form.querySelector('button[type="submit"]');
         let challenge = null;
         let challengeRequest = 0;
+        let puzzleData = null;
+
+        function positionToToken(pos) {
+            const rounded = Math.round(pos);
+            const hex = Math.max(0, Math.min(999, rounded)).toString(16).padStart(12, '0');
+            return `00000000-0000-4000-8000-${hex}`;
+        }
+
+        function updatePuzzlePiece() {
+            if (!puzzleData) return;
+            const ratio = slider.value / slider.max;
+            const x = puzzleData.minX + ratio * (puzzleData.maxX - puzzleData.minX);
+            puzzlePiece.style.left = x + 'px';
+        }
 
         async function loadChallenge() {
             const request = ++challengeRequest;
             challenge = null;
-            choicesRoot.replaceChildren();
+            puzzleData = null;
+            puzzleImage.replaceChildren();
+            puzzlePiece.style.cssText = '';
+            slider.value = 0;
+            slider.disabled = true;
             submitButton.disabled = true;
             refreshButton.disabled = true;
-            setStatus(captchaStatus, 'Loading verification images...');
+            setStatus(captchaStatus, 'Loading puzzle...');
             try {
                 const { data, error } = await client.functions.invoke('guestbook-captcha');
                 if (error) throw error;
                 if (request !== challengeRequest || !dialog.open) return;
-                if (!data || !data.challenge_id || !Array.isArray(data.choices) || data.choices.length !== 9) {
+                if (!data || !data.challenge_id || !data.image_url || typeof data.target_x !== 'number') {
                     throw new Error('Invalid CAPTCHA challenge');
                 }
-                const fragment = document.createDocumentFragment();
-                data.choices.forEach((choice, index) => {
-                    const imageUrl = choice && safeCaptchaUrl(choice.image_url);
-                    if (!choice || typeof choice.token !== 'string' || !choice.token || !imageUrl) throw new Error('Invalid CAPTCHA choice');
-                    const label = document.createElement('label');
-                    label.className = 'captcha-choice';
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.name = 'captcha_choice';
-                    checkbox.value = choice.token;
-                    checkbox.setAttribute('aria-label', `Verification image ${index + 1}`);
-                    const visual = document.createElement('span');
-                    visual.className = 'captcha-choice-visual';
-                    const image = document.createElement('img');
-                    image.src = imageUrl;
-                    image.alt = '';
-                    image.referrerPolicy = 'no-referrer';
-                    visual.append(image);
-                    label.append(checkbox, visual);
-                    fragment.append(label);
-                });
+                const imageUrl = safeCaptchaUrl(data.image_url);
+                if (!imageUrl) throw new Error('Invalid image URL');
+
+                puzzleData = {
+                    displayWidth: data.display_width || 280,
+                    pieceSize: data.piece_size || 50,
+                    targetX: data.target_x,
+                    minX: data.min_x || 0,
+                    maxX: data.max_x || 230
+                };
+
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.alt = 'Slide puzzle';
+                img.referrerPolicy = 'no-referrer';
+                img.draggable = false;
+                puzzleImage.appendChild(img);
+
+                puzzleImage.style.width = puzzleData.displayWidth + 'px';
+                puzzlePiece.style.width = puzzleData.pieceSize + 'px';
+                puzzlePiece.style.height = puzzleData.pieceSize + 'px';
+                puzzlePiece.style.backgroundImage = `url(${imageUrl})`;
+                puzzlePiece.style.backgroundSize = `${puzzleData.displayWidth}px auto`;
+                puzzlePiece.style.backgroundPosition = `-${puzzleData.targetX}px -${(img.naturalHeight || 150) / 2 - puzzleData.pieceSize / 2}px`;
+
+                img.onload = () => {
+                    if (request !== challengeRequest) return;
+                    puzzlePiece.style.backgroundSize = `${puzzleData.displayWidth}px auto`;
+                    puzzlePiece.style.backgroundPosition = `-${puzzleData.targetX}px -${img.naturalHeight / 2 - puzzleData.pieceSize / 2}px`;
+                    puzzlePiece.style.top = (img.offsetHeight / 2 - puzzleData.pieceSize / 2) + 'px';
+                };
+                puzzlePiece.style.top = '50%';
+                puzzlePiece.style.transform = 'translateY(-50%)';
+                puzzlePiece.style.left = '0px';
+
                 challenge = {
                     id: data.challenge_id,
-                    expiresAt: data.expires_at || data.expiry ? new Date(data.expires_at || data.expiry).valueOf() : null
+                    expiresAt: data.expires_at ? new Date(data.expires_at).valueOf() : null
                 };
-                choicesRoot.append(fragment);
-                setStatus(captchaStatus, 'Choose the three Mizuki images.');
+                slider.disabled = false;
+                slider.value = 0;
+                setStatus(captchaStatus, 'Slide the piece to match the cutout.');
             } catch (error) {
                 if (request !== challengeRequest || !dialog.open) return;
-                setStatus(captchaStatus, 'Verification images could not be loaded. Please refresh them.', true);
+                setStatus(captchaStatus, 'Puzzle could not be loaded. Please try again.', true);
                 console.warn('guestbook-captcha:', error.message);
             } finally {
-                if (request === challengeRequest) refreshButton.disabled = false;
+                if (request === challengeRequest) { refreshButton.disabled = false; }
             }
         }
+
+        slider.addEventListener('input', () => { updatePuzzlePiece(); submitButton.disabled = !challenge; });
 
         dialog.addEventListener('compose-open', () => {
             if (dialog.open) return;
@@ -240,39 +277,35 @@
             dialog.showModal();
             loadChallenge();
         });
-        refreshButton.addEventListener('click', () => {
-            setStatus(formStatus, '');
-            loadChallenge();
-        });
-        choicesRoot.addEventListener('change', () => {
-            const selectedCount = [...choicesRoot.querySelectorAll('input[type="checkbox"]')].filter((choice) => choice.checked).length;
-            submitButton.disabled = !challenge || selectedCount !== 3;
-            setStatus(captchaStatus, selectedCount === 3 ? 'Three selected. Ready.' : `${selectedCount} of 3 selected.`);
-        });
+        refreshButton.addEventListener('click', () => { setStatus(formStatus, ''); loadChallenge(); });
         closeButton.addEventListener('click', () => dialog.close());
         cancelButton.addEventListener('click', () => dialog.close());
         dialog.addEventListener('close', () => {
             challengeRequest += 1;
             challenge = null;
-            choicesRoot.replaceChildren();
+            puzzleData = null;
+            puzzleImage.replaceChildren();
+            puzzlePiece.style.cssText = '';
+            slider.value = 0;
+            slider.disabled = true;
         });
 
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
             if (!form.reportValidity()) return;
-            const selectedTokens = [...form.elements.captcha_choice || []]
-                .filter((choice) => choice.checked)
-                .map((choice) => choice.value);
             if (!challenge || (challenge.expiresAt && challenge.expiresAt <= Date.now())) {
-                setStatus(formStatus, 'Verification expired. Please complete the new challenge.', true);
+                setStatus(formStatus, 'Verification expired. Please try the new puzzle.', true);
                 loadChallenge();
                 return;
             }
-            if (selectedTokens.length !== 3) {
-                setStatus(formStatus, 'Select exactly three matching images before sending.', true);
+            if (!puzzleData) {
+                setStatus(formStatus, 'Please solve the puzzle first.', true);
                 return;
             }
 
+            const ratio = slider.value / slider.max;
+            const currentX = puzzleData.minX + ratio * (puzzleData.maxX - puzzleData.minX);
+            const token = positionToToken(currentX);
             submitButton.disabled = true;
             refreshButton.disabled = true;
             setStatus(formStatus, 'Sending your note...');
@@ -281,7 +314,7 @@
                     p_display_name: form.elements.display_name.value.trim(),
                     p_message: form.elements.body.value.trim(),
                     p_challenge_id: challenge.id,
-                    p_selected_tokens: selectedTokens
+                    p_selected_tokens: [token]
                 });
                 if (error) throw error;
                 if (data === null || data === false || data === '' || (typeof data === 'object' && data.success === false)) {
