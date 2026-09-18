@@ -3,15 +3,15 @@ const DANBOORU_API = "https://danbooru.donmai.us/posts.json";
 const DANBOORU_USER_AGENT = "aleaf.is-a.dev guestbook-captcha/2.0";
 const POSTS_PER_PAGE = 40;
 const STATIC_IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp"]);
-const PIECE_SIZE = 50;
-const DISPLAY_WIDTH = 280;
-const DISPLAY_HEIGHT = 150;
-const MIN_X = 8;
-const MAX_X = DISPLAY_WIDTH - PIECE_SIZE - 8;
+const DISPLAY_SIZE = 300;
+const PIECE_SIZE = 68;
+const BOARD_PADDING = 24;
+const MAX_PIECE_COORD = DISPLAY_SIZE - PIECE_SIZE - BOARD_PADDING;
 
 type DanbooruVariant = { type?: unknown; url?: unknown; file_ext?: unknown };
 type DanbooruPost = {
   id?: unknown; rating?: unknown; tag_string_character?: unknown;
+  image_width?: unknown; image_height?: unknown;
   media_asset?: { file_ext?: unknown; variants?: unknown } | null;
 };
 
@@ -53,12 +53,6 @@ function shuffle<T>(arr: T[]): T[] {
   return arr;
 }
 
-function positionToToken(pos: number): string {
-  const rounded = Math.round(pos);
-  const hex = Math.max(0, Math.min(999, rounded)).toString(16).padStart(12, "0");
-  return `00000000-0000-4000-8000-${hex}`;
-}
-
 function safeImageUrl(asset: DanbooruPost["media_asset"]): string | null {
   if (!asset || typeof asset.file_ext !== "string" || !STATIC_IMAGE_EXTENSIONS.has(asset.file_ext.toLowerCase()) ||
     !Array.isArray(asset.variants)) return null;
@@ -67,7 +61,7 @@ function safeImageUrl(asset: DanbooruPost["media_asset"]): string | null {
     try {
       const u = new URL(v.url);
       if (u.origin === "https://cdn.donmai.us" &&
-        (u.pathname.startsWith("/360x360/") || u.pathname.startsWith("/sample/")) &&
+        u.pathname.startsWith("/360x360/") &&
         !u.username && !u.password && !u.search) return u.href;
     } catch { /* skip */ }
   }
@@ -76,13 +70,13 @@ function safeImageUrl(asset: DanbooruPost["media_asset"]): string | null {
 
 async function fetchMizukiImage(): Promise<string> {
   const tags = "akiyama_mizuki solo rating:general";
-  const pages = shuffle([1, 2, 3, 4, 5]);
+  const pages = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   for (const page of pages) {
     const url = new URL(DANBOORU_API);
     url.searchParams.set("tags", tags);
     url.searchParams.set("limit", String(POSTS_PER_PAGE));
     url.searchParams.set("page", String(page));
-    url.searchParams.set("only", "id,rating,tag_string_character,media_asset");
+    url.searchParams.set("only", "id,rating,tag_string_character,image_width,image_height,media_asset");
     let res: Response;
     try {
       res = await fetch(url.toString(), {
@@ -100,6 +94,9 @@ async function fetchMizukiImage(): Promise<string> {
       if (p.rating !== "g") continue;
       const chars = typeof p.tag_string_character === "string" ? p.tag_string_character : "";
       if (!chars.includes("akiyama_mizuki")) continue;
+      // Only accept truly square (1:1) images
+      if (typeof p.image_width !== "number" || typeof p.image_height !== "number") continue;
+      if (p.image_width !== p.image_height) continue;
       const img = safeImageUrl(p.media_asset);
       if (img) candidates.push(img);
     }
@@ -111,8 +108,7 @@ async function fetchMizukiImage(): Promise<string> {
 async function proxyImage(imageUrl: string): Promise<Response> {
   let parsed: URL;
   try { parsed = new URL(imageUrl); } catch { return new Response("Bad URL", { status: 400 }); }
-  if (parsed.origin !== "https://cdn.donmai.us" ||
-    (!parsed.pathname.startsWith("/360x360/") && !parsed.pathname.startsWith("/sample/"))) {
+  if (parsed.origin !== "https://cdn.donmai.us" || !parsed.pathname.startsWith("/360x360/")) {
     return new Response("Not allowed", { status: 403 });
   }
   try {
@@ -142,6 +138,39 @@ function parseChallenge(v: unknown): { challenge_id: string; expires_at: string 
   return { challenge_id: r.challenge_id, expires_at: r.expires_at };
 }
 
+function randomPieceCoordinate(): { x: number; y: number } {
+  return {
+    x: BOARD_PADDING + randomInt(MAX_PIECE_COORD - BOARD_PADDING + 1),
+    y: BOARD_PADDING + randomInt(MAX_PIECE_COORD - BOARD_PADDING + 1),
+  };
+}
+
+function pieceDistance(a: { x: number; y: number }, b: { x: number; y: number }): number {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function makeDistinctPieceCoordinates(): Array<{ x: number; y: number }> {
+  const coordinates: Array<{ x: number; y: number }> = [];
+  for (let attempts = 0; coordinates.length < 3 && attempts < 200; attempts++) {
+    const candidate = randomPieceCoordinate();
+    if (coordinates.every((existing) => pieceDistance(existing, candidate) >= PIECE_SIZE * 1.15)) {
+      coordinates.push(candidate);
+    }
+  }
+  if (coordinates.length !== 3) {
+    return [
+      { x: BOARD_PADDING, y: BOARD_PADDING },
+      { x: MAX_PIECE_COORD, y: BOARD_PADDING },
+      { x: Math.round((DISPLAY_SIZE - PIECE_SIZE) / 2), y: MAX_PIECE_COORD },
+    ];
+  }
+  return coordinates;
+}
+
+function makeTokenBundle(): string[] {
+  return [crypto.randomUUID(), crypto.randomUUID(), crypto.randomUUID()];
+}
+
 Deno.serve(async (request) => {
   const url = new URL(request.url);
   const requestOrigin = request.headers.get("origin");
@@ -165,16 +194,18 @@ Deno.serve(async (request) => {
 
   try {
     const imageUrl = await fetchMizukiImage();
-    const targetX = MIN_X + randomInt(MAX_X - MIN_X + 1);
+    const [target, decoyA, decoyB] = makeDistinctPieceCoordinates();
     const proxyBase = `${supabaseUrl.replace(/\/$/, "")}/functions/v1/guestbook-captcha`;
     const proxyUrl = `${proxyBase}?image_url=${encodeURIComponent(imageUrl)}`;
 
-    // RPC needs exactly 3 tokens. targetX ± 0 and ± 1 gives 3 accepted positions.
-    const expectedTokens = [
-      positionToToken(targetX),
-      positionToToken(targetX + 1),
-      positionToToken(targetX - 1),
-    ];
+    // The database requires exactly three expected tokens. Each visible piece
+    // receives an opaque bundle of three; only the matching crop gets this one.
+    const expectedTokens = makeTokenBundle();
+    const pieces = shuffle([
+      { source_x: target.x, source_y: target.y, tokens: expectedTokens },
+      { source_x: decoyA.x, source_y: decoyA.y, tokens: makeTokenBundle() },
+      { source_x: decoyB.x, source_y: decoyB.y, tokens: makeTokenBundle() },
+    ]).map((piece, index) => ({ id: `piece-${index + 1}`, ...piece }));
 
     const rpcResponse = await fetch(
       `${supabaseUrl.replace(/\/$/, "")}/rest/v1/rpc/create_guestbook_captcha_challenge`,
@@ -193,12 +224,12 @@ Deno.serve(async (request) => {
       challenge_id: challenge.challenge_id,
       expires_at: challenge.expires_at,
       image_url: proxyUrl,
-      display_width: DISPLAY_WIDTH,
-      display_height: DISPLAY_HEIGHT,
+      display_width: DISPLAY_SIZE,
+      display_height: DISPLAY_SIZE,
       piece_size: PIECE_SIZE,
-      target_x: targetX,
-      min_x: MIN_X,
-      max_x: MAX_X,
+      target_x: target.x,
+      target_y: target.y,
+      pieces,
     }, 200, origin);
   } catch (e) {
     console.error("[captcha] error:", String(e));

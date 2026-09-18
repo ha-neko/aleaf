@@ -40,7 +40,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Montserrat:wght@500;600;700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="me.css?v=2500-community-5">
+    <link rel="stylesheet" href="me.css?v=2500-community-8">
 </head>
 <body>
     <a class="skip-link" href="#mainContent">Skip to main content</a>
@@ -256,11 +256,11 @@
                            <label for="guestbookBody">Message</label>
                            <textarea id="guestbookBody" name="body" required minlength="2" maxlength="500" rows="4"></textarea>
                             <fieldset class="guestbook-captcha">
-                                <legend>Drag the piece into the matching slot.</legend>
-                                <div id="guestbookCaptchaPuzzle" class="captcha-puzzle">
-                                    <div class="captcha-puzzle-image" id="captchaPuzzleImage"></div>
-                                    <div class="captcha-puzzle-piece" id="captchaPuzzlePiece"></div>
-                                </div>
+                                 <legend>Drag the matching piece into the missing square.</legend>
+                                 <div id="guestbookCaptchaPuzzle" class="captcha-puzzle">
+                                     <div class="captcha-puzzle-image" id="captchaPuzzleImage"></div>
+                                 </div>
+                                 <div id="captchaPuzzlePieces" class="captcha-puzzle-pieces" aria-label="Puzzle pieces"></div>
                                 <div class="captcha-controls">
                                     <button id="guestbookCaptchaRefresh" class="secondary-button" type="button">new puzzle</button>
                                     <p id="guestbookCaptchaStatus" class="form-status" role="status" aria-live="polite"></p>
@@ -313,6 +313,6 @@
     <button id="musicToggle" class="music-button" type="button" aria-label="Play background music" aria-pressed="false" aria-describedby="musicStatus"><svg class="icon ui-icon sound-on" aria-hidden="true"><use href="#i-volume"/></svg><svg class="icon ui-icon sound-off" aria-hidden="true"><use href="#i-volume-off"/></svg></button>
     <span id="musicStatus" class="sr-only" role="status" aria-live="polite">Background music paused</span>
     <audio id="backgroundMusic" loop preload="metadata"><source src="First Date.mp3" type="audio/mpeg"></audio>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="default-content.js?v=2500-community-1"></script><script src="content.js?v=2500-community-1"></script><script src="test.js?v=2500-quiz-2"></script><script src="community.js?v=2500-community-7"></script><script src="me.js?v=2500-community-7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="default-content.js?v=2500-community-1"></script><script src="content.js?v=2500-community-1"></script><script src="test.js?v=2500-quiz-2"></script><script src="community.js?v=2500-community-8"></script><script src="me.js?v=2500-community-7"></script>
 </body>
 </html>

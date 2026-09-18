@@ -176,7 +176,7 @@
         const cancelButton = document.getElementById('guestbookCancel');
         const refreshButton = document.getElementById('guestbookCaptchaRefresh');
         const puzzleImage = document.getElementById('captchaPuzzleImage');
-        const puzzlePiece = document.getElementById('captchaPuzzlePiece');
+        const piecesRoot = document.getElementById('captchaPuzzlePieces');
         const captchaStatus = document.getElementById('guestbookCaptchaStatus');
         const formStatus = document.getElementById('guestbookFormStatus');
         const composeStatus = document.getElementById('composeStatus');
@@ -185,58 +185,171 @@
         let challenge = null;
         let challengeRequest = 0;
         let puzzleData = null;
-        let dragging = false;
-        let dragStartX = 0;
-        let pieceStartX = 0;
+        let selectedTokens = null;
+        let placedPiece = null;
+        let dragState = null;
 
-        function positionToToken(pos) {
-            const rounded = Math.round(pos);
-            const hex = Math.max(0, Math.min(999, rounded)).toString(16).padStart(12, '0');
-            return `00000000-0000-4000-8000-${hex}`;
+        function sortPieces() {
+            [...piecesRoot.querySelectorAll('.captcha-puzzle-piece')]
+                .sort((a, b) => Number(a.dataset.order) - Number(b.dataset.order))
+                .forEach((piece) => piecesRoot.appendChild(piece));
         }
 
-        function getPieceX() { return parseFloat(puzzlePiece.style.left) || 0; }
-
-        function onPointerDown(e) {
-            if (!puzzleData || !challenge) return;
-            e.preventDefault();
-            dragging = true;
-            dragStartX = e.clientX;
-            pieceStartX = getPieceX();
-            puzzlePiece.setPointerCapture(e.pointerId);
-            puzzlePiece.style.cursor = 'grabbing';
-        }
-        function onPointerMove(e) {
-            if (!dragging || !puzzleData) return;
-            e.preventDefault();
-            const dx = e.clientX - dragStartX;
-            let newX = pieceStartX + dx;
-            newX = Math.max(0, Math.min(puzzleData.maxX, newX));
-            puzzlePiece.style.left = newX + 'px';
-            const dist = Math.abs(newX - (puzzleData.scaledTargetX || puzzleData.targetX));
-            const threshold = puzzleData.glowThreshold || 6;
-            puzzlePiece.style.boxShadow = dist <= threshold
-                ? '0 0 14px 4px rgba(255,255,255,0.7)' : '0 2px 8px rgba(0,0,0,0.35)';
-            submitButton.disabled = !challenge;
-        }
-        function onPointerUp(e) {
-            if (!dragging) return;
-            dragging = false;
-            puzzlePiece.style.cursor = 'grab';
-            puzzlePiece.releasePointerCapture(e.pointerId);
+        function resetPieceStyle(piece) {
+            piece.classList.remove('is-dragging', 'is-placed');
+            ['position', 'left', 'top', 'width', 'height', 'zIndex'].forEach((property) => {
+                piece.style[property] = '';
+            });
         }
 
-        puzzlePiece.addEventListener('pointerdown', onPointerDown);
-        puzzlePiece.addEventListener('pointermove', onPointerMove);
-        puzzlePiece.addEventListener('pointerup', onPointerUp);
-        puzzlePiece.addEventListener('pointercancel', onPointerUp);
+        function returnPieceToTray(piece) {
+            if (!piece) return;
+            resetPieceStyle(piece);
+            piecesRoot.appendChild(piece);
+            sortPieces();
+            if (placedPiece === piece) {
+                placedPiece = null;
+                selectedTokens = null;
+                submitButton.disabled = true;
+            }
+        }
+
+        function placePiece(piece) {
+            if (!puzzleData || !puzzleData.slot) return;
+            if (placedPiece && placedPiece !== piece) returnPieceToTray(placedPiece);
+
+            const { slot, displayWidth, displayHeight, pieceSize, targetX, targetY } = puzzleData;
+            resetPieceStyle(piece);
+            piece.classList.add('is-placed');
+            piece.style.position = 'absolute';
+            piece.style.left = `${targetX / displayWidth * 100}%`;
+            piece.style.top = `${targetY / displayHeight * 100}%`;
+            piece.style.width = `${pieceSize / displayWidth * 100}%`;
+            piece.style.height = `${pieceSize / displayHeight * 100}%`;
+            puzzleImage.appendChild(piece);
+            slot.classList.add('has-piece');
+            placedPiece = piece;
+            selectedTokens = puzzleData.tokens.get(piece.dataset.pieceId) || null;
+            submitButton.disabled = !selectedTokens;
+            setStatus(captchaStatus, 'Piece placed. If the picture matches, send your note.');
+        }
+
+        function finishDrag(event, cancelled = false) {
+            if (!dragState || dragState.pointerId !== event.pointerId) return;
+            const { piece, placeholder } = dragState;
+            const slotRect = puzzleData && puzzleData.slot ? puzzleData.slot.getBoundingClientRect() : null;
+            const pieceRect = piece.getBoundingClientRect();
+            const centerX = pieceRect.left + pieceRect.width / 2;
+            const centerY = pieceRect.top + pieceRect.height / 2;
+            const droppedInSlot = !cancelled && slotRect &&
+                centerX >= slotRect.left && centerX <= slotRect.right &&
+                centerY >= slotRect.top && centerY <= slotRect.bottom;
+
+            try { piece.releasePointerCapture(event.pointerId); } catch { /* already released */ }
+            placeholder?.remove();
+            dragState = null;
+            if (droppedInSlot) placePiece(piece);
+            else {
+                returnPieceToTray(piece);
+                if (puzzleData && puzzleData.slot) puzzleData.slot.classList.remove('has-piece');
+                setStatus(captchaStatus, 'Drop one piece inside the missing square.');
+            }
+        }
+
+        function startDrag(event) {
+            if (!puzzleData || !challenge || (event.pointerType === 'mouse' && event.button !== 0)) return;
+            event.preventDefault();
+            const piece = event.currentTarget;
+            const rect = piece.getBoundingClientRect();
+            const placeholder = document.createElement('span');
+            placeholder.className = 'captcha-piece-placeholder';
+            placeholder.style.width = `${rect.width}px`;
+            placeholder.style.height = `${rect.height}px`;
+
+            if (piece.parentElement === piecesRoot) piece.replaceWith(placeholder);
+            else if (placedPiece === piece) {
+                placedPiece = null;
+                selectedTokens = null;
+                submitButton.disabled = true;
+                puzzleData.slot.classList.remove('has-piece');
+            }
+
+            document.body.appendChild(piece);
+            piece.classList.remove('is-placed');
+            piece.classList.add('is-dragging');
+            piece.style.position = 'fixed';
+            piece.style.left = `${rect.left}px`;
+            piece.style.top = `${rect.top}px`;
+            piece.style.width = `${rect.width}px`;
+            piece.style.height = `${rect.height}px`;
+            piece.style.zIndex = '9999';
+            dragState = {
+                piece,
+                placeholder,
+                pointerId: event.pointerId,
+                offsetX: event.clientX - rect.left,
+                offsetY: event.clientY - rect.top
+            };
+            piece.setPointerCapture(event.pointerId);
+        }
+
+        function moveDrag(event) {
+            if (!dragState || dragState.pointerId !== event.pointerId) return;
+            event.preventDefault();
+            dragState.piece.style.left = `${event.clientX - dragState.offsetX}px`;
+            dragState.piece.style.top = `${event.clientY - dragState.offsetY}px`;
+            const slotRect = puzzleData.slot.getBoundingClientRect();
+            const overSlot = event.clientX >= slotRect.left && event.clientX <= slotRect.right &&
+                event.clientY >= slotRect.top && event.clientY <= slotRect.bottom;
+            puzzleData.slot.classList.toggle('is-ready', overSlot);
+        }
+
+        function makePiece(pieceData, index, imageUrl, displayWidth, displayHeight, pieceSize) {
+            const piece = document.createElement('button');
+            piece.type = 'button';
+            piece.className = 'captcha-puzzle-piece';
+            piece.dataset.pieceId = pieceData.id;
+            piece.dataset.order = String(index);
+            piece.setAttribute('aria-label', `Puzzle piece ${index + 1}`);
+
+            const crop = document.createElement('img');
+            crop.src = imageUrl;
+            crop.alt = '';
+            crop.draggable = false;
+            crop.style.width = `${displayWidth / pieceSize * 100}%`;
+            crop.style.height = `${displayHeight / pieceSize * 100}%`;
+            crop.style.left = `${-pieceData.source_x / pieceSize * 100}%`;
+            crop.style.top = `${-pieceData.source_y / pieceSize * 100}%`;
+            piece.appendChild(crop);
+
+            piece.addEventListener('pointerdown', startDrag);
+            piece.addEventListener('pointermove', moveDrag);
+            piece.addEventListener('pointerup', (event) => {
+                puzzleData?.slot?.classList.remove('is-ready');
+                finishDrag(event);
+            });
+            piece.addEventListener('pointercancel', (event) => {
+                puzzleData?.slot?.classList.remove('is-ready');
+                finishDrag(event, true);
+            });
+            return piece;
+        }
+
+        function clearPuzzle() {
+            if (dragState && dragState.piece.isConnected) dragState.piece.remove();
+            dragState?.placeholder?.remove();
+            dragState = null;
+            placedPiece = null;
+            selectedTokens = null;
+            puzzleData = null;
+            puzzleImage.replaceChildren();
+            piecesRoot.replaceChildren();
+        }
 
         async function loadChallenge() {
             const request = ++challengeRequest;
             challenge = null;
-            puzzleData = null;
-            puzzleImage.replaceChildren();
-            puzzlePiece.style.cssText = '';
+            clearPuzzle();
             submitButton.disabled = true;
             refreshButton.disabled = true;
             setStatus(captchaStatus, 'Loading puzzle...');
@@ -244,80 +357,62 @@
                 const { data, error } = await client.functions.invoke('guestbook-captcha');
                 if (error) throw error;
                 if (request !== challengeRequest || !dialog.open) return;
-                if (!data || !data.challenge_id || !data.image_url || typeof data.target_x !== 'number') {
+                if (!data || !data.challenge_id || !data.image_url ||
+                    typeof data.target_x !== 'number' || typeof data.target_y !== 'number' ||
+                    !Array.isArray(data.pieces) || data.pieces.length !== 3) {
                     throw new Error('Invalid CAPTCHA challenge: ' + JSON.stringify(data));
                 }
 
-                const dw = data.display_width || 280;
-                const dh = data.display_height || 150;
-                const ps = data.piece_size || 50;
+                const dw = data.display_width || 300;
+                const dh = data.display_height || 300;
+                const ps = data.piece_size || 68;
+                const tokens = new Map();
+                data.pieces.forEach((piece) => {
+                    if (!piece || typeof piece.id !== 'string' ||
+                        typeof piece.source_x !== 'number' || typeof piece.source_y !== 'number' ||
+                        !Array.isArray(piece.tokens) || piece.tokens.length !== 3) {
+                        throw new Error('Invalid CAPTCHA piece');
+                    }
+                    tokens.set(piece.id, piece.tokens);
+                });
 
                 puzzleData = {
                     displayWidth: dw,
                     displayHeight: dh,
                     pieceSize: ps,
                     targetX: data.target_x,
-                    minX: data.min_x || 0,
-                    maxX: data.max_x || 222,
-                    imageUrl: data.image_url
+                    targetY: data.target_y,
+                    imageUrl: data.image_url,
+                    tokens,
+                    slot: null
                 };
 
-                // Build puzzle area: image + slot overlay
                 const img = document.createElement('img');
                 img.src = data.image_url;
-                img.alt = 'Puzzle image';
+                img.alt = 'Square Mizuki puzzle from Danbooru';
                 img.referrerPolicy = 'no-referrer';
                 img.draggable = false;
-                img.style.cssText = 'width:100%;display:block;border-radius:6px;';
                 puzzleImage.appendChild(img);
 
-                // Slot overlay uses percentage-based positioning (scales with image)
-                const slotYPct = ((dh - ps) / 2 / dh) * 100;
-                const slotXPct = (data.targetX / dw) * 100;
-                const slotWPct = (ps / dw) * 100;
-                const slotHPct = (ps / dh) * 100;
                 const slot = document.createElement('div');
-                slot.style.cssText = `position:absolute;left:${slotXPct}%;top:${slotYPct}%;width:${slotWPct}%;height:${slotHPct}%;border:2px dashed rgba(255,255,255,0.7);border-radius:5px;background:rgba(0,0,0,0.35);pointer-events:none;`;
+                slot.className = 'captcha-puzzle-slot';
+                slot.style.left = `${data.target_x / dw * 100}%`;
+                slot.style.top = `${data.target_y / dh * 100}%`;
+                slot.style.width = `${ps / dw * 100}%`;
+                slot.style.height = `${ps / dh * 100}%`;
                 puzzleImage.appendChild(slot);
+                puzzleData.slot = slot;
 
-                // Draggable piece: cropped view of the image at the target area
-                // Scale piece position to actual rendered size once image loads
-                function applyPieceScale() {
-                    const actualW = img.offsetWidth;
-                    const actualH = img.offsetHeight;
-                    const scale = actualW / dw;
-                    const scaledPs = ps * scale;
-                    const scaledTargetX = data.targetX * scale;
-                    const scaledSlotY = ((dh - ps) / 2) * scale;
-
-                    puzzlePiece.style.width = scaledPs + 'px';
-                    puzzlePiece.style.height = scaledPs + 'px';
-                    puzzlePiece.style.backgroundImage = `url(${data.image_url})`;
-                    puzzlePiece.style.backgroundSize = `${actualW}px ${actualH}px`;
-                    puzzlePiece.style.backgroundPosition = `-${scaledTargetX}px -${scaledSlotY}px`;
-                    puzzlePiece.style.top = scaledSlotY + 'px';
-                    puzzlePiece.style.left = '0px';
-                    puzzlePiece.style.cursor = 'grab';
-                    puzzlePiece.style.display = 'block';
-
-                    // Update drag bounds to actual pixels
-                    puzzleData.maxX = Math.round(actualW - scaledPs);
-                    puzzleData.minX = 0;
-                    puzzleData.scaledPs = scaledPs;
-                    puzzleData.scaledTargetX = data.targetX * scale;
-
-                    // Also scale the glow threshold
-                    puzzleData.glowThreshold = 6 * scale;
-                }
-                if (img.complete) applyPieceScale();
-                else img.addEventListener('load', applyPieceScale, { once: true });
+                data.pieces.forEach((piece, index) => {
+                    piecesRoot.appendChild(makePiece(piece, index, data.image_url, dw, dh, ps));
+                });
 
                 challenge = {
                     id: data.challenge_id,
                     expiresAt: data.expires_at ? new Date(data.expires_at).valueOf() : null
                 };
                 submitButton.disabled = true;
-                setStatus(captchaStatus, 'Drag the piece into the matching slot.');
+                setStatus(captchaStatus, 'Choose the crop that completes the image and drag it into the square.');
             } catch (error) {
                 if (request !== challengeRequest || !dialog.open) return;
                 setStatus(captchaStatus, 'Puzzle could not be loaded. Please try again.', true);
@@ -339,9 +434,7 @@
         dialog.addEventListener('close', () => {
             challengeRequest += 1;
             challenge = null;
-            puzzleData = null;
-            puzzleImage.replaceChildren();
-            puzzlePiece.style.cssText = '';
+            clearPuzzle();
         });
 
         form.addEventListener('submit', async (event) => {
@@ -352,16 +445,11 @@
                 loadChallenge();
                 return;
             }
-            if (!puzzleData) {
-                setStatus(formStatus, 'Please solve the puzzle first.', true);
+            if (!puzzleData || !selectedTokens) {
+                setStatus(formStatus, 'Drag one puzzle piece into the missing square first.', true);
                 return;
             }
 
-            const currentX = getPieceX();
-            // Convert from rendered pixels back to puzzle coordinates
-            const actualW = puzzleData.maxX + puzzleData.scaledPs;
-            const puzzleX = Math.round(currentX * puzzleData.displayWidth / actualW);
-            const token = positionToToken(puzzleX);
             submitButton.disabled = true;
             refreshButton.disabled = true;
             setStatus(formStatus, 'Sending your note...');
@@ -370,7 +458,7 @@
                     p_display_name: form.elements.display_name.value.trim(),
                     p_message: form.elements.body.value.trim(),
                     p_challenge_id: challenge.id,
-                    p_selected_tokens: [token]
+                    p_selected_tokens: selectedTokens
                 });
                 if (error) throw error;
                 if (data === null || data === false || data === '' || (typeof data === 'object' && data.success === false)) {
@@ -384,7 +472,7 @@
                 }
                 setStatus(composeStatus, 'Note received. It will appear after approval.');
             } catch (error) {
-                setStatus(formStatus, 'Your note could not be sent. Please try the new verification images.', true);
+                setStatus(formStatus, 'That piece did not complete the image. Please try the new puzzle.', true);
                 console.warn('submit_guestbook_entry:', error.message);
                 await loadChallenge();
             }
