@@ -361,11 +361,11 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .community-form .dialog-close { width: 38px; min-height: 38px; margin: 0; padding: 0; flex: none; border-color: #d2a9c2; color: #74416d; background: #fff; font-size: 24px; line-height: 1; text-transform: none; }
 .guestbook-captcha { min-width: 0; margin: 8px 0 0; padding: 14px; border: 1px solid #d8b4cb; border-radius: 12px; background: rgba(248,232,241,.46); }
 .guestbook-captcha legend { padding: 0 6px; color: #6e4562; font-size: 11px; font-weight: 700; }
-.captcha-puzzle { position: relative; overflow: hidden; border: 2px solid #d8b4cb; border-radius: 8px; background: #eadce6; user-select: none; }
+.captcha-puzzle { position: relative; overflow: hidden; border: 2px solid #d8b4cb; border-radius: 8px; background: #eadce6; user-select: none; touch-action: none; }
 .captcha-puzzle-image { position: relative; width: 100%; }
 .captcha-puzzle-image img { width: 100%; display: block; border-radius: 6px; }
-.captcha-puzzle-piece { position: absolute; z-index: 2; border: 2px solid rgba(255,255,255,.85); border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,.35); background-repeat: no-repeat; pointer-events: none; transition: left .05s linear; }
-.captcha-slider { width: 100%; accent-color: #9f477f; cursor: pointer; }
+.captcha-puzzle-piece { position: absolute; z-index: 2; border: 2px solid rgba(255,255,255,.85); border-radius: 5px; cursor: grab; touch-action: none; background-repeat: no-repeat; pointer-events: auto; transition: box-shadow .15s; }
+.captcha-puzzle-piece:active { cursor: grabbing; }
 .captcha-controls { margin-top: 9px; display: flex; align-items: center; gap: 10px; }
 .captcha-controls .form-status { flex: 1; }
 .community-form .secondary-button { min-height: 38px; margin: 0; color: #74416d; border-color: #d2a9c2; background: #fff; }

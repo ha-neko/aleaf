@@ -213,8 +213,9 @@
             let newX = pieceStartX + dx;
             newX = Math.max(0, Math.min(puzzleData.maxX, newX));
             puzzlePiece.style.left = newX + 'px';
-            const dist = Math.abs(newX - puzzleData.targetX);
-            puzzlePiece.style.boxShadow = dist <= 6
+            const dist = Math.abs(newX - (puzzleData.scaledTargetX || puzzleData.targetX));
+            const threshold = puzzleData.glowThreshold || 6;
+            puzzlePiece.style.boxShadow = dist <= threshold
                 ? '0 0 14px 4px rgba(255,255,255,0.7)' : '0 2px 8px rgba(0,0,0,0.35)';
             submitButton.disabled = !challenge;
         }
@@ -270,22 +271,46 @@
                 img.style.cssText = 'width:100%;display:block;border-radius:6px;';
                 puzzleImage.appendChild(img);
 
-                // Slot overlay at target position
-                const slotY = (dh - ps) / 2;
+                // Slot overlay uses percentage-based positioning (scales with image)
+                const slotYPct = ((dh - ps) / 2 / dh) * 100;
+                const slotXPct = (data.targetX / dw) * 100;
+                const slotWPct = (ps / dw) * 100;
+                const slotHPct = (ps / dh) * 100;
                 const slot = document.createElement('div');
-                slot.style.cssText = `position:absolute;left:${data.targetX}px;top:${slotY}px;width:${ps}px;height:${ps}px;border:2px dashed rgba(255,255,255,0.7);border-radius:5px;background:rgba(0,0,0,0.35);pointer-events:none;`;
+                slot.style.cssText = `position:absolute;left:${slotXPct}%;top:${slotYPct}%;width:${slotWPct}%;height:${slotHPct}%;border:2px dashed rgba(255,255,255,0.7);border-radius:5px;background:rgba(0,0,0,0.35);pointer-events:none;`;
                 puzzleImage.appendChild(slot);
 
                 // Draggable piece: cropped view of the image at the target area
-                puzzlePiece.style.width = ps + 'px';
-                puzzlePiece.style.height = ps + 'px';
-                puzzlePiece.style.backgroundImage = `url(${data.image_url})`;
-                puzzlePiece.style.backgroundSize = `${dw}px auto`;
-                puzzlePiece.style.backgroundPosition = `-${data.targetX}px -${slotY}px`;
-                puzzlePiece.style.top = slotY + 'px';
-                puzzlePiece.style.left = '0px';
-                puzzlePiece.style.cursor = 'grab';
-                puzzlePiece.style.display = 'block';
+                // Scale piece position to actual rendered size once image loads
+                function applyPieceScale() {
+                    const actualW = img.offsetWidth;
+                    const actualH = img.offsetHeight;
+                    const scale = actualW / dw;
+                    const scaledPs = ps * scale;
+                    const scaledTargetX = data.targetX * scale;
+                    const scaledSlotY = ((dh - ps) / 2) * scale;
+
+                    puzzlePiece.style.width = scaledPs + 'px';
+                    puzzlePiece.style.height = scaledPs + 'px';
+                    puzzlePiece.style.backgroundImage = `url(${data.image_url})`;
+                    puzzlePiece.style.backgroundSize = `${actualW}px ${actualH}px`;
+                    puzzlePiece.style.backgroundPosition = `-${scaledTargetX}px -${scaledSlotY}px`;
+                    puzzlePiece.style.top = scaledSlotY + 'px';
+                    puzzlePiece.style.left = '0px';
+                    puzzlePiece.style.cursor = 'grab';
+                    puzzlePiece.style.display = 'block';
+
+                    // Update drag bounds to actual pixels
+                    puzzleData.maxX = Math.round(actualW - scaledPs);
+                    puzzleData.minX = 0;
+                    puzzleData.scaledPs = scaledPs;
+                    puzzleData.scaledTargetX = data.targetX * scale;
+
+                    // Also scale the glow threshold
+                    puzzleData.glowThreshold = 6 * scale;
+                }
+                if (img.complete) applyPieceScale();
+                else img.addEventListener('load', applyPieceScale, { once: true });
 
                 challenge = {
                     id: data.challenge_id,
@@ -333,7 +358,10 @@
             }
 
             const currentX = getPieceX();
-            const token = positionToToken(currentX);
+            // Convert from rendered pixels back to puzzle coordinates
+            const actualW = puzzleData.maxX + puzzleData.scaledPs;
+            const puzzleX = Math.round(currentX * puzzleData.displayWidth / actualW);
+            const token = positionToToken(puzzleX);
             submitButton.disabled = true;
             refreshButton.disabled = true;
             setStatus(formStatus, 'Sending your note...');
