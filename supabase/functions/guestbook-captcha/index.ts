@@ -2,11 +2,10 @@ const PRODUCTION_ORIGIN = "https://aleaf.is-a.dev";
 const DANBOORU_API = "https://danbooru.donmai.us/posts.json";
 const DANBOORU_USER_AGENT = "aleaf.is-a.dev guestbook-captcha/2.0";
 const POSTS_PER_PAGE = 40;
-
 const STATIC_IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp"]);
-const TOLERANCE = 6;
 const PIECE_SIZE = 50;
 const DISPLAY_WIDTH = 280;
+const DISPLAY_HEIGHT = 150;
 const MIN_X = 8;
 const MAX_X = DISPLAY_WIDTH - PIECE_SIZE - 8;
 
@@ -30,7 +29,7 @@ function allowedOrigin(request: Request): string | null {
 
 function cors(origin: string | null): Record<string, string> {
   const h: Record<string, string> = {
-    "Vary": "Origin", "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Vary": "Origin", "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
     "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
     "Access-Control-Max-Age": "86400",
   };
@@ -86,9 +85,9 @@ async function fetchMizukiImage(): Promise<string> {
     url.searchParams.set("only", "id,rating,tag_string_character,media_asset");
     let res: Response;
     try {
-      res = await fetch(url, {
+      res = await fetch(url.toString(), {
         headers: { "Accept": "application/json", "User-Agent": DANBOORU_USER_AGENT },
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(12000),
       });
     } catch { continue; }
     if (!res.ok) continue;
@@ -109,19 +108,19 @@ async function fetchMizukiImage(): Promise<string> {
   throw new Error("No Mizuki image found");
 }
 
-async function proxyImage(imageUrl: string, origin: string | null): Promise<Response> {
+async function proxyImage(imageUrl: string): Promise<Response> {
   let parsed: URL;
-  try { parsed = new URL(imageUrl); } catch { return json({ error: "Invalid URL" }, 400, origin); }
+  try { parsed = new URL(imageUrl); } catch { return new Response("Bad URL", { status: 400 }); }
   if (parsed.origin !== "https://cdn.donmai.us" ||
     (!parsed.pathname.startsWith("/360x360/") && !parsed.pathname.startsWith("/sample/"))) {
-    return json({ error: "URL not allowed" }, 403, origin);
+    return new Response("Not allowed", { status: 403 });
   }
   try {
     const up = await fetch(imageUrl, {
       headers: { "User-Agent": DANBOORU_USER_AGENT, "Accept": "image/*" },
       signal: AbortSignal.timeout(10000),
     });
-    if (!up.ok || !up.body) return json({ error: "Image unavailable" }, 502, origin);
+    if (!up.ok || !up.body) return new Response("Unavailable", { status: 502 });
     return new Response(up.body, {
       status: 200,
       headers: {
@@ -130,7 +129,7 @@ async function proxyImage(imageUrl: string, origin: string | null): Promise<Resp
         "Access-Control-Allow-Origin": "*",
       },
     });
-  } catch { return json({ error: "Image unavailable" }, 502, origin); }
+  } catch { return new Response("Unavailable", { status: 502 }); }
 }
 
 function parseChallenge(v: unknown): { challenge_id: string; expires_at: string } | null {
@@ -150,19 +149,19 @@ Deno.serve(async (request) => {
   if (requestOrigin && !origin) return json({ error: "Request not allowed" }, 403, null);
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(origin) });
 
+  // Image proxy mode
   const imageUrlParam = url.searchParams.get("image_url");
-  if (imageUrlParam && request.method === "GET") return proxyImage(imageUrlParam, origin);
+  if (imageUrlParam && request.method === "GET") return proxyImage(imageUrlParam);
 
   if (request.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers: { ...cors(origin), "Allow": "POST, OPTIONS", "Content-Type": "application/json; charset=utf-8" },
+      status: 405, headers: { ...cors(origin), "Allow": "POST, GET, OPTIONS", "Content-Type": "application/json; charset=utf-8" },
     });
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!supabaseUrl || !serviceRoleKey) return json({ error: "Unable to generate challenge" }, 500, origin);
+  if (!supabaseUrl || !serviceRoleKey) return json({ error: "Missing config" }, 500, origin);
 
   try {
     const imageUrl = await fetchMizukiImage();
@@ -170,11 +169,12 @@ Deno.serve(async (request) => {
     const proxyBase = `${supabaseUrl.replace(/\/$/, "")}/functions/v1/guestbook-captcha`;
     const proxyUrl = `${proxyBase}?image_url=${encodeURIComponent(imageUrl)}`;
 
-    const expectedTokens: string[] = [];
-    for (let offset = -TOLERANCE; offset <= TOLERANCE; offset++) {
-      const px = targetX + offset;
-      if (px >= 0 && px <= MAX_X) expectedTokens.push(positionToToken(px));
-    }
+    // RPC needs exactly 3 tokens. targetX ± 0 and ± 1 gives 3 accepted positions.
+    const expectedTokens = [
+      positionToToken(targetX),
+      positionToToken(targetX + 1),
+      positionToToken(targetX - 1),
+    ];
 
     const rpcResponse = await fetch(
       `${supabaseUrl.replace(/\/$/, "")}/rest/v1/rpc/create_guestbook_captcha_challenge`,
@@ -184,22 +184,24 @@ Deno.serve(async (request) => {
         body: JSON.stringify({ p_expected_tokens: expectedTokens }),
       },
     );
-    if (!rpcResponse.ok) return json({ error: "Unable to generate challenge" }, 500, origin);
+    if (!rpcResponse.ok) return json({ error: "RPC failed" }, 500, origin);
 
     const challenge = parseChallenge(await rpcResponse.json());
-    if (!challenge) return json({ error: "Unable to generate challenge" }, 500, origin);
+    if (!challenge) return json({ error: "Invalid challenge" }, 500, origin);
 
     return json({
       challenge_id: challenge.challenge_id,
       expires_at: challenge.expires_at,
       image_url: proxyUrl,
       display_width: DISPLAY_WIDTH,
+      display_height: DISPLAY_HEIGHT,
       piece_size: PIECE_SIZE,
       target_x: targetX,
       min_x: MIN_X,
       max_x: MAX_X,
     }, 200, origin);
-  } catch {
-    return json({ error: "Unable to generate challenge" }, 500, origin);
+  } catch (e) {
+    console.error("[captcha] error:", String(e));
+    return json({ error: "Server error" }, 500, origin);
   }
 });

@@ -177,7 +177,6 @@
         const refreshButton = document.getElementById('guestbookCaptchaRefresh');
         const puzzleImage = document.getElementById('captchaPuzzleImage');
         const puzzlePiece = document.getElementById('captchaPuzzlePiece');
-        const slider = document.getElementById('guestbookCaptchaSlider');
         const captchaStatus = document.getElementById('guestbookCaptchaStatus');
         const formStatus = document.getElementById('guestbookFormStatus');
         const composeStatus = document.getElementById('composeStatus');
@@ -186,6 +185,9 @@
         let challenge = null;
         let challengeRequest = 0;
         let puzzleData = null;
+        let dragging = false;
+        let dragStartX = 0;
+        let pieceStartX = 0;
 
         function positionToToken(pos) {
             const rounded = Math.round(pos);
@@ -193,12 +195,40 @@
             return `00000000-0000-4000-8000-${hex}`;
         }
 
-        function updatePuzzlePiece() {
-            if (!puzzleData) return;
-            const ratio = slider.value / slider.max;
-            const x = puzzleData.minX + ratio * (puzzleData.maxX - puzzleData.minX);
-            puzzlePiece.style.left = x + 'px';
+        function getPieceX() { return parseFloat(puzzlePiece.style.left) || 0; }
+
+        function onPointerDown(e) {
+            if (!puzzleData || !challenge) return;
+            e.preventDefault();
+            dragging = true;
+            dragStartX = e.clientX;
+            pieceStartX = getPieceX();
+            puzzlePiece.setPointerCapture(e.pointerId);
+            puzzlePiece.style.cursor = 'grabbing';
         }
+        function onPointerMove(e) {
+            if (!dragging || !puzzleData) return;
+            e.preventDefault();
+            const dx = e.clientX - dragStartX;
+            let newX = pieceStartX + dx;
+            newX = Math.max(0, Math.min(puzzleData.maxX, newX));
+            puzzlePiece.style.left = newX + 'px';
+            const dist = Math.abs(newX - puzzleData.targetX);
+            puzzlePiece.style.boxShadow = dist <= 6
+                ? '0 0 14px 4px rgba(255,255,255,0.7)' : '0 2px 8px rgba(0,0,0,0.35)';
+            submitButton.disabled = !challenge;
+        }
+        function onPointerUp(e) {
+            if (!dragging) return;
+            dragging = false;
+            puzzlePiece.style.cursor = 'grab';
+            puzzlePiece.releasePointerCapture(e.pointerId);
+        }
+
+        puzzlePiece.addEventListener('pointerdown', onPointerDown);
+        puzzlePiece.addEventListener('pointermove', onPointerMove);
+        puzzlePiece.addEventListener('pointerup', onPointerUp);
+        puzzlePiece.addEventListener('pointercancel', onPointerUp);
 
         async function loadChallenge() {
             const request = ++challengeRequest;
@@ -206,8 +236,6 @@
             puzzleData = null;
             puzzleImage.replaceChildren();
             puzzlePiece.style.cssText = '';
-            slider.value = 0;
-            slider.disabled = true;
             submitButton.disabled = true;
             refreshButton.disabled = true;
             setStatus(captchaStatus, 'Loading puzzle...');
@@ -216,60 +244,63 @@
                 if (error) throw error;
                 if (request !== challengeRequest || !dialog.open) return;
                 if (!data || !data.challenge_id || !data.image_url || typeof data.target_x !== 'number') {
-                    throw new Error('Invalid CAPTCHA challenge');
+                    throw new Error('Invalid CAPTCHA challenge: ' + JSON.stringify(data));
                 }
-                const imageUrl = safeCaptchaUrl(data.image_url);
-                if (!imageUrl) throw new Error('Invalid image URL');
+
+                const dw = data.display_width || 280;
+                const dh = data.display_height || 150;
+                const ps = data.piece_size || 50;
 
                 puzzleData = {
-                    displayWidth: data.display_width || 280,
-                    pieceSize: data.piece_size || 50,
+                    displayWidth: dw,
+                    displayHeight: dh,
+                    pieceSize: ps,
                     targetX: data.target_x,
                     minX: data.min_x || 0,
-                    maxX: data.max_x || 230
+                    maxX: data.max_x || 222,
+                    imageUrl: data.image_url
                 };
 
+                // Build puzzle area: image + slot overlay
                 const img = document.createElement('img');
-                img.src = imageUrl;
-                img.alt = 'Slide puzzle';
+                img.src = data.image_url;
+                img.alt = 'Puzzle image';
                 img.referrerPolicy = 'no-referrer';
                 img.draggable = false;
+                img.style.cssText = 'width:100%;display:block;border-radius:6px;';
                 puzzleImage.appendChild(img);
 
-                puzzleImage.style.width = puzzleData.displayWidth + 'px';
-                puzzlePiece.style.width = puzzleData.pieceSize + 'px';
-                puzzlePiece.style.height = puzzleData.pieceSize + 'px';
-                puzzlePiece.style.backgroundImage = `url(${imageUrl})`;
-                puzzlePiece.style.backgroundSize = `${puzzleData.displayWidth}px auto`;
-                puzzlePiece.style.backgroundPosition = `-${puzzleData.targetX}px -${(img.naturalHeight || 150) / 2 - puzzleData.pieceSize / 2}px`;
+                // Slot overlay at target position
+                const slotY = (dh - ps) / 2;
+                const slot = document.createElement('div');
+                slot.style.cssText = `position:absolute;left:${data.targetX}px;top:${slotY}px;width:${ps}px;height:${ps}px;border:2px dashed rgba(255,255,255,0.7);border-radius:5px;background:rgba(0,0,0,0.35);pointer-events:none;`;
+                puzzleImage.appendChild(slot);
 
-                img.onload = () => {
-                    if (request !== challengeRequest) return;
-                    puzzlePiece.style.backgroundSize = `${puzzleData.displayWidth}px auto`;
-                    puzzlePiece.style.backgroundPosition = `-${puzzleData.targetX}px -${img.naturalHeight / 2 - puzzleData.pieceSize / 2}px`;
-                    puzzlePiece.style.top = (img.offsetHeight / 2 - puzzleData.pieceSize / 2) + 'px';
-                };
-                puzzlePiece.style.top = '50%';
-                puzzlePiece.style.transform = 'translateY(-50%)';
+                // Draggable piece: cropped view of the image at the target area
+                puzzlePiece.style.width = ps + 'px';
+                puzzlePiece.style.height = ps + 'px';
+                puzzlePiece.style.backgroundImage = `url(${data.image_url})`;
+                puzzlePiece.style.backgroundSize = `${dw}px auto`;
+                puzzlePiece.style.backgroundPosition = `-${data.targetX}px -${slotY}px`;
+                puzzlePiece.style.top = slotY + 'px';
                 puzzlePiece.style.left = '0px';
+                puzzlePiece.style.cursor = 'grab';
+                puzzlePiece.style.display = 'block';
 
                 challenge = {
                     id: data.challenge_id,
                     expiresAt: data.expires_at ? new Date(data.expires_at).valueOf() : null
                 };
-                slider.disabled = false;
-                slider.value = 0;
-                setStatus(captchaStatus, 'Slide the piece to match the cutout.');
+                submitButton.disabled = true;
+                setStatus(captchaStatus, 'Drag the piece into the matching slot.');
             } catch (error) {
                 if (request !== challengeRequest || !dialog.open) return;
                 setStatus(captchaStatus, 'Puzzle could not be loaded. Please try again.', true);
                 console.warn('guestbook-captcha:', error.message);
             } finally {
-                if (request === challengeRequest) { refreshButton.disabled = false; }
+                if (request === challengeRequest) refreshButton.disabled = false;
             }
         }
-
-        slider.addEventListener('input', () => { updatePuzzlePiece(); submitButton.disabled = !challenge; });
 
         dialog.addEventListener('compose-open', () => {
             if (dialog.open) return;
@@ -286,8 +317,6 @@
             puzzleData = null;
             puzzleImage.replaceChildren();
             puzzlePiece.style.cssText = '';
-            slider.value = 0;
-            slider.disabled = true;
         });
 
         form.addEventListener('submit', async (event) => {
@@ -303,8 +332,7 @@
                 return;
             }
 
-            const ratio = slider.value / slider.max;
-            const currentX = puzzleData.minX + ratio * (puzzleData.maxX - puzzleData.minX);
+            const currentX = getPieceX();
             const token = positionToToken(currentX);
             submitButton.disabled = true;
             refreshButton.disabled = true;
