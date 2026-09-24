@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,600&family=Montserrat:wght@500;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="admin.css?v=2500-community-5">
+    <link rel="stylesheet" href="admin.css?v=2500-community-6">
 </head>
 <body>
     <a class="skip-link" href="#adminMain">Skip to dashboard</a>
@@ -45,7 +45,7 @@
 
         <section id="dashboardView" class="dashboard" hidden>
             <header class="dashboard-header">
-                <div><p class="eyebrow">leaf.zip / authenticated</p><h1>site editor</h1></div>
+                <div class="dashboard-title"><div class="dashboard-connection"><i aria-hidden="true"></i>authenticated workspace</div><p class="eyebrow">leaf.zip / control room</p><h1>site editor</h1><p>Manage content, messages, media, and visitor submissions.</p></div>
                 <div class="header-actions">
                     <a class="button secondary" href="../" target="_blank"><svg class="icon"><use href="#i-eye"/></svg>Preview</a>
                     <button id="logoutButton" class="button secondary"><svg class="icon"><use href="#i-logout"/></svg>Sign out</button>
@@ -55,6 +55,7 @@
 
             <div class="editor-layout" id="dashboardContent">
                 <nav class="editor-nav" aria-label="Editor sections">
+                    <div class="editor-nav-brand"><span>workspace</span><strong>content modules</strong></div>
                     <button class="active" data-editor-tab="site">General</button>
                     <button data-editor-tab="profile">Profile</button>
                     <button data-editor-tab="scrapbook">Scrapbook</button>
@@ -150,6 +151,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../config.js"></script>
     <script src="../default-content.js"></script>
-    <script src="admin.js?v=2500-community-5"></script>
+    <script src="admin.js?v=2500-community-6"></script>
 </body>
 </html>

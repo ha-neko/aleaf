@@ -202,14 +202,21 @@
         else { status.textContent = 'Published, but newer local changes remain.'; status.classList.add('dirty'); }
     });
 
-    document.querySelectorAll('[data-editor-tab]').forEach((button) => button.addEventListener('click', () => {
-        document.querySelectorAll('[data-editor-tab]').forEach((item) => item.classList.toggle('active', item === button));
-        document.querySelectorAll('[data-editor-panel]').forEach((panel) => { panel.hidden = panel.dataset.editorPanel !== button.dataset.editorTab; });
-        if (button.dataset.editorTab === 'guestbook') loadGuestbook();
-        if (button.dataset.editorTab === 'inbox') loadInbox();
-        if (button.dataset.editorTab === 'gallery') loadGallery();
-        if (button.dataset.editorTab === 'hotbuttons') loadHotbuttons();
-    }));
+    document.querySelectorAll('[data-editor-tab]').forEach((button) => {
+        button.setAttribute('aria-current', button.classList.contains('active') ? 'page' : 'false');
+        button.addEventListener('click', () => {
+            document.querySelectorAll('[data-editor-tab]').forEach((item) => {
+                const active = item === button;
+                item.classList.toggle('active', active);
+                item.setAttribute('aria-current', active ? 'page' : 'false');
+            });
+            document.querySelectorAll('[data-editor-panel]').forEach((panel) => { panel.hidden = panel.dataset.editorPanel !== button.dataset.editorTab; });
+            if (button.dataset.editorTab === 'guestbook') loadGuestbook();
+            if (button.dataset.editorTab === 'inbox') loadInbox();
+            if (button.dataset.editorTab === 'gallery') loadGallery();
+            if (button.dataset.editorTab === 'hotbuttons') loadHotbuttons();
+        });
+    });
 
     document.querySelectorAll('[data-add]').forEach((button) => button.addEventListener('click', () => {
         const type = button.dataset.add;
@@ -253,10 +260,17 @@
         return element;
     }
 
+    function stateBadge(value) {
+        const badge = textElement('span', 'state-badge', value);
+        badge.dataset.state = String(value || '').toLowerCase();
+        return badge;
+    }
+
     function actionButton(label, onClick, danger = false, accessibleLabel = label) {
         const button = document.createElement('button');
         button.type = 'button';
         button.textContent = label;
+        button.dataset.action = label.toLowerCase().split(/\s+/)[0];
         button.setAttribute('aria-label', accessibleLabel);
         if (danger) button.className = 'danger-action';
         button.addEventListener('click', async () => {
@@ -298,7 +312,7 @@
             const card = document.createElement('article'); card.className = 'management-card';
             const header = document.createElement('div'); header.className = 'management-card-header';
             const moderationState = entry.approved ? 'approved' : (entry.moderated_at ? 'rejected' : 'pending');
-            header.append(textElement('h3', '', displayName), textElement('span', 'state-badge', moderationState));
+            header.append(textElement('h3', '', displayName), stateBadge(moderationState));
             const meta = textElement('p', 'management-meta', formatDate(entry.created_at));
             const body = textElement('p', '', entry.message);
             const replyField = document.createElement('label'); replyField.className = 'owner-reply-field';
@@ -376,7 +390,7 @@
         data.forEach((item) => {
             const card = document.createElement('article'); card.className = `management-card${item.is_read ? '' : ' is-unread'}`;
             const header = document.createElement('div'); header.className = 'management-card-header';
-            header.append(textElement('h3', '', 'anonymous message'), textElement('span', 'state-badge', item.is_read ? 'read' : 'unread'));
+            header.append(textElement('h3', '', 'anonymous message'), stateBadge(item.is_read ? 'read' : 'unread'));
             card.append(header, textElement('p', 'management-meta', formatDate(item.created_at)), textElement('p', '', item.message));
             const actions = document.createElement('div'); actions.className = 'management-actions';
             actions.append(
@@ -415,7 +429,7 @@
             const image = document.createElement('img'); image.className = 'gallery-thumbnail'; image.src = item.public_url; image.alt = item.alt_text || ''; image.loading = 'lazy';
             const body = document.createElement('div'); body.className = 'gallery-card-body';
             const header = document.createElement('div'); header.className = 'management-card-header';
-            header.append(textElement('h3', '', item.title), textElement('span', 'state-badge', item.published ? 'published' : 'draft'));
+            header.append(textElement('h3', '', item.title), stateBadge(item.published ? 'published' : 'draft'));
             body.append(header, textElement('p', 'management-meta', `Sort order ${item.sort_order} / ${formatDate(item.created_at)}`));
             if (item.caption) body.append(textElement('p', '', item.caption));
             body.append(textElement('p', 'management-meta', `Alt: ${item.alt_text || 'Not provided'}`));
@@ -480,7 +494,7 @@
             body.className = 'hotbutton-admin-body';
             const header = document.createElement('div');
             header.className = 'management-card-header';
-            header.append(textElement('h3', '', item.button_name), textElement('span', 'state-badge', item.status));
+            header.append(textElement('h3', '', item.button_name), stateBadge(item.status));
             body.append(header, textElement('p', 'management-meta', formatDate(item.created_at)));
 
             if (siteUrl) {
