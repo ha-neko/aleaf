@@ -39,7 +39,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Montserrat:wght@500;600;700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="me.css?v=2500-community-13">
+    <link rel="stylesheet" href="me.css?v=2500-community-14">
 </head>
 <body>
     <a class="skip-link" href="#mainContent">Skip to main content</a>
@@ -344,7 +344,23 @@
                       <div id="galleryItems" class="gallery-grid" aria-live="polite"></div>
                       <nav id="galleryPagination" class="community-pagination" aria-label="Gallery pages"></nav>
                   </div>
-             </section>
+                  <dialog id="galleryDialog" class="gallery-dialog" aria-labelledby="galleryDialogTitle">
+                      <article class="gallery-post">
+                          <button id="galleryDialogClose" class="gallery-dialog-close" type="button" aria-label="Close gallery post">&times;</button>
+                          <div class="gallery-post-media"><img id="galleryDialogImage" alt=""></div>
+                          <div class="gallery-post-body">
+                              <span id="galleryDialogIndex" class="panel-index">archive 01</span>
+                              <h2 id="galleryDialogTitle">gallery post</h2>
+                              <p id="galleryDialogCaption"></p>
+                              <div class="gallery-post-actions">
+                                  <button id="galleryDialogPrevious" type="button" aria-label="Previous gallery post">&larr; previous</button>
+                                  <a id="galleryDialogOriginal" href="#" target="_blank" rel="noopener noreferrer">open original</a>
+                                  <button id="galleryDialogNext" type="button" aria-label="Next gallery post">next &rarr;</button>
+                              </div>
+                          </div>
+                      </article>
+                  </dialog>
+              </section>
 
              <section id="panel-web" class="page-panel web-page" role="tabpanel" aria-labelledby="tab-web" data-page-panel="web" hidden>
                 <div class="web-frame-bar"><div><span class="web-frame-dot" aria-hidden="true"></span><strong id="webFrameLabel">search results</strong></div><a id="openExternal" href="#" target="_blank" rel="noopener noreferrer">open outside frame</a></div>
@@ -362,6 +378,6 @@
     <button id="musicToggle" class="music-button" type="button" aria-label="Play background music" aria-pressed="false" aria-describedby="musicStatus"><svg class="icon ui-icon sound-on" aria-hidden="true"><use href="#i-volume"/></svg><svg class="icon ui-icon sound-off" aria-hidden="true"><use href="#i-volume-off"/></svg></button>
     <span id="musicStatus" class="sr-only" role="status" aria-live="polite">Background music paused</span>
     <audio id="backgroundMusic" loop preload="metadata"><source src="First Date.mp3" type="audio/mpeg"></audio>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="default-content.js?v=2500-community-1"></script><script src="content.js?v=2500-community-1"></script><script src="test.js?v=2500-quiz-2"></script><script src="community.js?v=2500-community-12"></script><script src="me.js?v=2500-community-7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="default-content.js?v=2500-community-1"></script><script src="content.js?v=2500-community-1"></script><script src="test.js?v=2500-quiz-2"></script><script src="community.js?v=2500-community-14"></script><script src="me.js?v=2500-community-7"></script>
 </body>
 </html>

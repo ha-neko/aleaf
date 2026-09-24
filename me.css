@@ -448,6 +448,9 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .gallery-grid.is-pair { grid-template-columns: repeat(2, minmax(0, 340px)); justify-content: center; }
 .gallery-archive > .community-pagination { border-top: 1px solid #ecd8e5; background: rgba(249,235,243,.38); }
 .gallery-item { min-width: 0; margin: 0; padding: 7px; position: relative; overflow: hidden; border: 1px solid #d8b4cb; border-radius: 15px; background: rgba(255,250,253,.96); box-shadow: 0 9px 22px rgba(86,42,73,.1); }
+.gallery-item[role="button"] { cursor: zoom-in; transition: border-color .18s, box-shadow .18s, transform .18s; }
+.gallery-item[role="button"]:hover { border-color: #bf81a6; box-shadow: 0 14px 30px rgba(86,42,73,.16); transform: translateY(-2px); }
+.gallery-item[role="button"]:focus-visible { outline: 3px solid rgba(185,79,137,.35); outline-offset: 3px; }
 .gallery-item::before { content: attr(data-archive-index); position: absolute; z-index: 2; top: 13px; left: 13px; min-width: 22px; height: 18px; padding: 0 4px; display: grid; place-items: center; color: #fff; border: 1px solid rgba(255,255,255,.5); border-radius: 999px; background: rgba(35,24,38,.72); backdrop-filter: blur(5px); font: 700 7px "Montserrat", sans-serif; }
 .gallery-item-featured { grid-column: span 2; grid-row: span 2; }
 .gallery-item img { width: 100%; height: auto; aspect-ratio: 4 / 3; display: block; object-fit: cover; border-radius: 10px; background: linear-gradient(145deg, #f4e3ed, #e8d9e8); transition: filter .2s, transform .25s; }
@@ -456,6 +459,22 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .gallery-item figcaption { padding: 11px 7px 6px; display: grid; gap: 4px; }
 .gallery-item figcaption strong { color: #68425d; font: 600 italic 19px "Cormorant Garamond", serif; overflow-wrap: anywhere; }
 .gallery-item figcaption span { color: var(--muted); font-size: 10px; line-height: 1.45; overflow-wrap: anywhere; white-space: pre-wrap; }
+.gallery-dialog { width: min(1040px, calc(100% - 32px)); max-height: calc(100dvh - 32px); padding: 0; overflow: visible; border: 1px solid #c995b5; border-radius: 20px; color: var(--ink); background: transparent; box-shadow: 0 28px 90px rgba(18,10,17,.52); }
+.gallery-dialog::backdrop { background: rgba(18,12,19,.76); backdrop-filter: blur(5px); }
+.gallery-post { min-height: 430px; position: relative; display: grid; grid-template-columns: minmax(0,1.55fr) minmax(260px,.65fr); overflow: hidden; border-radius: 19px; background: #fffafd; }
+.gallery-dialog-close { position: absolute; z-index: 4; top: 12px; right: 12px; width: 37px; height: 37px; padding: 0; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.35); border-radius: 50%; color: #fff; background: rgba(30,20,31,.72); backdrop-filter: blur(8px); cursor: pointer; font-size: 24px; line-height: 1; }
+.gallery-dialog-close:hover { background: #9d4d7b; }
+.gallery-post-media { min-width: 0; min-height: 430px; display: grid; place-items: center; overflow: hidden; background: radial-gradient(circle at 50% 40%, #4a344b, #1d171f 70%); }
+.gallery-post-media img { width: 100%; height: 100%; max-height: calc(100dvh - 64px); display: block; object-fit: contain; }
+.gallery-post-body { min-width: 0; padding: 54px 28px 25px; display: flex; flex-direction: column; border-left: 1px solid #ead5e2; background: radial-gradient(circle at 100% 0, rgba(221,170,204,.25), transparent 13rem), #fffafd; }
+.gallery-post-body h2 { margin: 7px 0 9px; color: #4d3043; font: 600 italic 32px/1.05 "Cormorant Garamond", serif; overflow-wrap: anywhere; }
+.gallery-post-body > p { margin: 0; color: #715969; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 11px; line-height: 1.65; }
+.gallery-post-actions { margin-top: auto; padding-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.gallery-post-actions button, .gallery-post-actions a { min-height: 38px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #d7b4c9; border-radius: 9px; color: #70435f; background: #fff; cursor: pointer; text-decoration: none; text-transform: uppercase; letter-spacing: .06em; font: 700 8px "Montserrat", sans-serif; }
+.gallery-post-actions a { grid-column: 1 / -1; grid-row: 2; color: #fff; border-color: #70406c; background: linear-gradient(135deg, #88427f, #6b3c71); }
+.gallery-post-actions button:hover:not(:disabled) { border-color: #a75b8a; background: #f8e8f1; }
+.gallery-post-actions a:hover { background: linear-gradient(135deg, #9d4d8d, #7c4780); }
+.gallery-post-actions button:disabled { opacity: .35; cursor: default; }
 
 .test-container { max-width: 900px; margin: 25px auto; position: relative; }
 .test-container::before { content: "QUIZ ARCHIVE / 25:00"; position: absolute; z-index: 2; top: -10px; left: 50%; min-width: 190px; padding: 5px 15px; transform: translateX(-50%); border: 1px solid #d5a4c2; border-radius: 999px; color: #fff; background: linear-gradient(135deg, #b35d91, #74417f); box-shadow: 0 5px 14px rgba(88,40,76,.18); text-align: center; font: 700 8px "Montserrat", sans-serif; letter-spacing: .16em; }
@@ -741,6 +760,13 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
     .gallery-item img { aspect-ratio: 1; border-radius: 8px; }
     .gallery-item figcaption { padding: 7px 4px 4px; }
     .gallery-item figcaption strong { font-size: 15px; }
+    .gallery-dialog { width: calc(100% - 16px); max-height: calc(100dvh - 16px); }
+    .gallery-post { max-height: calc(100dvh - 16px); grid-template-columns: 1fr; overflow-y: auto; }
+    .gallery-post-media { min-height: 0; height: min(58vh, 470px); }
+    .gallery-post-media img { max-height: none; }
+    .gallery-post-body { min-height: 220px; padding: 24px 17px 17px; border-top: 1px solid #ead5e2; border-left: 0; }
+    .gallery-post-body h2 { padding-right: 34px; font-size: 27px; }
+    .gallery-dialog-close { top: 9px; right: 9px; }
     .test-container { margin: 18px auto; }
     .test-container::before { top: -8px; min-width: 165px; padding: 4px 11px; font-size: 7px; }
     .test-card { min-height: 0; padding: 38px 14px 24px; border-radius: 16px; }

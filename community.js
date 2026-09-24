@@ -197,6 +197,21 @@
                     const figure = document.createElement('figure');
                     figure.className = `gallery-item${index === 0 && visibleItems.length >= 3 ? ' gallery-item-featured' : ''}`;
                     figure.dataset.archiveIndex = String(start + index + 1).padStart(2, '0');
+                    figure.tabIndex = 0;
+                    figure.setAttribute('role', 'button');
+                    figure.setAttribute('aria-label', `Open gallery post: ${item.title || `archive item ${start + index + 1}`}`);
+                    const openPost = () => {
+                        document.getElementById('galleryDialog').dispatchEvent(new CustomEvent('gallery-open', {
+                            detail: { items, index: start + index }
+                        }));
+                    };
+                    figure.addEventListener('click', openPost);
+                    figure.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            openPost();
+                        }
+                    });
                     const image = document.createElement('img');
                     image.src = safePublicUrl(item.public_url);
                     image.alt = item.alt_text || item.alt || item.title || 'Published gallery item';
@@ -234,6 +249,66 @@
             setStatus(galleryStatus, 'The gallery could not be loaded right now.', true);
             console.warn('gallery:', error.message);
         }
+    }
+
+    function bindGalleryDialog() {
+        const dialog = document.getElementById('galleryDialog');
+        const closeButton = document.getElementById('galleryDialogClose');
+        const image = document.getElementById('galleryDialogImage');
+        const indexLabel = document.getElementById('galleryDialogIndex');
+        const title = document.getElementById('galleryDialogTitle');
+        const caption = document.getElementById('galleryDialogCaption');
+        const original = document.getElementById('galleryDialogOriginal');
+        const previous = document.getElementById('galleryDialogPrevious');
+        const next = document.getElementById('galleryDialogNext');
+        let posts = [];
+        let currentIndex = 0;
+
+        function renderPost() {
+            const item = posts[currentIndex];
+            if (!item) return;
+            const imageUrl = safePublicUrl(item.public_url);
+            image.src = imageUrl;
+            image.alt = item.alt_text || item.alt || item.title || 'Published gallery item';
+            indexLabel.textContent = `archive ${String(currentIndex + 1).padStart(2, '0')} / ${String(posts.length).padStart(2, '0')}`;
+            title.textContent = item.title || 'untitled fragment';
+            const captionText = item.caption || item.description || '';
+            caption.textContent = captionText;
+            caption.hidden = !captionText;
+            original.href = imageUrl;
+            previous.disabled = currentIndex === 0;
+            next.disabled = currentIndex === posts.length - 1;
+        }
+
+        dialog.addEventListener('gallery-open', (event) => {
+            posts = Array.isArray(event.detail?.items) ? event.detail.items : [];
+            currentIndex = Math.min(Math.max(0, Number(event.detail?.index) || 0), Math.max(0, posts.length - 1));
+            if (!posts.length) return;
+            renderPost();
+            if (!dialog.open) dialog.showModal();
+        });
+        closeButton.addEventListener('click', () => dialog.close());
+        previous.addEventListener('click', () => {
+            if (currentIndex <= 0) return;
+            currentIndex -= 1;
+            renderPost();
+        });
+        next.addEventListener('click', () => {
+            if (currentIndex >= posts.length - 1) return;
+            currentIndex += 1;
+            renderPost();
+        });
+        dialog.addEventListener('click', (event) => {
+            if (event.target === dialog) dialog.close();
+        });
+        dialog.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowLeft' && !previous.disabled) previous.click();
+            if (event.key === 'ArrowRight' && !next.disabled) next.click();
+        });
+        dialog.addEventListener('close', () => {
+            image.removeAttribute('src');
+            posts = [];
+        });
     }
 
     async function loadHotbuttons(client) {
@@ -911,6 +986,7 @@
 
     function initialize() {
         bindSiteButtonCopy();
+        bindGalleryDialog();
         if (!configured) {
             setStatus(guestbookStatus, 'The guestbook is unavailable until the backend is configured.', true);
             setStatus(galleryStatus, 'The gallery is unavailable until the backend is configured.', true);
