@@ -466,14 +466,29 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .gallery-dialog-close:hover { background: #9d4d7b; }
 .gallery-post-media { min-width: 0; min-height: 430px; display: grid; place-items: center; overflow: hidden; background: radial-gradient(circle at 50% 40%, #4a344b, #1d171f 70%); }
 .gallery-post-media img { width: 100%; height: 100%; max-height: calc(100dvh - 64px); display: block; object-fit: contain; }
-.gallery-post-body { min-width: 0; padding: 54px 28px 25px; display: flex; flex-direction: column; border-left: 1px solid #ead5e2; background: radial-gradient(circle at 100% 0, rgba(221,170,204,.25), transparent 13rem), #fffafd; }
-.gallery-post-body h2 { margin: 7px 0 9px; color: #4d3043; font: 600 italic 32px/1.05 "Cormorant Garamond", serif; overflow-wrap: anywhere; }
-.gallery-post-body > p { margin: 0; color: #715969; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 11px; line-height: 1.65; }
-.gallery-post-actions { margin-top: auto; padding-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.gallery-post-actions button, .gallery-post-actions a { min-height: 38px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #d7b4c9; border-radius: 9px; color: #70435f; background: #fff; cursor: pointer; text-decoration: none; text-transform: uppercase; letter-spacing: .06em; font: 700 8px "Montserrat", sans-serif; }
-.gallery-post-actions a { grid-column: 1 / -1; grid-row: 2; color: #fff; border-color: #70406c; background: linear-gradient(135deg, #88427f, #6b3c71); }
+.gallery-post-body { min-width: 0; max-height: calc(100dvh - 64px); display: flex; flex-direction: column; overflow: hidden; border-left: 1px solid #e4d9df; background: #fff; }
+.gallery-post-account { min-height: 64px; padding: 11px 54px 11px 14px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #ebe4e8; }
+.gallery-post-account > img, .gallery-post-thread > img { width: 34px; height: 34px; flex: none; border: 1px solid #d8b5ca; border-radius: 50%; object-fit: cover; background: #f5e7ef; }
+.gallery-post-account > div { min-width: 0; display: grid; gap: 1px; }
+.gallery-post-account strong { color: #342a31; font: 700 11px "Montserrat", sans-serif; }
+.gallery-post-account div span { color: #8b7b85; font-size: 9px; }
+.gallery-post-account > span { margin-left: auto; color: #8d7d87; white-space: nowrap; text-transform: uppercase; letter-spacing: .06em; font: 700 7px "Montserrat", sans-serif; }
+.gallery-post-thread { min-height: 0; padding: 18px 15px; display: flex; align-items: flex-start; gap: 11px; overflow-y: auto; }
+.gallery-post-thread > img { width: 32px; height: 32px; }
+.gallery-post-thread > div { min-width: 0; }
+.gallery-post-thread h2 { margin: 1px 0 5px; color: #342a31; font: 700 11px/1.4 "Montserrat", sans-serif; overflow-wrap: anywhere; }
+.gallery-post-thread p { margin: 0; color: #554a51; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 11px; line-height: 1.55; }
+.gallery-post-footer { margin-top: auto; padding: 12px 14px 14px; border-top: 1px solid #ebe4e8; }
+.gallery-post-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.gallery-post-mark { width: 31px; height: 31px; display: grid; place-items: center; color: #a74e7d; }
+.gallery-post-mark .icon { width: 20px; height: 20px; fill: currentColor; stroke: none; }
+.gallery-post-toolbar a { min-height: 31px; padding: 0 9px; display: inline-flex; align-items: center; gap: 6px; color: #6c405b; border-radius: 7px; text-decoration: none; text-transform: uppercase; letter-spacing: .05em; font: 700 7px "Montserrat", sans-serif; }
+.gallery-post-toolbar a:hover { background: #f7edf2; }
+.gallery-post-toolbar a .icon { width: 13px; height: 13px; fill: currentColor; stroke: none; }
+.gallery-post-footer > p { margin: 5px 0 11px; color: #94868f; text-transform: uppercase; letter-spacing: .06em; font: 600 7px "Montserrat", sans-serif; }
+.gallery-post-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.gallery-post-actions button { min-height: 34px; padding: 0 9px; border: 1px solid #ddd0d8; border-radius: 7px; color: #65545f; background: #faf8f9; cursor: pointer; text-transform: uppercase; letter-spacing: .05em; font: 700 7px "Montserrat", sans-serif; }
 .gallery-post-actions button:hover:not(:disabled) { border-color: #a75b8a; background: #f8e8f1; }
-.gallery-post-actions a:hover { background: linear-gradient(135deg, #9d4d8d, #7c4780); }
 .gallery-post-actions button:disabled { opacity: .35; cursor: default; }
 
 .test-container { max-width: 900px; margin: 25px auto; position: relative; }
@@ -764,8 +779,9 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
     .gallery-post { max-height: calc(100dvh - 16px); grid-template-columns: 1fr; overflow-y: auto; }
     .gallery-post-media { min-height: 0; height: min(58vh, 470px); }
     .gallery-post-media img { max-height: none; }
-    .gallery-post-body { min-height: 220px; padding: 24px 17px 17px; border-top: 1px solid #ead5e2; border-left: 0; }
-    .gallery-post-body h2 { padding-right: 34px; font-size: 27px; }
+    .gallery-post-body { min-height: 250px; max-height: none; border-top: 1px solid #ead5e2; border-left: 0; overflow: visible; }
+    .gallery-post-account { padding-right: 14px; }
+    .gallery-post-thread { max-height: 220px; }
     .gallery-dialog-close { top: 9px; right: 9px; }
     .test-container { margin: 18px auto; }
     .test-container::before { top: -8px; min-width: 165px; padding: 4px 11px; font-size: 7px; }

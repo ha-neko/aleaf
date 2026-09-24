@@ -270,7 +270,7 @@
             const imageUrl = safePublicUrl(item.public_url);
             image.src = imageUrl;
             image.alt = item.alt_text || item.alt || item.title || 'Published gallery item';
-            indexLabel.textContent = `archive ${String(currentIndex + 1).padStart(2, '0')} / ${String(posts.length).padStart(2, '0')}`;
+            indexLabel.textContent = `${String(currentIndex + 1).padStart(2, '0')} / ${String(posts.length).padStart(2, '0')}`;
             title.textContent = item.title || 'untitled fragment';
             const captionText = item.caption || item.description || '';
             caption.textContent = captionText;
