@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>get to know me · 25:00 desktop</title>
 <meta name="description" content="Leaf's personal corner of the web.">
@@ -40,7 +39,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Montserrat:wght@500;600;700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="me.css?v=2500-community-11">
+    <link rel="stylesheet" href="me.css?v=2500-community-12">
 </head>
 <body>
     <a class="skip-link" href="#mainContent">Skip to main content</a>
@@ -56,6 +55,7 @@
         <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2.5 3 6.1 6.7 1-4.8 4.7 1.1 6.6-6-3.2-6 3.2 1.1-6.6-4.8-4.7 6.7-1 3-6.1Z"/></symbol>
         <symbol id="i-comment" viewBox="0 0 24 24"><path d="M5 3h14a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H9l-6 4V6a3 3 0 0 1 3-3Z"/></symbol>
         <symbol id="i-link" viewBox="0 0 24 24"><path d="M9.6 14.4a1.5 1.5 0 0 1 0-2.1l2.7-2.7a5 5 0 1 1 7.1 7.1l-3.2 3.2a5 5 0 0 1-7.8-1l2.3-2.3a2 2 0 0 0 3.4 1.2l3.2-3.2a2 2 0 1 0-2.8-2.8l-2.7 2.7a1.5 1.5 0 0 1-2.2-.1Zm4.8-4.8a1.5 1.5 0 0 1 0 2.1l-2.7 2.7a5 5 0 1 1-7.1-7.1l3.2-3.2a5 5 0 0 1 7.8 1l-2.3 2.3a2 2 0 0 0-3.4-1.2l-3.2 3.2a2 2 0 1 0 2.8 2.8l2.7-2.7a1.5 1.5 0 0 1 2.2.1Z"/></symbol>
+        <symbol id="i-copy" viewBox="0 0 24 24"><path d="M8 2h10a2 2 0 0 1 2 2v12h-3V5H8V2Zm-4 5h10a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm1 3v9h8v-9H5Z"/></symbol>
         <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 3h7v7h-3V8.1l-7.7 7.7-2.1-2.1L15.9 6H14V3ZM5 5h6v3H6v10h10v-5h3v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/></symbol>
         <symbol id="i-volume" viewBox="0 0 24 24"><path d="M3 9h4l5-4v14l-5-4H3V9Zm12.5-.8a5.4 5.4 0 0 1 0 7.6l-1.4-1.4a3.4 3.4 0 0 0 0-4.8l1.4-1.4Zm2.8-2.8a9.3 9.3 0 0 1 0 13.2l-1.4-1.4a7.3 7.3 0 0 0 0-10.4l1.4-1.4Z"/></symbol>
         <symbol id="i-volume-off" viewBox="0 0 24 24"><path d="M3 9h4l5-4v14l-5-4H3V9Zm12.2.8 2.1 2.1 2.1-2.1 1.4 1.4-2.1 2.1 2.1 2.1-1.4 1.4-2.1-2.1-2.1 2.1-1.4-1.4 2.1-2.1-2.1-2.1 1.4-1.4Z"/></symbol>
@@ -230,6 +230,11 @@
                                </div>
                                <button id="hotbuttonOpen" class="hotbutton-submit-button" type="button">submit your button</button>
                            </div>
+                           <div class="site-button-grab">
+                               <a class="site-button-preview" href="https://aleaf.is-a.dev/" aria-label="A Leaf home"><img src="aleaf-88x31.gif" width="88" height="31" alt="A leaf"></a>
+                               <div class="site-button-grab-copy"><strong>grab my button</strong><code id="siteButtonCode">&lt;a href="https://aleaf.is-a.dev/" target="_blank" rel="noopener"&gt;&lt;img src="https://aleaf.is-a.dev/aleaf-88x31.gif" alt="A leaf" width="88" height="31"&gt;&lt;/a&gt;</code></div>
+                               <button id="copySiteButton" class="copy-site-button" type="button" aria-label="Copy A Leaf button HTML"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg><span>copy</span></button>
+                           </div>
                            <p id="hotbuttonStatus" class="community-status" role="status" aria-live="polite">Loading approved buttons...</p>
                            <div id="hotbuttonWall" class="hotbutton-wall" aria-live="polite"></div>
                            <nav id="hotbuttonPagination" class="community-pagination" aria-label="Button wall pages"></nav>
@@ -357,6 +362,6 @@
     <button id="musicToggle" class="music-button" type="button" aria-label="Play background music" aria-pressed="false" aria-describedby="musicStatus"><svg class="icon ui-icon sound-on" aria-hidden="true"><use href="#i-volume"/></svg><svg class="icon ui-icon sound-off" aria-hidden="true"><use href="#i-volume-off"/></svg></button>
     <span id="musicStatus" class="sr-only" role="status" aria-live="polite">Background music paused</span>
     <audio id="backgroundMusic" loop preload="metadata"><source src="First Date.mp3" type="audio/mpeg"></audio>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="default-content.js?v=2500-community-1"></script><script src="content.js?v=2500-community-1"></script><script src="test.js?v=2500-quiz-2"></script><script src="community.js?v=2500-community-11"></script><script src="me.js?v=2500-community-7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="default-content.js?v=2500-community-1"></script><script src="content.js?v=2500-community-1"></script><script src="test.js?v=2500-quiz-2"></script><script src="community.js?v=2500-community-12"></script><script src="me.js?v=2500-community-7"></script>
 </body>
 </html>

@@ -368,6 +368,17 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .hotbutton-heading p { max-width: 560px; margin: 4px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
 .hotbutton-submit-button { min-height: 38px; padding: 0 16px; flex: none; border: 1px solid #784b75; border-radius: 999px; color: #fff; background: linear-gradient(135deg, #38243c, #6f3d68); box-shadow: 0 6px 15px rgba(52,28,48,.18); cursor: pointer; text-transform: uppercase; letter-spacing: .08em; font: 700 8px "Montserrat", sans-serif; }
 .hotbutton-submit-button:hover { background: linear-gradient(135deg, #493049, #8c4c79); transform: translateY(-1px); }
+.site-button-grab { margin-top: 14px; padding: 12px; display: grid; grid-template-columns: 88px minmax(0,1fr) auto; align-items: center; gap: 11px; border: 1px solid #dab6cc; border-radius: 13px; background: linear-gradient(145deg, #fff, #f6e4ef); }
+.site-button-preview { width: 88px; height: 31px; display: block; flex: none; outline: 1px solid #bf8caa; box-shadow: 0 3px 8px rgba(73,38,64,.16); }
+.site-button-preview img { width: 88px; height: 31px; display: block; }
+.site-button-grab-copy { min-width: 0; display: grid; gap: 4px; }
+.site-button-grab-copy strong { color: #68425d; text-transform: uppercase; letter-spacing: .08em; font: 700 8px "Montserrat", sans-serif; }
+.site-button-grab-copy code { min-width: 0; padding: 5px 7px; overflow: hidden; color: #76566c; border: 1px solid #ead0df; border-radius: 6px; background: rgba(255,255,255,.76); text-overflow: ellipsis; white-space: nowrap; font: 8px/1.3 monospace; }
+.copy-site-button { width: 34px; height: 34px; padding: 0; position: relative; display: grid; place-items: center; border: 1px solid #b97d9f; border-radius: 9px; color: #fff; background: #714363; cursor: pointer; }
+.copy-site-button .icon { width: 14px; height: 14px; fill: currentColor; }
+.copy-site-button span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.copy-site-button:hover { background: #92587f; }
+.copy-site-button.is-copied { border-color: #659879; background: #47775a; box-shadow: 0 0 0 3px rgba(101,152,121,.16); }
 .hotbutton-wall { min-height: 63px; margin-top: 12px; padding: 15px; display: grid; grid-template-columns: repeat(auto-fit, 88px); grid-auto-rows: 31px; align-content: start; justify-content: center; gap: 8px; border: 1px solid #e0bfd3; border-radius: 14px; background-color: #2a1c2c; background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px); background-size: 12px 12px; box-shadow: inset 0 0 24px rgba(0,0,0,.2); }
 .hotbutton-wall:empty { display: none; }
 .hotbutton-section > .community-pagination { padding-bottom: 0; }
@@ -433,6 +444,8 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .gallery-count { padding: 5px 9px; border: 1px solid rgba(239,187,218,.24); border-radius: 999px; color: #eac3da; background: rgba(255,255,255,.06); text-transform: uppercase; font: 700 7px "Montserrat", sans-serif; letter-spacing: .1em; }
 .gallery-status { margin: 0; padding: 9px 18px; border-bottom: 1px solid #ecd8e5; background: rgba(255,255,255,.5); }
 .gallery-grid { padding: 14px; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); grid-auto-flow: dense; gap: 12px; }
+.gallery-grid.is-single { grid-template-columns: minmax(0, 480px); justify-content: center; }
+.gallery-grid.is-pair { grid-template-columns: repeat(2, minmax(0, 340px)); justify-content: center; }
 .gallery-archive > .community-pagination { border-top: 1px solid #ecd8e5; background: rgba(249,235,243,.38); }
 .gallery-item { min-width: 0; margin: 0; padding: 7px; position: relative; overflow: hidden; border: 1px solid #d8b4cb; border-radius: 15px; background: rgba(255,250,253,.96); box-shadow: 0 9px 22px rgba(86,42,73,.1); }
 .gallery-item::before { content: attr(data-archive-index); position: absolute; z-index: 2; top: 13px; left: 13px; min-width: 22px; height: 18px; padding: 0 4px; display: grid; place-items: center; color: #fff; border: 1px solid rgba(255,255,255,.5); border-radius: 999px; background: rgba(35,24,38,.72); backdrop-filter: blur(5px); font: 700 7px "Montserrat", sans-serif; }
@@ -446,7 +459,7 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 
 .test-container { max-width: 900px; margin: 25px auto; position: relative; }
 .test-container::before { content: "QUIZ ARCHIVE / 25:00"; position: absolute; z-index: 2; top: -10px; left: 50%; min-width: 190px; padding: 5px 15px; transform: translateX(-50%); border: 1px solid #d5a4c2; border-radius: 999px; color: #fff; background: linear-gradient(135deg, #b35d91, #74417f); box-shadow: 0 5px 14px rgba(88,40,76,.18); text-align: center; font: 700 8px "Montserrat", sans-serif; letter-spacing: .16em; }
-.test-card { min-height: 460px; padding: 42px; position: relative; overflow: hidden; border: 1px solid #d5b5ca; border-radius: 22px; background: radial-gradient(circle at 92% 8%, rgba(221,170,204,.22), transparent 170px), linear-gradient(145deg, rgba(255,252,254,.96), rgba(247,231,241,.94)); box-shadow: 0 16px 38px rgba(58,36,54,.12), inset 0 1px rgba(255,255,255,.95); }
+.test-card { min-height: 0; padding: 42px; position: relative; overflow: hidden; border: 1px solid #d5b5ca; border-radius: 22px; background: radial-gradient(circle at 92% 8%, rgba(221,170,204,.22), transparent 170px), linear-gradient(145deg, rgba(255,252,254,.96), rgba(247,231,241,.94)); box-shadow: 0 16px 38px rgba(58,36,54,.12), inset 0 1px rgba(255,255,255,.95); }
 .test-card::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .2; background: radial-gradient(circle, #a75b90 0 1px, transparent 1.5px) 0 0 / 34px 34px; }
 .test-card::after { content: ""; position: absolute; inset: 8px; pointer-events: none; border: 1px dashed rgba(169,86,139,.16); border-radius: 15px; }
 .test-card > * { position: relative; z-index: 1; }
@@ -713,6 +726,7 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
     .hotbutton-submit-button { width: 100%; }
     .hotbutton-wall { justify-content: center; }
     .hotbutton-preview-row { grid-template-columns: 1fr; justify-items: start; }
+    .site-button-grab { grid-template-columns: 88px minmax(0,1fr) auto; gap: 8px; }
     .community-pagination { padding-inline: 8px; gap: 4px; }
     .community-pagination button { width: 27px; height: 27px; }
     .community-form { padding: 18px 15px; }
@@ -729,7 +743,7 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
     .gallery-item figcaption strong { font-size: 15px; }
     .test-container { margin: 18px auto; }
     .test-container::before { top: -8px; min-width: 165px; padding: 4px 11px; font-size: 7px; }
-    .test-card { min-height: 400px; padding: 38px 14px 24px; border-radius: 16px; }
+    .test-card { min-height: 0; padding: 38px 14px 24px; border-radius: 16px; }
     .test-card::after { inset: 6px; border-radius: 11px; }
     .test-card > .home > p { margin-bottom: 20px; font-size: 12px; }
     .test-menu { grid-template-columns: 1fr; gap: 9px; }

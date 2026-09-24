@@ -189,10 +189,13 @@
             const renderPage = (requestedPage) => {
                 const page = Math.min(Math.max(1, requestedPage), Math.max(1, Math.ceil(items.length / pageSize)));
                 const start = (page - 1) * pageSize;
+                const visibleItems = items.slice(start, start + pageSize);
                 root.replaceChildren();
-                items.slice(start, start + pageSize).forEach((item, index) => {
+                root.classList.toggle('is-single', visibleItems.length === 1);
+                root.classList.toggle('is-pair', visibleItems.length === 2);
+                visibleItems.forEach((item, index) => {
                     const figure = document.createElement('figure');
-                    figure.className = `gallery-item${index === 0 ? ' gallery-item-featured' : ''}`;
+                    figure.className = `gallery-item${index === 0 && visibleItems.length >= 3 ? ' gallery-item-featured' : ''}`;
                     figure.dataset.archiveIndex = String(start + index + 1).padStart(2, '0');
                     const image = document.createElement('img');
                     image.src = safePublicUrl(item.public_url);
@@ -225,6 +228,7 @@
             galleryStatus.classList.toggle('is-empty', items.length === 0);
         } catch (error) {
             root.replaceChildren();
+            root.classList.remove('is-single', 'is-pair');
             document.getElementById('galleryPagination').replaceChildren();
             if (count) count.textContent = '-- pieces';
             setStatus(galleryStatus, 'The gallery could not be loaded right now.', true);
@@ -803,6 +807,41 @@
         });
     }
 
+    function bindSiteButtonCopy() {
+        const button = document.getElementById('copySiteButton');
+        const code = document.getElementById('siteButtonCode');
+        if (!button || !code) return;
+        button.addEventListener('click', async () => {
+            const value = code.textContent.trim();
+            try {
+                if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(value);
+                else {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = value;
+                    textarea.setAttribute('readonly', '');
+                    textarea.style.position = 'fixed';
+                    textarea.style.opacity = '0';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    if (!document.execCommand('copy')) throw new Error('Copy command failed.');
+                    textarea.remove();
+                }
+                const label = button.querySelector('span');
+                label.textContent = 'copied';
+                button.classList.add('is-copied');
+                button.setAttribute('aria-label', 'A Leaf button HTML copied');
+                window.setTimeout(() => {
+                    label.textContent = 'copy';
+                    button.classList.remove('is-copied');
+                    button.setAttribute('aria-label', 'Copy A Leaf button HTML');
+                }, 1600);
+            } catch (error) {
+                console.warn('copy site button:', error.message);
+                code.focus?.();
+            }
+        });
+    }
+
     function visitorId() {
         const key = 'aleaf-visitor-id';
         const create = () => {
@@ -871,6 +910,7 @@
     }
 
     function initialize() {
+        bindSiteButtonCopy();
         if (!configured) {
             setStatus(guestbookStatus, 'The guestbook is unavailable until the backend is configured.', true);
             setStatus(galleryStatus, 'The gallery is unavailable until the backend is configured.', true);
