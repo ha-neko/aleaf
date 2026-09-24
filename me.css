@@ -561,7 +561,7 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .bookmark-bar { display: none; }
 @media (max-width: 900px) {
     body { padding: 20px; }
-    .viewport { height: auto; min-height: 650px; overflow: visible; }
+    .viewport { height: auto; min-height: 0; overflow: visible; }
     .page-panel { height: auto; overflow-y: visible; }
     .home-grid { grid-template-columns: 1fr; grid-template-areas: "archive" "signal" "notes" "scrapbook" "links"; }
     .profile-fields { grid-template-columns: repeat(2, minmax(0,1fr)); }
@@ -569,7 +569,7 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
     .guestbook-layout { grid-template-columns: 1fr; }
     .community-form-column { grid-template-columns: repeat(2, minmax(0,1fr)); }
     .gallery-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
-    .browser { min-height: calc(100vh - 40px); }
+    .browser { min-height: 0; }
 }
 @media (max-width: 640px) {
     body { padding: 0; }
