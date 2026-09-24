@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,600&family=Montserrat:wght@500;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="admin.css?v=2500-community-3">
+    <link rel="stylesheet" href="admin.css?v=2500-community-4">
 </head>
 <body>
     <a class="skip-link" href="#adminMain">Skip to dashboard</a>
@@ -65,6 +65,7 @@
                     <button data-editor-tab="guestbook">Guestbook</button>
                     <button data-editor-tab="inbox">Inbox</button>
                     <button data-editor-tab="gallery">Gallery</button>
+                    <button data-editor-tab="hotbuttons">88×31 buttons</button>
                     <button data-editor-tab="advanced">Advanced</button>
                 </nav>
 
@@ -130,6 +131,11 @@
                         <div class="management-heading gallery-management-heading"><button id="refreshGallery" class="button secondary" type="button">Refresh gallery</button><p id="galleryStatus" class="section-status" role="status">Open this section to load images.</p></div>
                         <div id="galleryList" class="management-list gallery-list"></div>
                     </section>
+                    <section class="editor-panel" data-editor-panel="hotbuttons" hidden>
+                        <div class="panel-heading"><p class="eyebrow">visitor button queue</p><h2>88×31 buttons</h2><p>Review submitted website buttons. Approve only images and destinations you trust; approved buttons appear on the guestbook wall.</p></div>
+                        <div class="management-heading"><button id="refreshHotbuttons" class="button secondary" type="button">Refresh buttons</button><p id="hotbuttonsStatus" class="section-status" role="status">Open this section to load submissions.</p></div>
+                        <div id="hotbuttonsList" class="management-list hotbuttons-list"></div>
+                    </section>
                     <section class="editor-panel" data-editor-panel="advanced" hidden>
                         <div class="panel-heading"><p class="eyebrow">raw configuration</p><h2>Advanced JSON</h2><p>This edits the complete content document, including optional quiz definitions. Invalid JSON cannot be published.</p></div>
                         <textarea id="advancedJson" rows="24" spellcheck="false"></textarea>
@@ -144,6 +150,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../config.js"></script>
     <script src="../default-content.js"></script>
-    <script src="admin.js?v=2500-community-3"></script>
+    <script src="admin.js?v=2500-community-4"></script>
 </body>
 </html>

@@ -288,9 +288,13 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .community-card::before { content: ""; position: absolute; top: 0; right: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--accent-dark), var(--primary), var(--sakura)); }
 .community-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
 .community-card-heading h2 { margin: 3px 0 0; color: var(--ink); font: 600 italic 25px "Cormorant Garamond", serif; }
-.guestbook-layout { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(260px,.72fr); gap: 14px; align-items: start; }
-.guestbook-entries-card { min-height: 340px; padding: 0; }
-.guestbook-feed-header { padding: 16px 18px 12px; border-bottom: 1px solid #ead4e1; background: linear-gradient(145deg, rgba(255,255,255,.76), rgba(249,235,243,.55)); }
+.guestbook-layout { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(270px,.65fr); gap: 18px; align-items: start; }
+.guestbook-console { position: relative; }
+.guestbook-console::before { content: "VISITOR TRANSMISSION ARCHIVE"; position: absolute; z-index: 2; top: -7px; left: 22px; padding: 2px 9px; color: #8b4a72; border: 1px solid #dcb4cb; border-radius: 999px; background: #fff8fc; font: 700 6px "Montserrat", sans-serif; letter-spacing: .15em; }
+.guestbook-entries-card { min-height: 390px; padding: 0; border-radius: 20px; }
+.guestbook-feed-header { padding: 22px 22px 16px; color: #fff; border-bottom: 1px solid #553650; background: radial-gradient(circle at 90% 10%, rgba(227,155,197,.2), transparent 9rem), linear-gradient(135deg, #342139, #211821); }
+.guestbook-feed-header .panel-index { color: #e4a8ca; }
+.guestbook-feed-header .community-card-heading h2 { color: #fff8fc; }
 .guestbook-entries-card .signal-light { width: 8px; height: 8px; flex: none; border: 3px solid #f7deec; border-radius: 50%; background: #a75288; box-shadow: 0 0 0 1px #ba7ca2, 0 0 11px rgba(167,82,136,.55); }
 .community-status { margin: 12px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
 .guestbook-entries-card > .community-status:not(.is-empty) { margin: 0; padding: 10px 24px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #eedce7; background: rgba(255,255,255,.46); }
@@ -298,9 +302,9 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .community-status.is-empty { margin: 12px 0; padding: 28px 14px; border: 1px dashed #d8b4cb; border-radius: 12px; text-align: center; background: rgba(247,229,239,.45); }
 .guestbook-entries-card > .community-status.is-empty { margin: 12px; }
 .community-status.is-error, .form-status.is-error { color: #a3365c; }
-.guestbook-entries { padding: 12px; display: grid; gap: 10px; }
+.guestbook-entries { padding: 16px; display: grid; gap: 12px; }
 .guestbook-entries:empty { display: none; }
-.guestbook-entry { position: relative; padding: 14px 15px 14px 19px; border: 1px solid #e3c4d7; border-radius: 14px; background: linear-gradient(145deg, #fff, rgba(249,235,243,.78)); box-shadow: 0 5px 12px rgba(91,45,76,.06); }
+.guestbook-entry { position: relative; padding: 16px 17px 16px 22px; border: 1px solid #e3c4d7; border-radius: 5px 16px 16px 16px; background: linear-gradient(145deg, #fff, rgba(249,235,243,.72)); box-shadow: 0 7px 16px rgba(91,45,76,.07); }
 .guestbook-entry::before { content: attr(data-entry-index); position: absolute; top: 19px; left: -8px; width: 17px; height: 17px; display: grid; place-items: center; border: 1px solid #d29ab9; border-radius: 50%; color: #8b4a72; background: #fff8fc; box-shadow: 0 2px 6px rgba(91,45,76,.12); font: 700 6px "Montserrat", sans-serif; }
 .guestbook-entry-heading, .guestbook-reply-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 15px; }
 .guestbook-author { min-width: 0; display: flex; align-items: center; gap: 9px; }
@@ -341,6 +345,25 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .compose-send-btn span:last-child { font-size: 14px; }
 .compose-send-btn:hover { background: linear-gradient(135deg, #ffe4f1, #eaa3c8); box-shadow: 0 8px 18px rgba(9,4,10,.28); transform: translateY(-1px); }
 .compose-send-btn:disabled { opacity: .5; cursor: default; transform: none; }
+.guestbook-side-note { padding: 15px 17px; border: 1px dashed #cda3bd; border-radius: 14px; background: rgba(255,250,253,.64); box-shadow: inset 0 0 0 4px rgba(255,255,255,.34); }
+.guestbook-side-note p { margin: 7px 0 0; color: #72596a; font-size: 10px; line-height: 1.55; }
+.hotbutton-section { margin-top: 18px; padding: 20px 22px 22px; border-radius: 20px; }
+.hotbutton-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.hotbutton-heading h2 { margin: 2px 0 0; color: var(--ink); font: 600 italic 27px "Cormorant Garamond", serif; }
+.hotbutton-heading p { max-width: 560px; margin: 4px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+.hotbutton-submit-button { min-height: 38px; padding: 0 16px; flex: none; border: 1px solid #784b75; border-radius: 999px; color: #fff; background: linear-gradient(135deg, #38243c, #6f3d68); box-shadow: 0 6px 15px rgba(52,28,48,.18); cursor: pointer; text-transform: uppercase; letter-spacing: .08em; font: 700 8px "Montserrat", sans-serif; }
+.hotbutton-submit-button:hover { background: linear-gradient(135deg, #493049, #8c4c79); transform: translateY(-1px); }
+.hotbutton-wall { min-height: 63px; margin-top: 12px; padding: 15px; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; border: 1px solid #e0bfd3; border-radius: 14px; background-color: #2a1c2c; background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px); background-size: 12px 12px; box-shadow: inset 0 0 24px rgba(0,0,0,.2); }
+.hotbutton-wall:empty { display: none; }
+.hotbutton-item { width: 88px; height: 31px; display: block; flex: none; outline: 1px solid rgba(255,255,255,.18); outline-offset: 1px; box-shadow: 0 2px 6px rgba(0,0,0,.32); transition: transform .12s, outline-color .12s; }
+.hotbutton-item:hover, .hotbutton-item:focus-visible { z-index: 1; outline-color: #f1b9d8; transform: translateY(-2px) scale(1.04); }
+.hotbutton-item img { width: 88px; height: 31px; display: block; image-rendering: auto; }
+.hotbutton-preview-row { margin: 6px 0; padding: 11px 13px; display: grid; grid-template-columns: auto 96px 1fr; align-items: center; gap: 12px; border: 1px dashed #d2a9c2; border-radius: 11px; background: #f9edf4; }
+.hotbutton-preview-row > span { color: #6e4562; text-transform: uppercase; letter-spacing: .08em; font: 700 8px "Montserrat", sans-serif; }
+.hotbutton-preview-frame { width: 96px; height: 39px; display: grid; place-items: center; border: 1px solid #dec0d2; background: #2a1c2c; }
+.hotbutton-preview-frame img { width: 88px; height: 31px; display: block; }
+.hotbutton-preview-row small { color: var(--muted); font-size: 9px; line-height: 1.4; }
+.hotbutton-preview-row small.is-error { color: #a3365c; font-weight: 700; }
 .community-form { padding: 16px; display: grid; gap: 7px; }
 .community-form .community-card-heading { margin-bottom: 2px; }
 .form-note { margin: 0 0 5px; color: var(--muted); font-size: 10px; line-height: 1.5; }
@@ -386,12 +409,21 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 .private-dialog .form-note { color: var(--muted); }
 .private-dialog .form-note strong { color: #6e4562; }
 .private-dialog textarea { background: rgba(255,255,255,.94); }
-.gallery-status { margin: 0 0 14px; }
-.gallery-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
-.gallery-item { min-width: 0; margin: 0; padding: 8px; overflow: hidden; border: 1px solid #d8b4cb; border-radius: 15px; background: rgba(255,250,253,.94); box-shadow: 0 11px 25px rgba(86,42,73,.11); }
-.gallery-item:nth-child(3n+2) { transform: translateY(7px); }
-.gallery-item img { width: 100%; height: auto; aspect-ratio: 4 / 3; display: block; object-fit: contain; border-radius: 9px; background: linear-gradient(145deg, #f4e3ed, #e8d9e8); }
-.gallery-item figcaption { padding: 10px 6px 5px; display: grid; gap: 3px; }
+.gallery-archive { overflow: hidden; border: 1px solid #d5b2c8; border-radius: 20px; background: rgba(255,250,253,.72); box-shadow: 0 14px 32px rgba(70,36,62,.1); }
+.gallery-archive-bar { min-height: 58px; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; gap: 18px; color: #fff8fc; border-bottom: 1px solid #573852; background: radial-gradient(circle at 80% 0, rgba(225,145,191,.22), transparent 10rem), linear-gradient(135deg, #352239, #201821); }
+.gallery-archive-bar > div { display: grid; gap: 2px; }
+.gallery-archive-bar .panel-index { color: #dfa5c7; }
+.gallery-archive-bar strong { font: 600 italic 21px "Cormorant Garamond", serif; }
+.gallery-count { padding: 5px 9px; border: 1px solid rgba(239,187,218,.24); border-radius: 999px; color: #eac3da; background: rgba(255,255,255,.06); text-transform: uppercase; font: 700 7px "Montserrat", sans-serif; letter-spacing: .1em; }
+.gallery-status { margin: 0; padding: 9px 18px; border-bottom: 1px solid #ecd8e5; background: rgba(255,255,255,.5); }
+.gallery-grid { padding: 14px; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); grid-auto-flow: dense; gap: 12px; }
+.gallery-item { min-width: 0; margin: 0; padding: 7px; position: relative; overflow: hidden; border: 1px solid #d8b4cb; border-radius: 15px; background: rgba(255,250,253,.96); box-shadow: 0 9px 22px rgba(86,42,73,.1); }
+.gallery-item::before { content: attr(data-archive-index); position: absolute; z-index: 2; top: 13px; left: 13px; min-width: 22px; height: 18px; padding: 0 4px; display: grid; place-items: center; color: #fff; border: 1px solid rgba(255,255,255,.5); border-radius: 999px; background: rgba(35,24,38,.72); backdrop-filter: blur(5px); font: 700 7px "Montserrat", sans-serif; }
+.gallery-item-featured { grid-column: span 2; grid-row: span 2; }
+.gallery-item img { width: 100%; height: auto; aspect-ratio: 4 / 3; display: block; object-fit: cover; border-radius: 10px; background: linear-gradient(145deg, #f4e3ed, #e8d9e8); transition: filter .2s, transform .25s; }
+.gallery-item-featured img { aspect-ratio: 16 / 10; }
+.gallery-item:hover img { filter: saturate(1.06); transform: scale(1.012); }
+.gallery-item figcaption { padding: 11px 7px 6px; display: grid; gap: 4px; }
 .gallery-item figcaption strong { color: #68425d; font: 600 italic 19px "Cormorant Garamond", serif; overflow-wrap: anywhere; }
 .gallery-item figcaption span { color: var(--muted); font-size: 10px; line-height: 1.45; overflow-wrap: anywhere; white-space: pre-wrap; }
 
@@ -659,12 +691,18 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
     .guestbook-owner-reply { margin-left: 13px; padding: 10px; }
     .community-form-column { grid-template-columns: 1fr; }
     .compose-card { padding: 18px 16px; }
+    .hotbutton-section { padding: 17px 14px 18px; }
+    .hotbutton-heading { align-items: flex-start; flex-direction: column; gap: 12px; }
+    .hotbutton-submit-button { width: 100%; }
+    .hotbutton-wall { justify-content: center; }
+    .hotbutton-preview-row { grid-template-columns: 1fr; justify-items: start; }
     .community-form { padding: 18px 15px; }
     .guestbook-dialog { width: calc(100% - 16px); max-height: calc(100dvh - 16px); }
     .guestbook-dialog-form { max-height: calc(100dvh - 16px); padding: 16px 12px; }
     .captcha-controls { align-items: flex-start; flex-direction: column; }
     .dialog-actions button { flex: 1; padding: 0 10px; }
-    .gallery-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+    .gallery-grid { padding: 9px; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 9px; }
+    .gallery-archive-bar { padding: 11px 13px; }
     .gallery-item { padding: 5px; border-radius: 12px; }
     .gallery-item:nth-child(3n+2) { transform: none; }
     .gallery-item img { aspect-ratio: 1; border-radius: 8px; }

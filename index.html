@@ -40,7 +40,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Montserrat:wght@500;600;700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="me.css?v=2500-community-8">
+    <link rel="stylesheet" href="me.css?v=2500-community-9">
 </head>
 <body>
     <a class="skip-link" href="#mainContent">Skip to main content</a>
@@ -212,7 +212,7 @@
 
              <section id="panel-guestbook" class="page-panel community-page guestbook-page" role="tabpanel" aria-labelledby="tab-guestbook" data-page-panel="guestbook" hidden>
                  <header class="page-title community-title"><span class="title-icon"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-comment"/></svg></span><h1 data-content="guestbook-heading">nightcord guestbook</h1><div class="bead-line"></div><p data-content="guestbook-intro">leave a little signal for the next visitor.</p></header>
-                 <div class="guestbook-layout">
+                  <div class="guestbook-layout guestbook-console">
                      <section class="community-card guestbook-entries-card" aria-labelledby="guestbookEntriesHeading">
                          <div class="guestbook-feed-header">
                              <div class="community-card-heading"><div><span class="panel-index">approved signals / public feed</span><h2 id="guestbookEntriesHeading">notes from visitors</h2></div><span class="signal-light" aria-hidden="true"></span></div>
@@ -242,8 +242,24 @@
                                </div>
                                <p id="composeStatus" class="form-status" role="status" aria-live="polite"></p>
                            </section>
-                      </aside>
-                  </div>
+                           <section class="guestbook-side-note" aria-label="Guestbook information">
+                               <span class="panel-index">visitor channel / moderated</span>
+                               <p>Public notes and site buttons enter a private queue first. Nothing appears here until Leaf approves it.</p>
+                           </section>
+                       </aside>
+                   </div>
+                   <section class="community-card hotbutton-section" aria-labelledby="hotbuttonHeading">
+                       <div class="hotbutton-heading">
+                           <div>
+                               <span class="panel-index">88 × 31 neighbours</span>
+                               <h2 id="hotbuttonHeading">button wall</h2>
+                               <p>tiny portals to other corners of the web. submissions appear after approval.</p>
+                           </div>
+                           <button id="hotbuttonOpen" class="hotbutton-submit-button" type="button">submit your button</button>
+                       </div>
+                       <p id="hotbuttonStatus" class="community-status" role="status" aria-live="polite">Loading approved buttons...</p>
+                       <div id="hotbuttonWall" class="hotbutton-wall" aria-live="polite"></div>
+                   </section>
                    <dialog id="guestbookDialog" class="guestbook-dialog" aria-labelledby="guestbookDialogHeading" aria-describedby="guestbookDialogNote">
                        <form id="guestbookForm" class="community-form guestbook-dialog-form">
                            <div class="guestbook-dialog-heading">
@@ -273,7 +289,7 @@
                            <p id="guestbookFormStatus" class="form-status" role="status" aria-live="polite"></p>
                        </form>
                    </dialog>
-                   <dialog id="privateDialog" class="guestbook-dialog private-dialog" aria-labelledby="privateDialogHeading">
+                    <dialog id="privateDialog" class="guestbook-dialog private-dialog" aria-labelledby="privateDialogHeading">
                        <form id="privateForm" class="community-form guestbook-dialog-form">
                            <div class="guestbook-dialog-heading">
                                <div><span class="panel-index">anonymous / private / one-way</span><h2 id="privateDialogHeading" data-content="private-message-heading">send a private message</h2></div>
@@ -287,14 +303,44 @@
                                <button type="submit">send anonymous message</button>
                            </div>
                            <p id="privateFormStatus" class="form-status" role="status" aria-live="polite"></p>
-                       </form>
-                   </dialog>
-              </section>
+                        </form>
+                    </dialog>
+                    <dialog id="hotbuttonDialog" class="guestbook-dialog hotbutton-dialog" aria-labelledby="hotbuttonDialogHeading" aria-describedby="hotbuttonDialogNote">
+                        <form id="hotbuttonForm" class="community-form guestbook-dialog-form">
+                            <div class="guestbook-dialog-heading">
+                                <div><span class="panel-index">88 × 31 submission</span><h2 id="hotbuttonDialogHeading">join the button wall</h2></div>
+                                <button id="hotbuttonClose" class="dialog-close" type="button" aria-label="Close button submission form">&times;</button>
+                            </div>
+                            <p id="hotbuttonDialogNote" class="form-note">Use a direct image URL for an exact 88×31 button. Every submission is reviewed before publication.</p>
+                            <label for="hotbuttonName">Site or button name</label>
+                            <input id="hotbuttonName" name="button_name" type="text" required minlength="1" maxlength="80" autocomplete="organization">
+                            <label for="hotbuttonSiteUrl">Website URL</label>
+                            <input id="hotbuttonSiteUrl" name="site_url" type="url" required maxlength="2048" inputmode="url" placeholder="https://example.com/">
+                            <label for="hotbuttonImageUrl">Direct 88×31 image URL</label>
+                            <input id="hotbuttonImageUrl" name="image_url" type="url" required maxlength="2048" inputmode="url" placeholder="https://example.com/button.png">
+                            <div class="hotbutton-preview-row">
+                                <span>preview</span>
+                                <div class="hotbutton-preview-frame"><img id="hotbuttonPreview" alt="" hidden></div>
+                                <small id="hotbuttonDimensions">waiting for an image URL</small>
+                            </div>
+                            <label for="hotbuttonNote">Short note <span>optional, 300 characters</span></label>
+                            <textarea id="hotbuttonNote" name="note" maxlength="300" rows="3"></textarea>
+                            <div class="dialog-actions">
+                                <button id="hotbuttonCancel" class="secondary-button" type="button">cancel</button>
+                                <button type="submit">send for approval</button>
+                            </div>
+                            <p id="hotbuttonFormStatus" class="form-status" role="status" aria-live="polite"></p>
+                        </form>
+                    </dialog>
+               </section>
 
              <section id="panel-gallery" class="page-panel community-page gallery-page" role="tabpanel" aria-labelledby="tab-gallery" data-page-panel="gallery" hidden>
                  <header class="page-title community-title"><span class="title-icon"><svg class="icon ui-icon" aria-hidden="true"><use href="#i-star"/></svg></span><h1 data-content="gallery-heading">midnight gallery</h1><div class="bead-line"></div><p data-content="gallery-intro">published pieces from the archive.</p></header>
-                 <p id="galleryStatus" class="community-status gallery-status" role="status" aria-live="polite">Loading gallery...</p>
-                 <div id="galleryItems" class="gallery-grid" aria-live="polite"></div>
+                  <div class="gallery-archive">
+                      <div class="gallery-archive-bar"><div><span class="panel-index">visual archive / published</span><strong>selected fragments</strong></div><span id="galleryCount" class="gallery-count">00 pieces</span></div>
+                      <p id="galleryStatus" class="community-status gallery-status" role="status" aria-live="polite">Loading gallery...</p>
+                      <div id="galleryItems" class="gallery-grid" aria-live="polite"></div>
+                  </div>
              </section>
 
              <section id="panel-web" class="page-panel web-page" role="tabpanel" aria-labelledby="tab-web" data-page-panel="web" hidden>
@@ -313,6 +359,6 @@
     <button id="musicToggle" class="music-button" type="button" aria-label="Play background music" aria-pressed="false" aria-describedby="musicStatus"><svg class="icon ui-icon sound-on" aria-hidden="true"><use href="#i-volume"/></svg><svg class="icon ui-icon sound-off" aria-hidden="true"><use href="#i-volume-off"/></svg></button>
     <span id="musicStatus" class="sr-only" role="status" aria-live="polite">Background music paused</span>
     <audio id="backgroundMusic" loop preload="metadata"><source src="First Date.mp3" type="audio/mpeg"></audio>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="default-content.js?v=2500-community-1"></script><script src="content.js?v=2500-community-1"></script><script src="test.js?v=2500-quiz-2"></script><script src="community.js?v=2500-community-8"></script><script src="me.js?v=2500-community-7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="default-content.js?v=2500-community-1"></script><script src="content.js?v=2500-community-1"></script><script src="test.js?v=2500-quiz-2"></script><script src="community.js?v=2500-community-9"></script><script src="me.js?v=2500-community-7"></script>
 </body>
 </html>

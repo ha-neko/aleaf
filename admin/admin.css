@@ -132,6 +132,7 @@ textarea { resize: vertical; line-height: 1.55; }
 .management-card h3 { margin: 0; font: 700 14px "Montserrat", sans-serif; }
 .management-card p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; line-height: 1.55; }
 .management-meta { color: var(--muted); font-size: 11px !important; }
+.management-meta.error { color: var(--danger); font-weight: 700; }
 .state-badge { padding: 4px 8px; flex: none; border-radius: 999px; color: var(--purple-deep); background: #f4dce9; text-transform: uppercase; font: 700 9px "Montserrat", sans-serif; letter-spacing: .06em; }
 .management-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .management-actions button { min-height: 36px; padding: 0 12px; border: 1px solid #d8acc7; border-radius: 999px; color: var(--purple-deep); background: #fff; cursor: pointer; font-size: 11px; font-weight: 700; }
@@ -151,6 +152,14 @@ textarea { resize: vertical; line-height: 1.55; }
 .gallery-card { grid-template-columns: 130px minmax(0,1fr); }
 .gallery-thumbnail { width: 130px; height: 110px; border: 1px solid var(--line); border-radius: 11px; object-fit: cover; background: #f4e6ee; }
 .gallery-card-body { min-width: 0; display: grid; gap: 8px; }
+.hotbutton-management-card { grid-template-columns: 122px minmax(0,1fr); align-items: start; }
+.hotbutton-admin-preview { min-height: 72px; padding: 10px; display: grid; place-items: center; align-content: center; gap: 7px; border: 1px solid #d8b4cb; border-radius: 11px; background: #2a1c2c; text-align: center; }
+.hotbutton-admin-preview img { width: 88px; height: 31px; display: block; }
+.hotbutton-admin-preview .management-meta { color: #dec2d3; font-size: 8px !important; }
+.hotbutton-admin-preview .management-meta.error { color: #ffb5cb; }
+.hotbutton-admin-body { min-width: 0; display: grid; gap: 9px; }
+.hotbutton-admin-link { color: var(--purple-deep); overflow-wrap: anywhere; font-size: 11px; font-weight: 700; }
+.hotbutton-admin-link:hover { color: var(--pink-strong); }
 .save-status { position: sticky; z-index: 3; bottom: 0; min-height: 35px; padding: 0 18px; display: flex; align-items: center; color: #6c5265; border-top: 1px solid #dfbed2; background: rgba(250,237,245,.96); backdrop-filter: blur(10px); font: 600 10px "Montserrat", sans-serif; }
 .save-status::before { content: ""; width: 7px; height: 7px; margin-right: 8px; border-radius: 50%; background: #78a68d; }
 .save-status.dirty { color: #8b3f67; }
@@ -177,7 +186,7 @@ textarea { resize: vertical; line-height: 1.55; }
     .header-actions .button { flex: 1 1 120px; }
     .editor-nav { padding: 9px 12px; }
     .editor-content { padding: 24px 14px 42px; }
-    .form-grid, .color-grid, .repeat-row, .repeat-row.game-row, .repeat-row.scrapbook-row, .gallery-upload-form, .gallery-card { grid-template-columns: 1fr; }
+    .form-grid, .color-grid, .repeat-row, .repeat-row.game-row, .repeat-row.scrapbook-row, .gallery-upload-form, .gallery-card, .hotbutton-management-card { grid-template-columns: 1fr; }
     .repeat-row.game-row .remove-button { grid-column: auto; justify-self: stretch; }
     .remove-button { width: 100%; }
     .upload-box { align-items: stretch; flex-direction: column; }

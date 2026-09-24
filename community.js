@@ -6,6 +6,7 @@
         config.supabaseAnonKey && !config.supabaseAnonKey.includes('YOUR_') && window.supabase;
     const guestbookStatus = document.getElementById('guestbookListStatus');
     const galleryStatus = document.getElementById('galleryStatus');
+    const hotbuttonStatus = document.getElementById('hotbuttonStatus');
     const visitorStatus = document.getElementById('visitorStatus');
 
     function setStatus(element, message, error = false) {
@@ -19,13 +20,15 @@
         if (composeSend) composeSend.disabled = true;
         const composeBody = document.getElementById('composeBody');
         if (composeBody) composeBody.disabled = true;
+        const hotbuttonOpen = document.getElementById('hotbuttonOpen');
+        if (hotbuttonOpen) hotbuttonOpen.disabled = true;
         setStatus(document.getElementById('composeStatus'), message, true);
     }
 
     function safePublicUrl(value) {
         try {
             const url = new URL(value);
-            return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+            return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password ? url.href : '';
         } catch (_) {
             return '';
         }
@@ -127,14 +130,16 @@
 
     async function loadGallery(client) {
         const root = document.getElementById('galleryItems');
+        const count = document.getElementById('galleryCount');
         try {
             const { data, error } = await client.from('gallery_items').select('*').eq('published', true).order('sort_order', { ascending: true }).order('created_at', { ascending: false });
             if (error) throw error;
             const items = (Array.isArray(data) ? data : []).filter(isPublished).filter((item) => safePublicUrl(item.public_url));
             root.replaceChildren();
-            items.forEach((item) => {
+            items.forEach((item, index) => {
                 const figure = document.createElement('figure');
-                figure.className = 'gallery-item';
+                figure.className = `gallery-item${index === 0 ? ' gallery-item-featured' : ''}`;
+                figure.dataset.archiveIndex = String(index + 1).padStart(2, '0');
                 const image = document.createElement('img');
                 image.src = safePublicUrl(item.public_url);
                 image.alt = item.alt_text || item.alt || item.title || 'Published gallery item';
@@ -159,12 +164,48 @@
                 }
                 root.append(figure);
             });
+            if (count) count.textContent = `${String(items.length).padStart(2, '0')} ${items.length === 1 ? 'piece' : 'pieces'}`;
             setStatus(galleryStatus, items.length ? `${items.length} published ${items.length === 1 ? 'piece' : 'pieces'}.` : 'The gallery is quiet for now. Published pieces will appear here.');
             galleryStatus.classList.toggle('is-empty', items.length === 0);
         } catch (error) {
             root.replaceChildren();
+            if (count) count.textContent = '-- pieces';
             setStatus(galleryStatus, 'The gallery could not be loaded right now.', true);
             console.warn('gallery:', error.message);
+        }
+    }
+
+    async function loadHotbuttons(client) {
+        const root = document.getElementById('hotbuttonWall');
+        try {
+            const { data, error } = await client.from('hotbuttons').select('id, button_name, site_url, image_url, note, created_at').eq('status', 'approved').order('created_at', { ascending: true });
+            if (error) throw error;
+            const buttons = (Array.isArray(data) ? data : []).filter((item) => safePublicUrl(item.site_url) && safePublicUrl(item.image_url));
+            root.replaceChildren();
+            buttons.forEach((item) => {
+                const link = document.createElement('a');
+                link.className = 'hotbutton-item';
+                link.href = safePublicUrl(item.site_url);
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.title = item.note ? `${item.button_name}: ${item.note}` : item.button_name;
+
+                const image = document.createElement('img');
+                image.src = safePublicUrl(item.image_url);
+                image.width = 88;
+                image.height = 31;
+                image.alt = item.button_name;
+                image.loading = 'lazy';
+                image.referrerPolicy = 'no-referrer';
+                link.appendChild(image);
+                root.appendChild(link);
+            });
+            setStatus(hotbuttonStatus, buttons.length ? `${buttons.length} approved ${buttons.length === 1 ? 'button' : 'buttons'} online.` : 'No approved buttons yet. The first tiny portal could be yours.');
+            hotbuttonStatus.classList.toggle('is-empty', buttons.length === 0);
+        } catch (error) {
+            root.replaceChildren();
+            setStatus(hotbuttonStatus, 'The button wall could not be loaded right now.', true);
+            console.warn('hotbuttons:', error.message);
         }
     }
 
@@ -423,9 +464,8 @@
         }
 
         dialog.addEventListener('compose-open', () => {
-            if (dialog.open) return;
             setStatus(formStatus, '');
-            dialog.showModal();
+            if (!dialog.open) dialog.showModal();
             loadChallenge();
         });
         refreshButton.addEventListener('click', () => { setStatus(formStatus, ''); loadChallenge(); });
@@ -580,6 +620,122 @@
         });
     }
 
+    function bindHotbuttonDialog(client) {
+        const dialog = document.getElementById('hotbuttonDialog');
+        const form = document.getElementById('hotbuttonForm');
+        const openButton = document.getElementById('hotbuttonOpen');
+        const closeButton = document.getElementById('hotbuttonClose');
+        const cancelButton = document.getElementById('hotbuttonCancel');
+        const imageInput = document.getElementById('hotbuttonImageUrl');
+        const preview = document.getElementById('hotbuttonPreview');
+        const dimensions = document.getElementById('hotbuttonDimensions');
+        const formStatus = document.getElementById('hotbuttonFormStatus');
+        let previewTimer = 0;
+        let previewRequest = 0;
+
+        function inspectImage(url) {
+            return new Promise((resolve, reject) => {
+                const image = new Image();
+                const timeout = window.setTimeout(() => reject(new Error('Image check timed out.')), 10000);
+                image.onload = () => {
+                    window.clearTimeout(timeout);
+                    resolve({ width: image.naturalWidth, height: image.naturalHeight });
+                };
+                image.onerror = () => {
+                    window.clearTimeout(timeout);
+                    reject(new Error('Image could not be loaded.'));
+                };
+                image.referrerPolicy = 'no-referrer';
+                image.src = url;
+            });
+        }
+
+        async function updatePreview() {
+            const request = ++previewRequest;
+            const url = safePublicUrl(imageInput.value.trim());
+            preview.hidden = true;
+            preview.removeAttribute('src');
+            if (!url) {
+                dimensions.textContent = imageInput.value.trim() ? 'enter a valid HTTP or HTTPS image URL' : 'waiting for an image URL';
+                dimensions.classList.toggle('is-error', Boolean(imageInput.value.trim()));
+                return false;
+            }
+            dimensions.textContent = 'checking image dimensions...';
+            dimensions.classList.remove('is-error');
+            try {
+                const size = await inspectImage(url);
+                if (request !== previewRequest) return false;
+                preview.src = url;
+                preview.alt = `88 by 31 preview for ${document.getElementById('hotbuttonName').value.trim() || 'submitted site'}`;
+                preview.hidden = false;
+                const valid = size.width === 88 && size.height === 31;
+                dimensions.textContent = valid ? '88 × 31 — ready' : `${size.width} × ${size.height} — image must be exactly 88 × 31`;
+                dimensions.classList.toggle('is-error', !valid);
+                return valid;
+            } catch (error) {
+                if (request !== previewRequest) return false;
+                dimensions.textContent = error.message;
+                dimensions.classList.add('is-error');
+                return false;
+            }
+        }
+
+        openButton.addEventListener('click', () => {
+            setStatus(formStatus, '');
+            if (!dialog.open) dialog.showModal();
+        });
+        closeButton.addEventListener('click', () => dialog.close());
+        cancelButton.addEventListener('click', () => dialog.close());
+        imageInput.addEventListener('input', () => {
+            window.clearTimeout(previewTimer);
+            previewTimer = window.setTimeout(updatePreview, 450);
+        });
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!form.reportValidity()) return;
+
+            const siteUrl = safePublicUrl(form.elements.site_url.value.trim());
+            const imageUrl = safePublicUrl(form.elements.image_url.value.trim());
+            if (!siteUrl || !imageUrl) {
+                setStatus(formStatus, 'Use valid HTTP or HTTPS URLs without embedded credentials.', true);
+                return;
+            }
+
+            setStatus(formStatus, 'Checking the 88 × 31 image...');
+            if (!await updatePreview()) {
+                setStatus(formStatus, 'The button image must load successfully at exactly 88 × 31 pixels.', true);
+                return;
+            }
+
+            const submitButton = form.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            setStatus(formStatus, 'Sending button for approval...');
+            try {
+                const { data, error } = await client.rpc('submit_hotbutton', {
+                    p_button_name: form.elements.button_name.value.trim(),
+                    p_site_url: siteUrl,
+                    p_image_url: imageUrl,
+                    p_note: form.elements.note.value.trim() || null
+                });
+                if (error) throw error;
+                if (!data) throw new Error('Submission was rejected.');
+                form.reset();
+                preview.hidden = true;
+                preview.removeAttribute('src');
+                dimensions.textContent = 'waiting for an image URL';
+                dimensions.classList.remove('is-error');
+                dialog.close();
+                setStatus(hotbuttonStatus, 'Button received. It will join the wall if Leaf approves it.');
+            } catch (error) {
+                setStatus(formStatus, 'Your button could not be submitted. Please check the URLs and try again.', true);
+                console.warn('submit_hotbutton:', error.message);
+            } finally {
+                submitButton.disabled = false;
+            }
+        });
+    }
+
     function visitorId() {
         const key = 'aleaf-visitor-id';
         const create = () => {
@@ -651,6 +807,7 @@
         if (!configured) {
             setStatus(guestbookStatus, 'The guestbook is unavailable until the backend is configured.', true);
             setStatus(galleryStatus, 'The gallery is unavailable until the backend is configured.', true);
+            setStatus(hotbuttonStatus, 'The button wall is unavailable until the backend is configured.', true);
             setStatus(visitorStatus, 'Visitor statistics are unavailable.', true);
             document.getElementById('totalVisitors').textContent = '--';
             document.getElementById('currentVisitors').textContent = '--';
@@ -662,14 +819,21 @@
         bindGuestbookDialog(client);
         bindComposeCard(client);
         bindPrivateDialog(client);
+        bindHotbuttonDialog(client);
 
         const id = visitorId();
         loadTotalVisitors(client);
         connectPresence(client, id);
-        if (window.ALEAF_CONTENT?.site?.guestbookEnabled !== false) loadGuestbook(client);
+        if (window.ALEAF_CONTENT?.site?.guestbookEnabled !== false) {
+            loadGuestbook(client);
+            loadHotbuttons(client);
+        }
         if (window.ALEAF_CONTENT?.site?.galleryEnabled !== false) loadGallery(client);
         window.addEventListener('aleaf:refresh', (event) => {
-            if (event.detail === 'guestbook') loadGuestbook(client);
+            if (event.detail === 'guestbook') {
+                loadGuestbook(client);
+                loadHotbuttons(client);
+            }
             if (event.detail === 'gallery') loadGallery(client);
             if (event.detail === 'profile') loadTotalVisitors(client);
         });

@@ -210,6 +210,7 @@
         if (button.dataset.editorTab === 'guestbook') loadGuestbook();
         if (button.dataset.editorTab === 'inbox') loadInbox();
         if (button.dataset.editorTab === 'gallery') loadGallery();
+        if (button.dataset.editorTab === 'hotbuttons') loadHotbuttons();
     }));
 
     document.querySelectorAll('[data-add]').forEach((button) => button.addEventListener('click', () => {
@@ -276,6 +277,15 @@
         if (!value) return 'Date unavailable';
         const date = new Date(value);
         return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
+    }
+
+    function safeHttpUrl(value) {
+        try {
+            const url = new URL(value);
+            return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password ? url.href : '';
+        } catch (_) {
+            return '';
+        }
     }
 
     async function loadGuestbook() {
@@ -438,9 +448,88 @@
         setSectionStatus('gallery', 'Gallery image deleted.'); await loadGallery();
     }
 
+    async function loadHotbuttons() {
+        const root = document.getElementById('hotbuttonsList');
+        setSectionStatus('hotbuttons', 'Loading button submissions...');
+        const { data, error } = await client.from('hotbuttons').select('*').order('created_at', { ascending: false });
+        if (error) { renderEmpty(root, 'Button submissions could not be loaded.'); setSectionStatus('hotbuttons', `Load failed: ${error.message}`, true); return; }
+        root.replaceChildren();
+        if (!data.length) { renderEmpty(root, 'No 88×31 button submissions yet.'); setSectionStatus('hotbuttons', 'No submissions.'); return; }
+
+        data.forEach((item) => {
+            const siteUrl = safeHttpUrl(item.site_url);
+            const imageUrl = safeHttpUrl(item.image_url);
+            const card = document.createElement('article');
+            card.className = 'management-card hotbutton-management-card';
+
+            const preview = document.createElement('div');
+            preview.className = 'hotbutton-admin-preview';
+            if (imageUrl) {
+                const image = document.createElement('img');
+                image.src = imageUrl;
+                image.alt = item.button_name || 'Submitted website button';
+                image.referrerPolicy = 'no-referrer';
+                const dimensions = textElement('span', 'management-meta', 'Checking dimensions...');
+                image.addEventListener('load', () => {
+                    dimensions.textContent = `${image.naturalWidth} × ${image.naturalHeight}${image.naturalWidth === 88 && image.naturalHeight === 31 ? ' / exact' : ' / not 88×31'}`;
+                    dimensions.classList.toggle('error', image.naturalWidth !== 88 || image.naturalHeight !== 31);
+                }, { once: true });
+                image.addEventListener('error', () => { dimensions.textContent = 'Image failed to load.'; dimensions.classList.add('error'); }, { once: true });
+                preview.append(image, dimensions);
+            } else preview.append(textElement('span', 'management-meta error', 'Invalid image URL'));
+
+            const body = document.createElement('div');
+            body.className = 'hotbutton-admin-body';
+            const header = document.createElement('div');
+            header.className = 'management-card-header';
+            header.append(textElement('h3', '', item.button_name), textElement('span', 'state-badge', item.status));
+            body.append(header, textElement('p', 'management-meta', formatDate(item.created_at)));
+
+            if (siteUrl) {
+                const destination = document.createElement('a');
+                destination.className = 'hotbutton-admin-link';
+                destination.href = siteUrl;
+                destination.target = '_blank';
+                destination.rel = 'noopener noreferrer';
+                destination.textContent = siteUrl;
+                body.append(destination);
+            } else body.append(textElement('p', 'management-meta error', 'Invalid destination URL'));
+            if (item.note) body.append(textElement('p', '', item.note));
+
+            const actions = document.createElement('div');
+            actions.className = 'management-actions';
+            actions.append(
+                actionButton('Approve', () => updateHotbuttonStatus(item.id, 'approved'), false, `Approve button for ${item.button_name}`),
+                actionButton('Reject', () => updateHotbuttonStatus(item.id, 'rejected'), false, `Reject button for ${item.button_name}`),
+                actionButton('Delete', () => deleteHotbutton(item.id, item.button_name), true, `Delete button for ${item.button_name}`)
+            );
+            body.append(actions);
+            card.append(preview, body);
+            root.append(card);
+        });
+        setSectionStatus('hotbuttons', `${data.length} ${data.length === 1 ? 'submission' : 'submissions'} loaded.`);
+    }
+
+    async function updateHotbuttonStatus(id, nextStatus) {
+        setSectionStatus('hotbuttons', `${nextStatus === 'approved' ? 'Approving' : 'Rejecting'} button...`);
+        const { error } = await client.from('hotbuttons').update({ status: nextStatus, moderated_at: new Date().toISOString() }).eq('id', id);
+        if (error) { setSectionStatus('hotbuttons', `Update failed: ${error.message}`, true); return; }
+        await loadHotbuttons();
+    }
+
+    async function deleteHotbutton(id, name) {
+        if (!window.confirm(`Permanently delete the button submission for "${name || 'this site'}"?`)) return;
+        setSectionStatus('hotbuttons', 'Deleting button...');
+        const { error } = await client.from('hotbuttons').delete().eq('id', id);
+        if (error) { setSectionStatus('hotbuttons', `Delete failed: ${error.message}`, true); return; }
+        setSectionStatus('hotbuttons', 'Button deleted.');
+        await loadHotbuttons();
+    }
+
     document.getElementById('refreshGuestbook').addEventListener('click', loadGuestbook);
     document.getElementById('refreshInbox').addEventListener('click', loadInbox);
     document.getElementById('refreshGallery').addEventListener('click', loadGallery);
+    document.getElementById('refreshHotbuttons').addEventListener('click', loadHotbuttons);
     document.getElementById('galleryUploadForm').addEventListener('submit', async (event) => {
         event.preventDefault();
         const form = event.currentTarget;
