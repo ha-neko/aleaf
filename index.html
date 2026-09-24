@@ -40,7 +40,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Montserrat:wght@500;600;700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="me.css?v=2500-community-9">
+    <link rel="stylesheet" href="me.css?v=2500-community-11">
 </head>
 <body>
     <a class="skip-link" href="#mainContent">Skip to main content</a>
@@ -217,49 +217,46 @@
                          <div class="guestbook-feed-header">
                              <div class="community-card-heading"><div><span class="panel-index">approved signals / public feed</span><h2 id="guestbookEntriesHeading">notes from visitors</h2></div><span class="signal-light" aria-hidden="true"></span></div>
                          </div>
-                         <p id="guestbookListStatus" class="community-status" role="status" aria-live="polite">Loading guestbook entries...</p>
-                         <div id="guestbookEntries" class="guestbook-entries" aria-live="polite"></div>
+                          <p id="guestbookListStatus" class="community-status" role="status" aria-live="polite">Loading guestbook entries...</p>
+                          <div id="guestbookEntries" class="guestbook-entries" aria-live="polite"></div>
+                          <nav id="guestbookPagination" class="community-pagination" aria-label="Guestbook pages"></nav>
                      </section>
-                      <aside class="community-form-column" aria-label="Guestbook message options">
-                           <section class="community-card compose-card" aria-labelledby="composeHeading">
-                               <div class="compose-header">
-                                   <div class="compose-mark" aria-hidden="true"><svg class="icon ui-icon"><use href="#i-comment"/></svg></div>
-                                   <div class="compose-header-text"><span class="panel-index">send a signal</span><h2 id="composeHeading">leave a message</h2></div>
+                       <section class="community-card hotbutton-section" aria-labelledby="hotbuttonHeading">
+                           <div class="hotbutton-heading">
+                               <div>
+                                   <span class="panel-index">88 × 31 neighbours</span>
+                                   <h2 id="hotbuttonHeading">button wall</h2>
+                                   <p>tiny portals to other corners of the web. submissions appear after approval.</p>
                                </div>
-                               <div class="compose-toggle-row">
-                                   <span class="compose-toggle-label" data-mode="public">public</span>
-                                   <label class="compose-toggle" aria-label="Toggle between public and private message">
-                                       <input id="composeModeToggle" type="checkbox" role="switch" aria-checked="false">
-                                       <span class="compose-toggle-track"><span class="compose-toggle-thumb"></span></span>
-                                   </label>
-                                   <span class="compose-toggle-label" data-mode="private">private</span>
-                               </div>
-                               <p class="compose-hint" id="composeHint">Visible to everyone after approval. Includes a CAPTCHA.</p>
-                               <textarea id="composeBody" class="compose-textarea" required minlength="2" maxlength="1000" rows="4" autocomplete="off" placeholder="Write your message here..."></textarea>
-                               <div class="compose-footer">
-                                   <span class="compose-char-count" id="composeCharCount">0 / 1000</span>
-                                   <button id="composeSend" type="button" class="compose-send-btn"><span>send</span><span aria-hidden="true">&rarr;</span></button>
-                               </div>
-                               <p id="composeStatus" class="form-status" role="status" aria-live="polite"></p>
-                           </section>
-                           <section class="guestbook-side-note" aria-label="Guestbook information">
-                               <span class="panel-index">visitor channel / moderated</span>
-                               <p>Public notes and site buttons enter a private queue first. Nothing appears here until Leaf approves it.</p>
-                           </section>
-                       </aside>
-                   </div>
-                   <section class="community-card hotbutton-section" aria-labelledby="hotbuttonHeading">
-                       <div class="hotbutton-heading">
-                           <div>
-                               <span class="panel-index">88 × 31 neighbours</span>
-                               <h2 id="hotbuttonHeading">button wall</h2>
-                               <p>tiny portals to other corners of the web. submissions appear after approval.</p>
+                               <button id="hotbuttonOpen" class="hotbutton-submit-button" type="button">submit your button</button>
                            </div>
-                           <button id="hotbuttonOpen" class="hotbutton-submit-button" type="button">submit your button</button>
-                       </div>
-                       <p id="hotbuttonStatus" class="community-status" role="status" aria-live="polite">Loading approved buttons...</p>
-                       <div id="hotbuttonWall" class="hotbutton-wall" aria-live="polite"></div>
-                   </section>
+                           <p id="hotbuttonStatus" class="community-status" role="status" aria-live="polite">Loading approved buttons...</p>
+                           <div id="hotbuttonWall" class="hotbutton-wall" aria-live="polite"></div>
+                           <nav id="hotbuttonPagination" class="community-pagination" aria-label="Button wall pages"></nav>
+                       </section>
+                       <section class="community-card compose-card guestbook-compose-card" aria-labelledby="composeHeading">
+                           <div class="compose-header">
+                               <div class="compose-mark" aria-hidden="true"><svg class="icon ui-icon"><use href="#i-comment"/></svg></div>
+                               <div class="compose-header-text"><span class="panel-index">send a signal</span><h2 id="composeHeading">leave a message</h2></div>
+                           </div>
+                           <div class="compose-toggle-row">
+                               <span class="compose-toggle-label" data-mode="public">public</span>
+                               <label class="compose-toggle" aria-label="Toggle between public and private message">
+                                   <input id="composeModeToggle" type="checkbox" role="switch" aria-checked="false">
+                                   <span class="compose-toggle-track"><span class="compose-toggle-thumb"></span></span>
+                               </label>
+                               <span class="compose-toggle-label" data-mode="private">private</span>
+                           </div>
+                           <p class="compose-hint" id="composeHint">Visible to everyone after approval. Includes a CAPTCHA.</p>
+                           <textarea id="composeBody" class="compose-textarea" required minlength="2" maxlength="1000" rows="4" autocomplete="off" placeholder="Write your message here..."></textarea>
+                           <div class="compose-footer">
+                               <span class="compose-char-count" id="composeCharCount">0 / 1000</span>
+                               <button id="composeSend" type="button" class="compose-send-btn"><span>send</span><span aria-hidden="true">&rarr;</span></button>
+                           </div>
+                           <p id="composeStatus" class="form-status" role="status" aria-live="polite"></p>
+                           <div class="guestbook-side-note" aria-label="Guestbook information"><span class="panel-index">visitor channel / moderated</span><p>Public notes and site buttons enter a private queue first. Nothing appears here until Leaf approves it.</p></div>
+                       </section>
+                    </div>
                    <dialog id="guestbookDialog" class="guestbook-dialog" aria-labelledby="guestbookDialogHeading" aria-describedby="guestbookDialogNote">
                        <form id="guestbookForm" class="community-form guestbook-dialog-form">
                            <div class="guestbook-dialog-heading">
@@ -340,6 +337,7 @@
                       <div class="gallery-archive-bar"><div><span class="panel-index">visual archive / published</span><strong>selected fragments</strong></div><span id="galleryCount" class="gallery-count">00 pieces</span></div>
                       <p id="galleryStatus" class="community-status gallery-status" role="status" aria-live="polite">Loading gallery...</p>
                       <div id="galleryItems" class="gallery-grid" aria-live="polite"></div>
+                      <nav id="galleryPagination" class="community-pagination" aria-label="Gallery pages"></nav>
                   </div>
              </section>
 
@@ -359,6 +357,6 @@
     <button id="musicToggle" class="music-button" type="button" aria-label="Play background music" aria-pressed="false" aria-describedby="musicStatus"><svg class="icon ui-icon sound-on" aria-hidden="true"><use href="#i-volume"/></svg><svg class="icon ui-icon sound-off" aria-hidden="true"><use href="#i-volume-off"/></svg></button>
     <span id="musicStatus" class="sr-only" role="status" aria-live="polite">Background music paused</span>
     <audio id="backgroundMusic" loop preload="metadata"><source src="First Date.mp3" type="audio/mpeg"></audio>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="default-content.js?v=2500-community-1"></script><script src="content.js?v=2500-community-1"></script><script src="test.js?v=2500-quiz-2"></script><script src="community.js?v=2500-community-9"></script><script src="me.js?v=2500-community-7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="default-content.js?v=2500-community-1"></script><script src="content.js?v=2500-community-1"></script><script src="test.js?v=2500-quiz-2"></script><script src="community.js?v=2500-community-11"></script><script src="me.js?v=2500-community-7"></script>
 </body>
 </html>

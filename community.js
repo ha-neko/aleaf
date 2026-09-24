@@ -53,6 +53,45 @@
         return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
     }
 
+    function renderPagination(root, totalItems, pageSize, requestedPage, onPageChange) {
+        if (!root) return 1;
+        const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+        const currentPage = Math.min(Math.max(1, requestedPage), totalPages);
+        root.replaceChildren();
+        root.hidden = totalPages <= 1;
+        if (totalPages <= 1) return currentPage;
+
+        const addButton = (label, page, options = {}) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = label;
+            button.disabled = options.disabled || false;
+            if (options.current) {
+                button.classList.add('is-current');
+                button.setAttribute('aria-current', 'page');
+            }
+            button.setAttribute('aria-label', options.ariaLabel || `Page ${page}`);
+            button.addEventListener('click', () => onPageChange(page));
+            root.appendChild(button);
+        };
+
+        addButton('‹', currentPage - 1, { disabled: currentPage === 1, ariaLabel: 'Previous page' });
+        const visiblePages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
+        let previous = 0;
+        [...visiblePages].filter((page) => page >= 1 && page <= totalPages).sort((a, b) => a - b).forEach((page) => {
+            if (previous && page - previous > 1) {
+                const gap = document.createElement('span');
+                gap.textContent = '…';
+                gap.setAttribute('aria-hidden', 'true');
+                root.appendChild(gap);
+            }
+            addButton(String(page), page, { current: page === currentPage });
+            previous = page;
+        });
+        addButton('›', currentPage + 1, { disabled: currentPage === totalPages, ariaLabel: 'Next page' });
+        return currentPage;
+    }
+
     function isApproved(entry) {
         if ('approved' in entry) return entry.approved === true;
         if ('is_approved' in entry) return entry.is_approved === true;
@@ -73,55 +112,65 @@
             const { data, error } = await client.from('guestbook_entries').select('*').eq('approved', true).order('created_at', { ascending: false });
             if (error) throw error;
             const entries = (Array.isArray(data) ? data : []).filter(isApproved);
-            root.replaceChildren();
-            entries.forEach((entry, index) => {
-                const article = document.createElement('article');
-                article.className = 'guestbook-entry';
-                article.dataset.entryIndex = String(entries.length - index).padStart(2, '0');
-                const heading = document.createElement('div');
-                heading.className = 'guestbook-entry-heading';
-                const author = document.createElement('div');
-                author.className = 'guestbook-author';
-                const authorMark = document.createElement('span');
-                authorMark.className = 'guestbook-author-mark';
-                authorMark.textContent = (entry.display_name || 'anonymous visitor').trim().charAt(0).toUpperCase() || '?';
-                authorMark.setAttribute('aria-hidden', 'true');
-                const name = document.createElement('strong');
-                name.textContent = entry.display_name || 'anonymous visitor';
-                const time = document.createElement('time');
-                const dateText = displayDate(entry.created_at);
-                time.textContent = dateText;
-                if (entry.created_at) time.dateTime = entry.created_at;
-                time.hidden = !dateText;
-                author.append(authorMark, name);
-                heading.append(author, time);
-                const body = document.createElement('p');
-                body.textContent = entry.body || entry.message || '';
-                article.append(heading, body);
-                if (typeof entry.owner_reply === 'string' && entry.owner_reply.trim()) {
-                    const reply = document.createElement('div');
-                    reply.className = 'guestbook-owner-reply';
-                    const replyHeading = document.createElement('div');
-                    replyHeading.className = 'guestbook-reply-heading';
-                    const replyLabel = document.createElement('strong');
-                    replyLabel.textContent = 'leaf replied';
-                    const replyTime = document.createElement('time');
-                    const replyDateText = displayDate(entry.replied_at);
-                    replyTime.textContent = replyDateText;
-                    if (entry.replied_at) replyTime.dateTime = entry.replied_at;
-                    replyTime.hidden = !replyDateText;
-                    const replyBody = document.createElement('p');
-                    replyBody.textContent = entry.owner_reply.trim();
-                    replyHeading.append(replyLabel, replyTime);
-                    reply.append(replyHeading, replyBody);
-                    article.append(reply);
-                }
-                root.append(article);
-            });
-            setStatus(guestbookStatus, entries.length ? `${entries.length} approved ${entries.length === 1 ? 'entry' : 'entries'}.` : 'No approved entries yet. Be the first to leave a note.');
+            const pagination = document.getElementById('guestbookPagination');
+            const pageSize = 5;
+            const renderPage = (requestedPage) => {
+                const page = Math.min(Math.max(1, requestedPage), Math.max(1, Math.ceil(entries.length / pageSize)));
+                const start = (page - 1) * pageSize;
+                root.replaceChildren();
+                entries.slice(start, start + pageSize).forEach((entry, index) => {
+                    const article = document.createElement('article');
+                    article.className = 'guestbook-entry';
+                    article.dataset.entryIndex = String(entries.length - (start + index)).padStart(2, '0');
+                    const heading = document.createElement('div');
+                    heading.className = 'guestbook-entry-heading';
+                    const author = document.createElement('div');
+                    author.className = 'guestbook-author';
+                    const authorMark = document.createElement('span');
+                    authorMark.className = 'guestbook-author-mark';
+                    authorMark.textContent = (entry.display_name || 'anonymous visitor').trim().charAt(0).toUpperCase() || '?';
+                    authorMark.setAttribute('aria-hidden', 'true');
+                    const name = document.createElement('strong');
+                    name.textContent = entry.display_name || 'anonymous visitor';
+                    const time = document.createElement('time');
+                    const dateText = displayDate(entry.created_at);
+                    time.textContent = dateText;
+                    if (entry.created_at) time.dateTime = entry.created_at;
+                    time.hidden = !dateText;
+                    author.append(authorMark, name);
+                    heading.append(author, time);
+                    const body = document.createElement('p');
+                    body.textContent = entry.body || entry.message || '';
+                    article.append(heading, body);
+                    if (typeof entry.owner_reply === 'string' && entry.owner_reply.trim()) {
+                        const reply = document.createElement('div');
+                        reply.className = 'guestbook-owner-reply';
+                        const replyHeading = document.createElement('div');
+                        replyHeading.className = 'guestbook-reply-heading';
+                        const replyLabel = document.createElement('strong');
+                        replyLabel.textContent = 'leaf replied';
+                        const replyTime = document.createElement('time');
+                        const replyDateText = displayDate(entry.replied_at);
+                        replyTime.textContent = replyDateText;
+                        if (entry.replied_at) replyTime.dateTime = entry.replied_at;
+                        replyTime.hidden = !replyDateText;
+                        const replyBody = document.createElement('p');
+                        replyBody.textContent = entry.owner_reply.trim();
+                        replyHeading.append(replyLabel, replyTime);
+                        reply.append(replyHeading, replyBody);
+                        article.append(reply);
+                    }
+                    root.append(article);
+                });
+                renderPagination(pagination, entries.length, pageSize, page, renderPage);
+                if (entries.length) setStatus(guestbookStatus, `Showing ${start + 1}–${Math.min(start + pageSize, entries.length)} of ${entries.length} approved entries.`);
+            };
+            renderPage(1);
+            if (!entries.length) setStatus(guestbookStatus, 'No approved entries yet. Be the first to leave a note.');
             guestbookStatus.classList.toggle('is-empty', entries.length === 0);
         } catch (error) {
             root.replaceChildren();
+            document.getElementById('guestbookPagination').replaceChildren();
             guestbookStatus.classList.remove('is-empty');
             setStatus(guestbookStatus, 'The guestbook could not be loaded right now.', true);
             console.warn('guestbook:', error.message);
@@ -135,40 +184,48 @@
             const { data, error } = await client.from('gallery_items').select('*').eq('published', true).order('sort_order', { ascending: true }).order('created_at', { ascending: false });
             if (error) throw error;
             const items = (Array.isArray(data) ? data : []).filter(isPublished).filter((item) => safePublicUrl(item.public_url));
-            root.replaceChildren();
-            items.forEach((item, index) => {
-                const figure = document.createElement('figure');
-                figure.className = `gallery-item${index === 0 ? ' gallery-item-featured' : ''}`;
-                figure.dataset.archiveIndex = String(index + 1).padStart(2, '0');
-                const image = document.createElement('img');
-                image.src = safePublicUrl(item.public_url);
-                image.alt = item.alt_text || item.alt || item.title || 'Published gallery item';
-                image.loading = 'lazy';
-                const titleText = item.title || '';
-                const captionText = item.caption || item.description || '';
-                if (titleText || captionText) {
-                    const caption = document.createElement('figcaption');
-                    if (titleText) {
-                        const title = document.createElement('strong');
-                        title.textContent = titleText;
-                        caption.append(title);
-                    }
-                    if (captionText) {
-                        const description = document.createElement('span');
-                        description.textContent = captionText;
-                        caption.append(description);
-                    }
-                    figure.append(image, caption);
-                } else {
-                    figure.append(image);
-                }
-                root.append(figure);
-            });
+            const pagination = document.getElementById('galleryPagination');
+            const pageSize = 7;
+            const renderPage = (requestedPage) => {
+                const page = Math.min(Math.max(1, requestedPage), Math.max(1, Math.ceil(items.length / pageSize)));
+                const start = (page - 1) * pageSize;
+                root.replaceChildren();
+                items.slice(start, start + pageSize).forEach((item, index) => {
+                    const figure = document.createElement('figure');
+                    figure.className = `gallery-item${index === 0 ? ' gallery-item-featured' : ''}`;
+                    figure.dataset.archiveIndex = String(start + index + 1).padStart(2, '0');
+                    const image = document.createElement('img');
+                    image.src = safePublicUrl(item.public_url);
+                    image.alt = item.alt_text || item.alt || item.title || 'Published gallery item';
+                    image.loading = 'lazy';
+                    const titleText = item.title || '';
+                    const captionText = item.caption || item.description || '';
+                    if (titleText || captionText) {
+                        const caption = document.createElement('figcaption');
+                        if (titleText) {
+                            const title = document.createElement('strong');
+                            title.textContent = titleText;
+                            caption.append(title);
+                        }
+                        if (captionText) {
+                            const description = document.createElement('span');
+                            description.textContent = captionText;
+                            caption.append(description);
+                        }
+                        figure.append(image, caption);
+                    } else figure.append(image);
+                    root.append(figure);
+                });
+                renderPagination(pagination, items.length, pageSize, page, renderPage);
+                if (items.length) setStatus(galleryStatus, `Showing ${start + 1}–${Math.min(start + pageSize, items.length)} of ${items.length} published pieces.`);
+            };
+            renderPage(1);
             if (count) count.textContent = `${String(items.length).padStart(2, '0')} ${items.length === 1 ? 'piece' : 'pieces'}`;
-            setStatus(galleryStatus, items.length ? `${items.length} published ${items.length === 1 ? 'piece' : 'pieces'}.` : 'The gallery is quiet for now. Published pieces will appear here.');
+            if (!items.length) setStatus(galleryStatus, 'The gallery is quiet for now. Published pieces will appear here.');
             galleryStatus.classList.toggle('is-empty', items.length === 0);
         } catch (error) {
             root.replaceChildren();
+            document.getElementById('galleryPagination').replaceChildren();
             if (count) count.textContent = '-- pieces';
             setStatus(galleryStatus, 'The gallery could not be loaded right now.', true);
             console.warn('gallery:', error.message);
@@ -181,29 +238,39 @@
             const { data, error } = await client.from('hotbuttons').select('id, button_name, site_url, image_url, note, created_at').eq('status', 'approved').order('created_at', { ascending: true });
             if (error) throw error;
             const buttons = (Array.isArray(data) ? data : []).filter((item) => safePublicUrl(item.site_url) && safePublicUrl(item.image_url));
-            root.replaceChildren();
-            buttons.forEach((item) => {
-                const link = document.createElement('a');
-                link.className = 'hotbutton-item';
-                link.href = safePublicUrl(item.site_url);
-                link.target = '_blank';
-                link.rel = 'noopener noreferrer';
-                link.title = item.note ? `${item.button_name}: ${item.note}` : item.button_name;
+            const pagination = document.getElementById('hotbuttonPagination');
+            const pageSize = 12;
+            const renderPage = (requestedPage) => {
+                const page = Math.min(Math.max(1, requestedPage), Math.max(1, Math.ceil(buttons.length / pageSize)));
+                const start = (page - 1) * pageSize;
+                root.replaceChildren();
+                buttons.slice(start, start + pageSize).forEach((item, index) => {
+                    const link = document.createElement('a');
+                    link.className = 'hotbutton-item';
+                    link.href = safePublicUrl(item.site_url);
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    link.title = item.note ? `${String(start + index + 1).padStart(2, '0')} / ${item.button_name}: ${item.note}` : `${String(start + index + 1).padStart(2, '0')} / ${item.button_name}`;
 
-                const image = document.createElement('img');
-                image.src = safePublicUrl(item.image_url);
-                image.width = 88;
-                image.height = 31;
-                image.alt = item.button_name;
-                image.loading = 'lazy';
-                image.referrerPolicy = 'no-referrer';
-                link.appendChild(image);
-                root.appendChild(link);
-            });
-            setStatus(hotbuttonStatus, buttons.length ? `${buttons.length} approved ${buttons.length === 1 ? 'button' : 'buttons'} online.` : 'No approved buttons yet. The first tiny portal could be yours.');
+                    const image = document.createElement('img');
+                    image.src = safePublicUrl(item.image_url);
+                    image.width = 88;
+                    image.height = 31;
+                    image.alt = `${String(start + index + 1).padStart(2, '0')}. ${item.button_name}`;
+                    image.loading = 'lazy';
+                    image.referrerPolicy = 'no-referrer';
+                    link.appendChild(image);
+                    root.appendChild(link);
+                });
+                renderPagination(pagination, buttons.length, pageSize, page, renderPage);
+                if (buttons.length) setStatus(hotbuttonStatus, `Showing ${start + 1}–${Math.min(start + pageSize, buttons.length)} of ${buttons.length} approved buttons.`);
+            };
+            renderPage(1);
+            if (!buttons.length) setStatus(hotbuttonStatus, 'No approved buttons yet. The first tiny portal could be yours.');
             hotbuttonStatus.classList.toggle('is-empty', buttons.length === 0);
         } catch (error) {
             root.replaceChildren();
+            document.getElementById('hotbuttonPagination').replaceChildren();
             setStatus(hotbuttonStatus, 'The button wall could not be loaded right now.', true);
             console.warn('hotbuttons:', error.message);
         }

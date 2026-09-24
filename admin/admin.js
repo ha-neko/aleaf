@@ -10,7 +10,6 @@
     let content = clone(window.ALEAF_DEFAULT_CONTENT);
     let dirty = false;
     let changeVersion = 0;
-    const emojiPattern = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]/u;
 
     const loginView = document.getElementById('loginView');
     const dashboardView = document.getElementById('dashboardView');
@@ -63,7 +62,6 @@
         if (!candidate.theme || !Object.values(candidate.theme).every((value) => /^#[0-9a-f]{6}$/i.test(value))) throw new Error('Theme values must be six-digit hex colors.');
         if (candidate.quizzes !== null && candidate.quizzes !== undefined && !validateQuizzes(candidate.quizzes)) throw new Error('Custom quizzes must include valid political, philosophical, and eeveelution tests.');
         if (candidate.quizDescriptions !== null && candidate.quizDescriptions !== undefined && (typeof candidate.quizDescriptions !== 'object' || !Object.values(candidate.quizDescriptions).every((value) => typeof value === 'string'))) throw new Error('Quiz descriptions must be an object of strings.');
-        if (emojiPattern.test(JSON.stringify(candidate))) throw new Error('Emoji are disabled for this site. Use text or an SVG icon instead.');
         return candidate;
     }
 
