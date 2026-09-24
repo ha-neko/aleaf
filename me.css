@@ -607,7 +607,9 @@ button.tool-btn:hover { color: #fff; background: var(--surface-raised); }
 }
 @media (max-width: 640px) {
     body { padding: 0; }
-    .browser { min-height: 100vh; padding: 0; border: 0; border-radius: 0; background: var(--window); box-shadow: none; }
+    .browser { min-height: 100vh; min-height: 100dvh; padding: 0; display: flex; flex-direction: column; border: 0; border-radius: 0; background: var(--window); box-shadow: none; }
+    .browser-chrome, .statusbar { flex: none; }
+    .viewport { width: 100%; flex: 1 0 auto; }
     .celestial-frame, .browser::before { display: none; }
     .browser-chrome, .statusbar { border-radius: 0; }
     .chrome-top { display: none; }
